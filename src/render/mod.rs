@@ -1063,7 +1063,7 @@ impl TextureManager {
             let animation = meta.get("animation").unwrap();
             let frame_time = animation.get("frametime").and_then(|v| v.as_i64()).unwrap_or(1);
             let interpolate = animation.get("interpolate")
-                                       .and_then(|v| v.as_boolean())
+                                       .and_then(|v| v.as_bool())
                                        .unwrap_or(false);
             let frames = if let Some(frames) = animation.get("frames")
                                                         .and_then(|v| v.as_array()) {

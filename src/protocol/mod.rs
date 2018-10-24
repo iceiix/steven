@@ -911,7 +911,7 @@ impl Conn {
 
         Ok((Status {
             version: StatusVersion {
-                name: try!(version.get("name").and_then(Value::as_string).ok_or(invalid_status()))
+                name: try!(version.get("name").and_then(Value::as_str).ok_or(invalid_status()))
                           .to_owned(),
                 protocol: try!(version.get("protocol")
                                       .and_then(Value::as_i64)
@@ -928,7 +928,7 @@ impl Conn {
             },
             description: format::Component::from_value(try!(val.get("description")
                                                                .ok_or(invalid_status()))),
-            favicon: val.get("favicon").and_then(Value::as_string).map(|v| v.to_owned()),
+            favicon: val.get("favicon").and_then(Value::as_str).map(|v| v.to_owned()),
         },
             ping))
     }

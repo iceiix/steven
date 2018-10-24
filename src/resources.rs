@@ -313,7 +313,7 @@ impl Manager {
             let objects = index.get("objects").and_then(|v| v.as_object()).unwrap();
             Self::add_task(&progress_info, "Downloading Assets", "./objects", objects.len() as u64);
             for (k, v) in objects {
-                let hash = v.get("hash").and_then(|v| v.as_string()).unwrap();
+                let hash = v.get("hash").and_then(|v| v.as_str()).unwrap();
                 let hash_path = format!("{}/{}", &hash[..2], hash);
                 let location = root_location.join(&hash_path);
                 if fs::metadata(&location).is_err(){
@@ -459,7 +459,7 @@ impl ObjectPack {
         let objects = index.get("objects").and_then(|v| v.as_object()).unwrap();
         let mut hash_objs = HashMap::with_hasher(BuildHasherDefault::default());
         for (k, v) in objects {
-            hash_objs.insert(k.clone(), v.get("hash").and_then(|v| v.as_string()).unwrap().to_owned());
+            hash_objs.insert(k.clone(), v.get("hash").and_then(|v| v.as_str()).unwrap().to_owned());
         }
         ObjectPack {
             objects: hash_objs,

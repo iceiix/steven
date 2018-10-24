@@ -268,7 +268,7 @@ impl Factory {
     }
 
     fn parse_block_state_variant(&self, plugin: &str, v: &serde_json::Value) -> Option<RawModel> {
-        let model_name = match v.get("model").and_then(|v| v.as_string()) {
+        let model_name = match v.get("model").and_then(|v| v.as_str()) {
             Some(val) => val,
             None => {
                 error!("Couldn't find model name");
@@ -295,13 +295,13 @@ impl Factory {
 
         model.y = v.get("y").and_then(|v| v.as_f64()).unwrap_or(0.0);
         model.x = v.get("x").and_then(|v| v.as_f64()).unwrap_or(0.0);
-        model.uvlock = v.get("uvlock").and_then(|v| v.as_boolean()).unwrap_or(false);
+        model.uvlock = v.get("uvlock").and_then(|v| v.as_bool()).unwrap_or(false);
         model.weight = v.get("weight").and_then(|v| v.as_f64()).unwrap_or(1.0);
         Some(model)
     }
 
     fn parse_model(&self, plugin: &str, v: &serde_json::Value) -> Option<RawModel> {
-        let parent = v.get("parent").and_then(|v| v.as_string()).unwrap_or("");
+        let parent = v.get("parent").and_then(|v| v.as_str()).unwrap_or("");
         let mut model = if !parent.is_empty() && !parent.starts_with("builtin/") {
             let file = match self.resources.read().unwrap().open(plugin, &format!("models/{}.json", parent)) {
                 Some(val) => val,
@@ -343,11 +343,11 @@ impl Factory {
 
         if let Some(textures) = v.get("textures").and_then(|v| v.as_object()) {
             for (k, v) in textures {
-                model.texture_vars.insert(k.clone(), v.as_string().unwrap_or("").to_owned());
+                model.texture_vars.insert(k.clone(), v.as_str().unwrap_or("").to_owned());
             }
         }
 
-        if let Some(ao) = v.get("ambientocclusion").and_then(|v| v.as_boolean()) {
+        if let Some(ao) = v.get("ambientocclusion").and_then(|v| v.as_bool()) {
             model.ambient_occlusion = ao;
             model.ao_set = true;
         } else if !model.ao_set {
@@ -377,7 +377,7 @@ impl Factory {
                 v[1].as_f64().unwrap(),
                 v[2].as_f64().unwrap()
             ]).unwrap(),
-            shade: v.get("shade").and_then(|v| v.as_boolean()).unwrap_or(false),
+            shade: v.get("shade").and_then(|v| v.as_bool()).unwrap_or(false),
             faces: [None, None, None, None, None, None],
             rotation: None,
         };
@@ -419,7 +419,7 @@ impl Factory {
                             ]
                         ),
                         texture: face.get("texture")
-                            .and_then(|v| v.as_string())
+                            .and_then(|v| v.as_str())
                             .map(|v| if v.starts_with('#') {
                                 v.to_owned()
                             } else {
@@ -427,7 +427,7 @@ impl Factory {
                             }).unwrap(),
                         cull_face: Direction::from_string(
                                 face.get("cullface")
-                                    .and_then(|v| v.as_string())
+                                    .and_then(|v| v.as_str())
                                     .unwrap_or("invalid")
                             ),
                         rotation: face.get("rotation")
@@ -448,9 +448,9 @@ impl Factory {
                     v[1].as_f64().unwrap(),
                     v[2].as_f64().unwrap()
                 ]),
-                axis: rotation.get("axis").and_then(|v| v.as_string()).unwrap_or("").to_owned(),
+                axis: rotation.get("axis").and_then(|v| v.as_str()).unwrap_or("").to_owned(),
                 angle: rotation.get("angle").and_then(|v| v.as_f64()).unwrap_or(0.0),
-                rescale: rotation.get("rescale").and_then(|v| v.as_boolean()).unwrap_or(false),
+                rescale: rotation.get("rescale").and_then(|v| v.as_bool()).unwrap_or(false),
             });
         }
 

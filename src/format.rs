@@ -38,7 +38,7 @@ impl Component {
 
     pub fn from_value(v: &serde_json::Value) -> Self {
         let mut modifier = Modifier::from_value(v);
-        if let Some(val) = v.as_string() {
+        if let Some(val) = v.as_str() {
             Component::Text(TextComponent {
                 text: val.to_owned(),
                 modifier: modifier,
@@ -92,13 +92,13 @@ pub struct Modifier {
 impl Modifier {
     pub fn from_value(v: &serde_json::Value) -> Self {
         let mut m = Modifier {
-            bold: v.get("bold").map_or(Option::None, |v| v.as_boolean()),
-            italic: v.get("italic").map_or(Option::None, |v| v.as_boolean()),
-            underlined: v.get("underlined").map_or(Option::None, |v| v.as_boolean()),
-            strikethrough: v.get("strikethrough").map_or(Option::None, |v| v.as_boolean()),
-            obfuscated: v.get("obfuscated").map_or(Option::None, |v| v.as_boolean()),
+            bold: v.get("bold").map_or(Option::None, |v| v.as_bool()),
+            italic: v.get("italic").map_or(Option::None, |v| v.as_bool()),
+            underlined: v.get("underlined").map_or(Option::None, |v| v.as_bool()),
+            strikethrough: v.get("strikethrough").map_or(Option::None, |v| v.as_bool()),
+            obfuscated: v.get("obfuscated").map_or(Option::None, |v| v.as_bool()),
             color: v.get("color")
-                    .map_or(Option::None, |v| v.as_string())
+                    .map_or(Option::None, |v| v.as_str())
                     .map(|v| Color::from_string(&v.to_owned())),
             extra: Option::None,
         };
@@ -135,7 +135,7 @@ impl TextComponent {
 
     pub fn from_value(v: &serde_json::Value, modifier: Modifier) -> Self {
         TextComponent {
-            text: v.get("text").unwrap().as_string().unwrap_or("").to_owned(),
+            text: v.get("text").unwrap().as_str().unwrap_or("").to_owned(),
             modifier: modifier,
         }
     }

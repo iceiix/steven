@@ -122,8 +122,8 @@ impl ServerList {
         let mut offset = 0.0;
 
         for (index, svr) in servers.iter().enumerate() {
-            let name = svr.get("name").unwrap().as_string().unwrap().to_owned();
-            let address = svr.get("address").unwrap().as_string().unwrap().to_owned();
+            let name = svr.get("name").unwrap().as_str().unwrap().to_owned();
+            let address = svr.get("address").unwrap().as_str().unwrap().to_owned();
 
             // Everything is attached to this
             let back = ui::ImageBuilder::new()
