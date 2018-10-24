@@ -49,17 +49,17 @@ impl Profile {
                         .send());
 
         let ret: serde_json::Value = try!(serde_json::from_reader(res));
-        if let Some(error) = ret.find("error").and_then(|v| v.as_string()) {
+        if let Some(error) = ret.get("error").and_then(|v| v.as_string()) {
             return Err(super::Error::Err(format!(
                 "{}: {}",
                 error,
-                ret.find("errorMessage").and_then(|v| v.as_string()).unwrap())
+                ret.get("errorMessage").and_then(|v| v.as_string()).unwrap())
             ));
         }
         Ok(Profile {
             username: ret.lookup("selectedProfile.name").and_then(|v| v.as_string()).unwrap().to_owned(),
             id: ret.lookup("selectedProfile.id").and_then(|v| v.as_string()).unwrap().to_owned(),
-            access_token: ret.find("accessToken").and_then(|v| v.as_string()).unwrap().to_owned(),
+            access_token: ret.get("accessToken").and_then(|v| v.as_string()).unwrap().to_owned(),
         })
     }
 
@@ -84,17 +84,17 @@ impl Profile {
                             .send());
 
             let ret: serde_json::Value = try!(serde_json::from_reader(res));
-            if let Some(error) = ret.find("error").and_then(|v| v.as_string()) {
+            if let Some(error) = ret.get("error").and_then(|v| v.as_string()) {
                 return Err(super::Error::Err(format!(
                     "{}: {}",
                     error,
-                    ret.find("errorMessage").and_then(|v| v.as_string()).unwrap())
+                    ret.get("errorMessage").and_then(|v| v.as_string()).unwrap())
                 ));
             }
             return Ok(Profile {
                 username: ret.lookup("selectedProfile.name").and_then(|v| v.as_string()).unwrap().to_owned(),
                 id: ret.lookup("selectedProfile.id").and_then(|v| v.as_string()).unwrap().to_owned(),
-                access_token: ret.find("accessToken").and_then(|v| v.as_string()).unwrap().to_owned(),
+                access_token: ret.get("accessToken").and_then(|v| v.as_string()).unwrap().to_owned(),
             });
         }
         Ok(self)
