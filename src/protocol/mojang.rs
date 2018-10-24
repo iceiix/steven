@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use sha1::{self, Digest};
-#[macro_use]
 use serde_json;
 use hyper;
 
