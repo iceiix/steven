@@ -227,7 +227,7 @@ impl Factory {
         true
     }
 
-    fn parse_rules(when: &::std::collections::BTreeMap<String, serde_json::Value>, rules: &mut Vec<Rule>) {
+    fn parse_rules(when: &serde_json::Map<String, serde_json::Value>, rules: &mut Vec<Rule>) {
         for (name, val) in when {
             if name == "OR" {
                 let mut or_rules = vec![];
@@ -239,8 +239,8 @@ impl Factory {
                 rules.push(Rule::Or(or_rules));
             } else {
                 let v = match *val {
-                    serde_json::Value::Bool(v) => v.to_string(),
-                    serde_json::Value::Number(v) => v.to_string(),
+                    serde_json::Value::Bool(ref v) => v.to_string(),
+                    serde_json::Value::Number(ref v) => v.to_string(),
                     serde_json::Value::String(ref v) => v.to_owned(),
                     _ => unreachable!(),
                 };
