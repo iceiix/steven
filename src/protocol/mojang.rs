@@ -15,7 +15,6 @@
 use sha1::{self, Digest};
 #[macro_use]
 use serde_json;
-use serde_json::builder::ObjectBuilder;
 use hyper;
 
 #[derive(Clone, Debug)]
