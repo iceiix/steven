@@ -43,7 +43,7 @@ impl Profile {
         let client = hyper::Client::new();
         let res = try!(client.post(LOGIN_URL)
                         .body(&req)
-                        .header(hyper::header::ContentType("application/json".parse().unwrap()))
+                        .header(hyper::header::CONTENT_TYPE("application/json".parse().unwrap()))
                         .send());
 
         let ret: serde_json::Value = try!(serde_json::from_reader(res));
@@ -71,14 +71,14 @@ impl Profile {
         let client = hyper::Client::new();
         let res = try!(client.post(VALIDATE_URL)
                         .body(&req)
-                        .header(hyper::header::ContentType("application/json".parse().unwrap()))
+                        .header(hyper::header::CONTENT_TYPE("application/json".parse().unwrap()))
                         .send());
 
-        if res.status != hyper::status::StatusCode::NoContent {
+        if res.status != hyper::StatusCode::NO_CONTENT {
             // Refresh needed
             let res = try!(client.post(REFRESH_URL)
                             .body(&req)
-                            .header(hyper::header::ContentType("application/json".parse().unwrap()))
+                            .header(hyper::header::CONTENT_TYPE("application/json".parse().unwrap()))
                             .send());
 
             let ret: serde_json::Value = try!(serde_json::from_reader(res));
@@ -129,10 +129,10 @@ impl Profile {
         let client = hyper::Client::new();
         let res = try!(client.post(JOIN_URL)
                         .body(&join)
-                        .header(hyper::header::ContentType("application/json".parse().unwrap()))
+                        .header(hyper::header::CONTENT_TYPE("application/json".parse().unwrap()))
                         .send());
 
-        if res.status == hyper::status::StatusCode::NoContent {
+        if res.status == hyper::StatusCode::NO_CONTENT {
             Ok(())
         } else {
             Err(super::Error::Err("Failed to auth with server".to_owned()))

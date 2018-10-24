@@ -292,7 +292,7 @@ impl Manager {
                                 .send()
                                 .unwrap();
 
-                let length = *res.headers.get::<hyper::header::ContentLength>().unwrap();
+                let length = *res.headers().get(hyper::header::CONTENT_LENGTH).unwrap();
                 Self::add_task(&progress_info, "Downloading Asset Index", &*location.to_string_lossy(), *length);
                 {
                     let mut file = fs::File::create(format!("index-{}.tmp", ASSET_VERSION)).unwrap();
@@ -360,7 +360,7 @@ impl Manager {
                             .unwrap();
             let mut file = fs::File::create(format!("{}.tmp", RESOURCES_VERSION)).unwrap();
 
-            let length = *res.headers.get::<hyper::header::ContentLength>().unwrap();
+            let length = *res.headers().get(hyper::header::CONTENT_LENGTH).unwrap();
             let task_file = format!("./resources-{}", RESOURCES_VERSION);
             Self::add_task(&progress_info, "Downloading Core Assets", &task_file, *length);
             {
