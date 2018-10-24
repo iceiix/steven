@@ -780,7 +780,7 @@ impl Server {
                                 continue;
                             },
                         };
-                        if let Some(skin_url) = skin_blob.lookup("textures.SKIN.url").and_then(|v| v.as_str()) {
+                        if let Some(skin_url) = skin_blob.pointer("/textures/SKIN/url").and_then(|v| v.as_str()) {
                             info.skin_url = Some(skin_url.to_owned());
                         }
                     }
