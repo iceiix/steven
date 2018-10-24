@@ -856,7 +856,7 @@ impl TextureManager {
         }
     }
 
-    fn obtain_skin(client: &::hyper::Client, hash: &str) -> Result<image::DynamicImage, ::std::io::Error> {
+    fn obtain_skin(client: &::hyper::Client<hyper::client::HttpConnector, hyper::Body>, hash: &str) -> Result<image::DynamicImage, ::std::io::Error> {
         use std::io::Read;
         use std::fs;
         use std::path::Path;
