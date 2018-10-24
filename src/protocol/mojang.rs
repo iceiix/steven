@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use sha1::{self, Digest};
+#[macro_use]
 use serde_json;
 use serde_json::builder::ObjectBuilder;
 use hyper;
@@ -31,15 +32,14 @@ const VALIDATE_URL: &'static str = "https://authserver.mojang.com/validate";
 
 impl Profile {
     pub fn login(username: &str, password: &str, token: &str) -> Result<Profile, super::Error> {
-        let req_msg = ObjectBuilder::new()
-                           .insert("username", username)
-                           .insert("password", password)
-                           .insert("clientToken", token)
-                           .insert_object("agent", |b| b
-                                .insert("name", "Minecraft")
-                                .insert("version", 1)
-                            )
-                           .unwrap();
+        let req_msg = json!({
+            "username": username,
+            "password": password,
+            "clientToken": token,
+            "agent": {
+                "name": "Minecraft",
+                "version": 1
+            }});
         let req = try!(serde_json::to_string(&req_msg));
 
         let client = hyper::Client::new();
@@ -64,10 +64,10 @@ impl Profile {
     }
 
     pub fn refresh(self, token: &str) -> Result<Profile, super::Error> {
-        let req_msg = ObjectBuilder::new()
-                           .insert("accessToken", self.access_token.clone())
-                           .insert("clientToken", token)
-                           .unwrap();
+        let req_msg = json!({
+            "accessToken": self.access_token.clone(),
+            "clientToken": token
+            });
         let req = try!(serde_json::to_string(&req_msg));
 
         let client = hyper::Client::new();
@@ -121,11 +121,11 @@ impl Profile {
             hash_val.to_owned()
         };
 
-        let join_msg = ObjectBuilder::new()
-                           .insert("accessToken", &self.access_token)
-                           .insert("selectedProfile", &self.id)
-                           .insert("serverId", hash_str)
-                           .unwrap();
+        let join_msg = json!({
+            "accessToken": &self.access_token,
+            "selectedProfile": &self.id,
+            "serverId": hash_str
+        });
         let join = serde_json::to_string(&join_msg).unwrap();
 
         let client = hyper::Client::new();
