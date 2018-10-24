@@ -240,9 +240,7 @@ impl Factory {
             } else {
                 let v = match *val {
                     serde_json::Value::Bool(v) => v.to_string(),
-                    serde_json::Value::I64(v) => v.to_string(),
-                    serde_json::Value::U64(v) => v.to_string(),
-                    serde_json::Value::F64(v) => v.to_string(),
+                    serde_json::Value::Number(v) => v.to_string(),
                     serde_json::Value::String(ref v) => v.to_owned(),
                     _ => unreachable!(),
                 };
