@@ -43,7 +43,7 @@ impl Profile {
         let client = hyper::Client::new();
         let res = try!(client.post(LOGIN_URL)
                         .body(&req)
-                        .header(hyper::header::CONTENT_TYPE("application/json".parse().unwrap()))
+                        .header(hyper::header::CONTENT_TYPE, "application/json")
                         .send());
 
         let ret: serde_json::Value = try!(serde_json::from_reader(res));
@@ -71,14 +71,14 @@ impl Profile {
         let client = hyper::Client::new();
         let res = try!(client.post(VALIDATE_URL)
                         .body(&req)
-                        .header(hyper::header::CONTENT_TYPE("application/json".parse().unwrap()))
+                        .header(hyper::header::CONTENT_TYPE, "application/json")
                         .send());
 
         if res.status != hyper::StatusCode::NO_CONTENT {
             // Refresh needed
             let res = try!(client.post(REFRESH_URL)
                             .body(&req)
-                            .header(hyper::header::CONTENT_TYPE("application/json".parse().unwrap()))
+                            .header(hyper::header::CONTENT_TYPE, "application/json")
                             .send());
 
             let ret: serde_json::Value = try!(serde_json::from_reader(res));
@@ -129,7 +129,7 @@ impl Profile {
         let client = hyper::Client::new();
         let res = try!(client.post(JOIN_URL)
                         .body(&join)
-                        .header(hyper::header::CONTENT_TYPE("application/json".parse().unwrap()))
+                        .header(hyper::header::CONTENT_TYPE, "application/json")
                         .send());
 
         if res.status == hyper::StatusCode::NO_CONTENT {
