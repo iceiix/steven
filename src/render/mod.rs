@@ -872,7 +872,7 @@ impl TextureManager {
         } else {
             // Need to download it
             let url = format!("http://textures.minecraft.net/texture/{}", hash);
-            let mut res = match client.get(&url).send() {
+            let mut res = match client.get(url.parse::<hyper::Uri>().unwrap()).send() {
                 Ok(val) => val,
                 Err(err) => {
                     return Err(Error::new(ErrorKind::ConnectionAborted, err));
