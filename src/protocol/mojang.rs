@@ -38,13 +38,14 @@ impl Profile {
                 "name": "Minecraft",
                 "version": 1
             }});
-        let req = try!(serde_json::to_string(&req_msg));
+        let body = try!(serde_json::to_string(&req_msg));
 
         let client = hyper::Client::new();
-        let res = try!(client.post(LOGIN_URL.parse::<hyper::Uri>().unwrap())
-                        .body(&req)
-                        .header(hyper::header::CONTENT_TYPE, "application/json")
-                        .send());
+        let request = hyper::Request::post(LOGIN_URL.parse::<hyper::Uri>().unwrap())
+            .header(hyper::header::CONTENT_TYPE, "application/json")
+            .body(body.into())
+            .unwrap();
+        let res = try!(client.request(request));
 
         let ret: serde_json::Value = try!(serde_json::from_reader(res));
         if let Some(error) = ret.get("error").and_then(|v| v.as_str()) {
@@ -66,20 +67,22 @@ impl Profile {
             "accessToken": self.access_token.clone(),
             "clientToken": token
             });
-        let req = try!(serde_json::to_string(&req_msg));
+        let body = try!(serde_json::to_string(&req_msg));
 
         let client = hyper::Client::new();
-        let res = try!(client.post(VALIDATE_URL.parse::<hyper::Uri>().unwrap())
-                        .body(&req)
-                        .header(hyper::header::CONTENT_TYPE, "application/json")
-                        .send());
+        let request = hyper::Request::post(VALIDATE_URL.parse::<hyper::Uri>().unwrap())
+            .header(hyper::header::CONTENT_TYPE, "application/json")
+            .body(body.into())
+            .unwrap();
+        let res = try!(client.request(request));
 
         if res.status != hyper::StatusCode::NO_CONTENT {
             // Refresh needed
-            let res = try!(client.post(REFRESH_URL.parse::<hyper::Uri>().unwrap())
-                            .body(&req)
-                            .header(hyper::header::CONTENT_TYPE, "application/json")
-                            .send());
+            let request = hyper::Request::post(REFRESH_URL.parse::<hyper::Uri>().unwrap())
+                .header(hyper::header::CONTENT_TYPE, "application/json")
+                .body(body.into())
+                .unwrap();
+            let res = try!(client.request(request));
 
             let ret: serde_json::Value = try!(serde_json::from_reader(res));
             if let Some(error) = ret.get("error").and_then(|v| v.as_str()) {
@@ -127,10 +130,11 @@ impl Profile {
         let join = serde_json::to_string(&join_msg).unwrap();
 
         let client = hyper::Client::new();
-        let res = try!(client.post(JOIN_URL.parse::<hyper::Uri>().unwrap())
-                        .body(&join)
-                        .header(hyper::header::CONTENT_TYPE, "application/json")
-                        .send());
+        let request = hyper::Request::post(LOGIN_URL.parse::<hyper::Uri>().unwrap())
+            .header(hyper::header::CONTENT_TYPE, "application/json")
+            .body(join.into())
+            .unwrap();
+        let res = try!(client.request(request));
 
         if res.status == hyper::StatusCode::NO_CONTENT {
             Ok(())
