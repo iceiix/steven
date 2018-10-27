@@ -77,7 +77,7 @@ impl Profile {
             .unwrap();
         let res = try!(client.request(request).wait());
 
-        if res.status != hyper::StatusCode::NO_CONTENT {
+        if res.status() != hyper::StatusCode::NO_CONTENT {
             // Refresh needed
             let request = hyper::Request::post(REFRESH_URL.parse::<hyper::Uri>().unwrap())
                 .header(hyper::header::CONTENT_TYPE, "application/json")
@@ -137,7 +137,7 @@ impl Profile {
             .unwrap();
         let res = try!(client.request(request).wait());
 
-        if res.status == hyper::StatusCode::NO_CONTENT {
+        if res.status() == hyper::StatusCode::NO_CONTENT {
             Ok(())
         } else {
             Err(super::Error::Err("Failed to auth with server".to_owned()))
