@@ -14,10 +14,7 @@
 
 use sha1::{self, Digest};
 use serde_json;
-use hyper;
-use hyper::rt::Future;
-use hyper::rt::Stream;
-use hyper_rustls;
+use reqwest;
 
 #[derive(Clone, Debug)]
 pub struct Profile {
@@ -44,15 +41,13 @@ impl Profile {
             }});
         let body = try!(serde_json::to_string(&req_msg));
 
-        let https = hyper_rustls::HttpsConnector::new(DNS_WORKER_THREAD_COUNT);
-        let client = hyper::Client::builder().build::<_, hyper::Body>(https);
-        let request = hyper::Request::post(LOGIN_URL.parse::<hyper::Uri>().unwrap())
-            .header(hyper::header::CONTENT_TYPE, "application/json")
-            .body(body.into())
-            .unwrap();
-        let res = try!(client.request(request).wait());
+        let client = reqwest::Client::new();
+        let res = client.post(LOGIN_URL)
+            .header(reqwest::header::CONTENT_TYPE, "application/json")
+            .body(body)
+            .send()?;
 
-        let ret: serde_json::Value = try!(serde_json::from_slice(&res.into_body().concat2().wait().unwrap().into_bytes()));
+        let ret: serde_json::Value = try!(serde_json::from_reader(res));
         if let Some(error) = ret.get("error").and_then(|v| v.as_str()) {
             return Err(super::Error::Err(format!(
                 "{}: {}",
@@ -74,24 +69,21 @@ impl Profile {
             });
         let body = try!(serde_json::to_string(&req_msg));
 
-        let https = hyper_rustls::HttpsConnector::new(DNS_WORKER_THREAD_COUNT);
-        let client = hyper::Client::builder().build::<_, hyper::Body>(https);
-        let request = hyper::Request::post(VALIDATE_URL.parse::<hyper::Uri>().unwrap())
-            .header(hyper::header::CONTENT_TYPE, "application/json")
-            .body(body.into())
-            .unwrap();
-        let res = try!(client.request(request).wait());
+        let client = reqwest::Client::new();
+        let res = client.get(VALIDATE_URL)
+            .header(reqwest::header::CONTENT_TYPE, "application/json")
+            .body(body)
+            .send()?;
 
-        if res.status() != hyper::StatusCode::NO_CONTENT {
+        if res.status() != reqwest::StatusCode::NO_CONTENT {
             let body = try!(serde_json::to_string(&req_msg)); // TODO: fix parsing twice to avoid move
             // Refresh needed
-            let request = hyper::Request::post(REFRESH_URL.parse::<hyper::Uri>().unwrap())
-                .header(hyper::header::CONTENT_TYPE, "application/json")
-                .body(body.into())
-                .unwrap();
-            let res = try!(client.request(request).wait());
+            let res = client.post(REFRESH_URL)
+                .header(reqwest::header::CONTENT_TYPE, "application/json")
+                .body(body)
+                .send()?;
 
-            let ret: serde_json::Value = try!(serde_json::from_slice(&res.into_body().concat2().wait().unwrap().into_bytes()));
+            let ret: serde_json::Value = try!(serde_json::from_reader(res));
             if let Some(error) = ret.get("error").and_then(|v| v.as_str()) {
                 return Err(super::Error::Err(format!(
                     "{}: {}",
@@ -136,15 +128,13 @@ impl Profile {
         });
         let join = serde_json::to_string(&join_msg).unwrap();
 
-        let https = hyper_rustls::HttpsConnector::new(DNS_WORKER_THREAD_COUNT);
-        let client = hyper::Client::builder().build::<_, hyper::Body>(https);
-        let request = hyper::Request::post(LOGIN_URL.parse::<hyper::Uri>().unwrap())
-            .header(hyper::header::CONTENT_TYPE, "application/json")
-            .body(join.into())
-            .unwrap();
-        let res = try!(client.request(request).wait());
+        let client = reqwest::Client::new();
+        let res = client.post(LOGIN_URL)
+            .header(reqwest::header::CONTENT_TYPE, "application/json")
+            .body(join)
+            .send()?;
 
-        if res.status() == hyper::StatusCode::NO_CONTENT {
+        if res.status() == reqwest::StatusCode::NO_CONTENT {
             Ok(())
         } else {
             Err(super::Error::Err("Failed to auth with server".to_owned()))
