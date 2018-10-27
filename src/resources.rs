@@ -24,9 +24,7 @@ use std::collections::HashMap;
 use std::hash::BuildHasherDefault;
 use serde_json;
 
-use hyper;
-use hyper::rt::Future;
-use hyper::rt::Stream;
+use reqwest;
 use zip;
 
 use types::hash::FNVHash;
@@ -36,7 +34,6 @@ const RESOURCES_VERSION: &'static str = "1.11";
 const VANILLA_CLIENT_URL: &'static str = "https://launcher.mojang.com/mc/game/1.11/client/780e46b3a96091a7f42c028c615af45974629072/client.jar";
 const ASSET_VERSION: &'static str = "1.11";
 const ASSET_INDEX_URL: &'static str = "https://launchermeta.mojang.com/mc/assets/1.11/e02b8fba4390e173057895c56ecc91e3ce3bbd40/1.11.json";
-const DNS_WORKER_THREAD_COUNT: usize = 4;
 
 pub trait Pack: Sync + Send {
     fn open(&self, name: &str) -> Option<Box<io::Read>>;
@@ -288,20 +285,19 @@ impl Manager {
             self.vanilla_assets_chan = Some(recv);
         }
         thread::spawn(move || {
-            let https = hyper_rustls::HttpsConnector::new(DNS_WORKER_THREAD_COUNT);
-            let client = hyper::Client::builder().build::<_, hyper::Body>(https);
+            let client = reqwest::Client::new();
             if fs::metadata(&location).is_err(){
                 fs::create_dir_all(location.parent().unwrap()).unwrap();
-                let res = client.get(ASSET_INDEX_URL.parse::<hyper::Uri>().unwrap())
-                                .wait()
-                                .unwrap();
+                let res = client.get(ASSET_INDEX_URL)
+                    .send()
+                    .unwrap();
 
-                let length = res.headers().get(hyper::header::CONTENT_LENGTH).unwrap().to_str().unwrap().parse::<u64>().unwrap();
+                let length = res.headers().get(reqwest::header::CONTENT_LENGTH).unwrap().to_str().unwrap().parse::<u64>().unwrap();
                 Self::add_task(&progress_info, "Downloading Asset Index", &*location.to_string_lossy(), length);
                 {
                     let mut file = fs::File::create(format!("index-{}.tmp", ASSET_VERSION)).unwrap();
                     let mut progress = ProgressRead {
-                        read: &*res.into_body().concat2().wait().unwrap().into_bytes(),
+                        read: res,
                         progress: &progress_info,
                         task_name: "Downloading Asset Index".into(),
                         task_file: location.to_string_lossy().into_owned(),
@@ -322,9 +318,9 @@ impl Manager {
                 let location = root_location.join(&hash_path);
                 if fs::metadata(&location).is_err(){
                     fs::create_dir_all(location.parent().unwrap()).unwrap();
-                    let res = client.get(format!("http://resources.download.minecraft.net/{}", hash_path).parse::<hyper::Uri>().unwrap())
-                                    .wait()
-                                    .unwrap();
+                    let res = client.get(&format!("http://resources.download.minecraft.net/{}", hash_path))
+                        .send()
+                        .unwrap();
                     let length = v.get("size").and_then(|v| v.as_u64()).unwrap();
                     Self::add_task(&progress_info, "Downloading Asset", k, length);
                     let mut tmp_file = location.to_owned();
@@ -332,7 +328,7 @@ impl Manager {
                     {
                         let mut file = fs::File::create(&tmp_file).unwrap();
                         let mut progress = ProgressRead {
-                            read: &*res.into_body().concat2().wait().unwrap().into_bytes(),
+                            read: res,
                             progress: &progress_info,
                             task_name: "Downloading Asset".into(),
                             task_file: k.to_owned(),
@@ -358,19 +354,18 @@ impl Manager {
 
         let progress_info = self.vanilla_progress.clone();
         thread::spawn(move || {
-            let https = hyper_rustls::HttpsConnector::new(DNS_WORKER_THREAD_COUNT);
-            let client = hyper::Client::builder().build::<_, hyper::Body>(https);
-            let res = client.get(VANILLA_CLIENT_URL.parse::<hyper::Uri>().unwrap())
-                            .wait()
-                            .unwrap();
+            let client = reqwest::Client::new();
+            let res = client.get(VANILLA_CLIENT_URL)
+                .send()
+                .unwrap();
             let mut file = fs::File::create(format!("{}.tmp", RESOURCES_VERSION)).unwrap();
 
-            let length = res.headers().get(hyper::header::CONTENT_LENGTH).unwrap().to_str().unwrap().parse::<u64>().unwrap();
+            let length = res.headers().get(reqwest::header::CONTENT_LENGTH).unwrap().to_str().unwrap().parse::<u64>().unwrap();
             let task_file = format!("./resources-{}", RESOURCES_VERSION);
             Self::add_task(&progress_info, "Downloading Core Assets", &task_file, length);
             {
                 let mut progress = ProgressRead {
-                    read: &*res.into_body().concat2().wait().unwrap().into_bytes(),
+                    read: res,
                     progress: &progress_info,
                     task_name: "Downloading Core Assets".into(),
                     task_file: task_file,
