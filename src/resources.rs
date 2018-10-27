@@ -17,7 +17,6 @@ extern crate steven_resources as internal;
 use std::thread;
 use std::path;
 use std::io;
-use std::io::Read;
 use std::fs;
 use std::sync::mpsc;
 use std::sync::{Arc, Mutex};

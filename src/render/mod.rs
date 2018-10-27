@@ -862,6 +862,7 @@ impl TextureManager {
         use std::path::Path;
         use std::io::{Error, ErrorKind};
         use hyper::rt::Future;
+        use hyper::rt::Stream;
         let path = format!("skin-cache/{}/{}.png", &hash[..2], hash);
         let cache_path = Path::new(&path);
         try!(fs::create_dir_all(cache_path.parent().unwrap()));
@@ -879,7 +880,7 @@ impl TextureManager {
                     return Err(Error::new(ErrorKind::ConnectionAborted, err));
                 }
             };
-            try!(res.read_to_end(&mut buf));
+            let mut buf = res.into_body().concat2().wait().unwrap().into_bytes();
             // Save to cache
             let mut file = try!(fs::File::create(cache_path));
             try!(file.write_all(&buf));
