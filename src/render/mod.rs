@@ -874,13 +874,13 @@ impl TextureManager {
         } else {
             // Need to download it
             let url = format!("http://textures.minecraft.net/texture/{}", hash);
-            let mut res = match client.get(url.parse::<hyper::Uri>().unwrap()).wait() {
+            let res = match client.get(url.parse::<hyper::Uri>().unwrap()).wait() {
                 Ok(val) => val,
                 Err(err) => {
                     return Err(Error::new(ErrorKind::ConnectionAborted, err));
                 }
             };
-            let mut buf = res.into_body().concat2().wait().unwrap().into_bytes();
+            let buf = res.into_body().concat2().wait().unwrap().into_bytes();
             // Save to cache
             let mut file = try!(fs::File::create(cache_path));
             try!(file.write_all(&buf));
