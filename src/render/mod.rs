@@ -861,6 +861,7 @@ impl TextureManager {
         use std::fs;
         use std::path::Path;
         use std::io::{Error, ErrorKind};
+        use hyper::rt::Future;
         let path = format!("skin-cache/{}/{}.png", &hash[..2], hash);
         let cache_path = Path::new(&path);
         try!(fs::create_dir_all(cache_path.parent().unwrap()));
@@ -872,7 +873,7 @@ impl TextureManager {
         } else {
             // Need to download it
             let url = format!("http://textures.minecraft.net/texture/{}", hash);
-            let mut res = match client.get(url.parse::<hyper::Uri>().unwrap()).send() {
+            let mut res = match client.get(url.parse::<hyper::Uri>().unwrap()).wait() {
                 Ok(val) => val,
                 Err(err) => {
                     return Err(Error::new(ErrorKind::ConnectionAborted, err));

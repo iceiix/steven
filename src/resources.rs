@@ -25,6 +25,7 @@ use std::hash::BuildHasherDefault;
 use serde_json;
 
 use hyper;
+use hyper::rt::Future;
 use zip;
 
 use types::hash::FNVHash;
@@ -289,7 +290,7 @@ impl Manager {
             if fs::metadata(&location).is_err(){
                 fs::create_dir_all(location.parent().unwrap()).unwrap();
                 let res = client.get(ASSET_INDEX_URL.parse::<hyper::Uri>().unwrap())
-                                .send()
+                                .wait()
                                 .unwrap();
 
                 let length = *res.headers().get(hyper::header::CONTENT_LENGTH).unwrap();
@@ -319,7 +320,7 @@ impl Manager {
                 if fs::metadata(&location).is_err(){
                     fs::create_dir_all(location.parent().unwrap()).unwrap();
                     let res = client.get(format!("http://resources.download.minecraft.net/{}", hash_path).parse::<hyper::Uri>().unwrap())
-                                    .send()
+                                    .wait()
                                     .unwrap();
                     let length = v.get("size").and_then(|v| v.as_u64()).unwrap();
                     Self::add_task(&progress_info, "Downloading Asset", k, length);
@@ -356,7 +357,7 @@ impl Manager {
         thread::spawn(move || {
             let client = hyper::Client::new();
             let res = client.get(VANILLA_CLIENT_URL.parse::<hyper::Uri>().unwrap())
-                            .send()
+                            .wait()
                             .unwrap();
             let mut file = fs::File::create(format!("{}.tmp", RESOURCES_VERSION)).unwrap();
 
