@@ -289,8 +289,8 @@ impl Manager {
             if fs::metadata(&location).is_err(){
                 fs::create_dir_all(location.parent().unwrap()).unwrap();
                 let res = client.get(ASSET_INDEX_URL)
-                    .send()
-                    .unwrap();
+                                .send()
+                                .unwrap();
 
                 let length = res.headers().get(reqwest::header::CONTENT_LENGTH).unwrap().to_str().unwrap().parse::<u64>().unwrap();
                 Self::add_task(&progress_info, "Downloading Asset Index", &*location.to_string_lossy(), length);
@@ -319,8 +319,8 @@ impl Manager {
                 if fs::metadata(&location).is_err(){
                     fs::create_dir_all(location.parent().unwrap()).unwrap();
                     let res = client.get(&format!("http://resources.download.minecraft.net/{}", hash_path))
-                        .send()
-                        .unwrap();
+                                    .send()
+                                    .unwrap();
                     let length = v.get("size").and_then(|v| v.as_u64()).unwrap();
                     Self::add_task(&progress_info, "Downloading Asset", k, length);
                     let mut tmp_file = location.to_owned();
@@ -356,8 +356,8 @@ impl Manager {
         thread::spawn(move || {
             let client = reqwest::Client::new();
             let res = client.get(VANILLA_CLIENT_URL)
-                .send()
-                .unwrap();
+                            .send()
+                            .unwrap();
             let mut file = fs::File::create(format!("{}.tmp", RESOURCES_VERSION)).unwrap();
 
             let length = res.headers().get(reqwest::header::CONTENT_LENGTH).unwrap().to_str().unwrap().parse::<u64>().unwrap();
