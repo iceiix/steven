@@ -16,7 +16,6 @@
 
 use openssl::crypto::symm;
 use serde_json;
-use hyper;
 use reqwest;
 
 pub mod mojang;
@@ -691,7 +690,6 @@ pub enum Error {
     Disconnect(format::Component),
     IOError(io::Error),
     Json(serde_json::Error),
-    Hyper(hyper::Error),
     Reqwest(reqwest::Error),
 }
 
@@ -704,12 +702,6 @@ impl convert::From<io::Error> for Error {
 impl convert::From<serde_json::Error> for Error {
     fn from(e: serde_json::Error) -> Error {
         Error::Json(e)
-    }
-}
-
-impl convert::From<hyper::Error> for Error {
-    fn from(e: hyper::Error) -> Error {
-        Error::Hyper(e)
     }
 }
 
@@ -726,7 +718,6 @@ impl ::std::error::Error for Error {
             Error::Disconnect(_) => "Disconnect",
             Error::IOError(ref e) => e.description(),
             Error::Json(ref e) => e.description(),
-            Error::Hyper(ref e) => e.description(),
             Error::Reqwest(ref e) => e.description(),
         }
     }
@@ -739,7 +730,6 @@ impl ::std::fmt::Display for Error {
             Error::Disconnect(ref val) => write!(f, "{}", val),
             Error::IOError(ref e) => e.fmt(f),
             Error::Json(ref e) => e.fmt(f),
-            Error::Hyper(ref e) => e.fmt(f),
             Error::Reqwest(ref e) => e.fmt(f),
         }
     }

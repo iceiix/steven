@@ -24,8 +24,6 @@ extern crate byteorder;
 extern crate serde_json;
 extern crate openssl;
 extern crate sha1;
-extern crate hyper;
-extern crate hyper_rustls;
 extern crate reqwest;
 extern crate flate2;
 extern crate rand;
