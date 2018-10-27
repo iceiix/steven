@@ -69,7 +69,7 @@ impl Profile {
         let req = try!(serde_json::to_string(&req_msg));
 
         let client = reqwest::Client::new();
-        let res = client.get(VALIDATE_URL)
+        let res = client.post(VALIDATE_URL)
             .header(reqwest::header::CONTENT_TYPE, "application/json")
             .body(req)
             .send()?;
@@ -128,7 +128,7 @@ impl Profile {
         let join = serde_json::to_string(&join_msg).unwrap();
 
         let client = reqwest::Client::new();
-        let res = client.post(LOGIN_URL)
+        let res = client.post(JOIN_URL)
             .header(reqwest::header::CONTENT_TYPE, "application/json")
             .body(join)
             .send()?;
