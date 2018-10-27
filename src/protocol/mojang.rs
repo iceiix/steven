@@ -79,6 +79,7 @@ impl Profile {
         let res = try!(client.request(request).wait());
 
         if res.status() != hyper::StatusCode::NO_CONTENT {
+            let body = try!(serde_json::to_string(&req_msg)); // TODO: fix parsing twice to avoid move
             // Refresh needed
             let request = hyper::Request::post(REFRESH_URL.parse::<hyper::Uri>().unwrap())
                 .header(hyper::header::CONTENT_TYPE, "application/json")
