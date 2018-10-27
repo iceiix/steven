@@ -17,6 +17,7 @@ extern crate steven_resources as internal;
 use std::thread;
 use std::path;
 use std::io;
+use std::io::Read;
 use std::fs;
 use std::sync::mpsc;
 use std::sync::{Arc, Mutex};
@@ -26,6 +27,7 @@ use serde_json;
 
 use hyper;
 use hyper::rt::Future;
+use hyper::rt::Stream;
 use zip;
 
 use types::hash::FNVHash;
@@ -298,7 +300,7 @@ impl Manager {
                 {
                     let mut file = fs::File::create(format!("index-{}.tmp", ASSET_VERSION)).unwrap();
                     let mut progress = ProgressRead {
-                        read: res,
+                        read: &*res.into_body().concat2().wait().unwrap().into_bytes(),
                         progress: &progress_info,
                         task_name: "Downloading Asset Index".into(),
                         task_file: location.to_string_lossy().into_owned(),
@@ -329,7 +331,7 @@ impl Manager {
                     {
                         let mut file = fs::File::create(&tmp_file).unwrap();
                         let mut progress = ProgressRead {
-                            read: res,
+                            read: &*res.into_body().concat2().wait().unwrap().into_bytes(),
                             progress: &progress_info,
                             task_name: "Downloading Asset".into(),
                             task_file: k.to_owned(),
@@ -366,7 +368,7 @@ impl Manager {
             Self::add_task(&progress_info, "Downloading Core Assets", &task_file, length);
             {
                 let mut progress = ProgressRead {
-                    read: res,
+                    read: &*res.into_body().concat2().wait().unwrap().into_bytes(),
                     progress: &progress_info,
                     task_name: "Downloading Core Assets".into(),
                     task_file: task_file,
