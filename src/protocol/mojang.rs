@@ -15,6 +15,7 @@
 use sha1::{self, Digest};
 use serde_json;
 use hyper;
+use hyper::rt::Future;
 
 #[derive(Clone, Debug)]
 pub struct Profile {
@@ -45,7 +46,7 @@ impl Profile {
             .header(hyper::header::CONTENT_TYPE, "application/json")
             .body(body.into())
             .unwrap();
-        let res = try!(client.request(request));
+        let res = client.request(request).wait();
 
         let ret: serde_json::Value = try!(serde_json::from_reader(res));
         if let Some(error) = ret.get("error").and_then(|v| v.as_str()) {
@@ -74,7 +75,7 @@ impl Profile {
             .header(hyper::header::CONTENT_TYPE, "application/json")
             .body(body.into())
             .unwrap();
-        let res = try!(client.request(request));
+        let res = client.request(request).wait();
 
         if res.status != hyper::StatusCode::NO_CONTENT {
             // Refresh needed
@@ -82,7 +83,7 @@ impl Profile {
                 .header(hyper::header::CONTENT_TYPE, "application/json")
                 .body(body.into())
                 .unwrap();
-            let res = try!(client.request(request));
+            let res = client.request(request).wait();
 
             let ret: serde_json::Value = try!(serde_json::from_reader(res));
             if let Some(error) = ret.get("error").and_then(|v| v.as_str()) {
@@ -134,7 +135,7 @@ impl Profile {
             .header(hyper::header::CONTENT_TYPE, "application/json")
             .body(join.into())
             .unwrap();
-        let res = try!(client.request(request));
+        let res = client.request(request).wait();
 
         if res.status == hyper::StatusCode::NO_CONTENT {
             Ok(())
