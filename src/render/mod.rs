@@ -839,6 +839,11 @@ impl TextureManager {
     fn process_skins(recv: mpsc::Receiver<String>, reply: mpsc::Sender<(String, Option<image::DynamicImage>)>) {
         use hyper;
         let client = hyper::Client::new();
+        /* TODO: will skins ever require TLS?
+        const DNS_WORKER_THREAD_COUNT: usize = 4;
+        let https = hyper_rustls::HttpsConnector::new(DNS_WORKER_THREAD_COUNT);
+        let client = hyper::Client::builder().build::<_, hyper::Body>(https);
+        */
         loop {
             let hash = match recv.recv() {
                 Ok(val) => val,

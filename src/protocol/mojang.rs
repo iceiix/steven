@@ -17,6 +17,7 @@ use serde_json;
 use hyper;
 use hyper::rt::Future;
 use hyper::rt::Stream;
+use hyper_rustls;
 
 #[derive(Clone, Debug)]
 pub struct Profile {
@@ -29,6 +30,7 @@ const JOIN_URL: &'static str = "https://sessionserver.mojang.com/session/minecra
 const LOGIN_URL: &'static str = "https://authserver.mojang.com/authenticate";
 const REFRESH_URL: &'static str = "https://authserver.mojang.com/refresh";
 const VALIDATE_URL: &'static str = "https://authserver.mojang.com/validate";
+const DNS_WORKER_THREAD_COUNT: usize = 4;
 
 impl Profile {
     pub fn login(username: &str, password: &str, token: &str) -> Result<Profile, super::Error> {
@@ -42,7 +44,8 @@ impl Profile {
             }});
         let body = try!(serde_json::to_string(&req_msg));
 
-        let client = hyper::Client::new();
+        let https = hyper_rustls::HttpsConnector::new(DNS_WORKER_THREAD_COUNT);
+        let client = hyper::Client::builder().build::<_, hyper::Body>(https);
         let request = hyper::Request::post(LOGIN_URL.parse::<hyper::Uri>().unwrap())
             .header(hyper::header::CONTENT_TYPE, "application/json")
             .body(body.into())
@@ -71,7 +74,8 @@ impl Profile {
             });
         let body = try!(serde_json::to_string(&req_msg));
 
-        let client = hyper::Client::new();
+        let https = hyper_rustls::HttpsConnector::new(DNS_WORKER_THREAD_COUNT);
+        let client = hyper::Client::builder().build::<_, hyper::Body>(https);
         let request = hyper::Request::post(VALIDATE_URL.parse::<hyper::Uri>().unwrap())
             .header(hyper::header::CONTENT_TYPE, "application/json")
             .body(body.into())
@@ -132,7 +136,8 @@ impl Profile {
         });
         let join = serde_json::to_string(&join_msg).unwrap();
 
-        let client = hyper::Client::new();
+        let https = hyper_rustls::HttpsConnector::new(DNS_WORKER_THREAD_COUNT);
+        let client = hyper::Client::builder().build::<_, hyper::Body>(https);
         let request = hyper::Request::post(LOGIN_URL.parse::<hyper::Uri>().unwrap())
             .header(hyper::header::CONTENT_TYPE, "application/json")
             .body(join.into())

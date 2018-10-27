@@ -36,6 +36,7 @@ const RESOURCES_VERSION: &'static str = "1.11";
 const VANILLA_CLIENT_URL: &'static str = "https://launcher.mojang.com/mc/game/1.11/client/780e46b3a96091a7f42c028c615af45974629072/client.jar";
 const ASSET_VERSION: &'static str = "1.11";
 const ASSET_INDEX_URL: &'static str = "https://launchermeta.mojang.com/mc/assets/1.11/e02b8fba4390e173057895c56ecc91e3ce3bbd40/1.11.json";
+const DNS_WORKER_THREAD_COUNT: usize = 4;
 
 pub trait Pack: Sync + Send {
     fn open(&self, name: &str) -> Option<Box<io::Read>>;
@@ -287,7 +288,8 @@ impl Manager {
             self.vanilla_assets_chan = Some(recv);
         }
         thread::spawn(move || {
-            let client = hyper::Client::new();
+            let https = hyper_rustls::HttpsConnector::new(DNS_WORKER_THREAD_COUNT);
+            let client = hyper::Client::builder().build::<_, hyper::Body>(https);
             if fs::metadata(&location).is_err(){
                 fs::create_dir_all(location.parent().unwrap()).unwrap();
                 let res = client.get(ASSET_INDEX_URL.parse::<hyper::Uri>().unwrap())
@@ -356,7 +358,8 @@ impl Manager {
 
         let progress_info = self.vanilla_progress.clone();
         thread::spawn(move || {
-            let client = hyper::Client::new();
+            let https = hyper_rustls::HttpsConnector::new(DNS_WORKER_THREAD_COUNT);
+            let client = hyper::Client::builder().build::<_, hyper::Body>(https);
             let res = client.get(VANILLA_CLIENT_URL.parse::<hyper::Uri>().unwrap())
                             .wait()
                             .unwrap();
