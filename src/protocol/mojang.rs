@@ -16,6 +16,7 @@ use sha1::{self, Digest};
 use serde_json;
 use hyper;
 use hyper::rt::Future;
+use hyper::rt::Stream;
 
 #[derive(Clone, Debug)]
 pub struct Profile {
@@ -48,7 +49,7 @@ impl Profile {
             .unwrap();
         let res = try!(client.request(request).wait());
 
-        let ret: serde_json::Value = try!(serde_json::from_reader(res));
+        let ret: serde_json::Value = try!(serde_json::from_slice(&res.into_body().concat2().wait().unwrap().into_bytes()));
         if let Some(error) = ret.get("error").and_then(|v| v.as_str()) {
             return Err(super::Error::Err(format!(
                 "{}: {}",
@@ -85,7 +86,7 @@ impl Profile {
                 .unwrap();
             let res = try!(client.request(request).wait());
 
-            let ret: serde_json::Value = try!(serde_json::from_reader(res));
+            let ret: serde_json::Value = try!(serde_json::from_slice(&res.into_body().concat2().wait().unwrap().into_bytes()));
             if let Some(error) = ret.get("error").and_then(|v| v.as_str()) {
                 return Err(super::Error::Err(format!(
                     "{}: {}",
