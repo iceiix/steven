@@ -837,13 +837,8 @@ impl TextureManager {
     }
 
     fn process_skins(recv: mpsc::Receiver<String>, reply: mpsc::Sender<(String, Option<image::DynamicImage>)>) {
-        use hyper;
-        let client = hyper::Client::new();
-        /* TODO: will skins ever require TLS?
-        const DNS_WORKER_THREAD_COUNT: usize = 4;
-        let https = hyper_rustls::HttpsConnector::new(DNS_WORKER_THREAD_COUNT);
-        let client = hyper::Client::builder().build::<_, hyper::Body>(https);
-        */
+        use reqwest;
+        let client = reqwest::Client::new();
         loop {
             let hash = match recv.recv() {
                 Ok(val) => val,
@@ -861,13 +856,11 @@ impl TextureManager {
         }
     }
 
-    fn obtain_skin(client: &::hyper::Client<hyper::client::HttpConnector, hyper::Body>, hash: &str) -> Result<image::DynamicImage, ::std::io::Error> {
+    fn obtain_skin(client: &::reqwest::Client, hash: &str) -> Result<image::DynamicImage, ::std::io::Error> {
         use std::io::Read;
         use std::fs;
         use std::path::Path;
         use std::io::{Error, ErrorKind};
-        use hyper::rt::Future;
-        use hyper::rt::Stream;
         let path = format!("skin-cache/{}/{}.png", &hash[..2], hash);
         let cache_path = Path::new(&path);
         try!(fs::create_dir_all(cache_path.parent().unwrap()));
@@ -878,14 +871,22 @@ impl TextureManager {
             try!(file.read_to_end(&mut buf));
         } else {
             // Need to download it
-            let url = format!("http://textures.minecraft.net/texture/{}", hash);
-            let res = match client.get(url.parse::<hyper::Uri>().unwrap()).wait() {
+            let url = &format!("http://textures.minecraft.net/texture/{}", hash);
+            let mut res = match client.get(url).send() {
                 Ok(val) => val,
                 Err(err) => {
                     return Err(Error::new(ErrorKind::ConnectionAborted, err));
                 }
             };
-            let buf = res.into_body().concat2().wait().unwrap().into_bytes();
+            let mut buf = vec![];
+            match res.read_to_end(&mut buf) {
+                Ok(_) => {},
+                Err(err) => {
+                    // TODO: different error for failure to read?
+                    return Err(Error::new(ErrorKind::InvalidData, err));
+                }
+            }
+
             // Save to cache
             let mut file = try!(fs::File::create(cache_path));
             try!(file.write_all(&buf));
