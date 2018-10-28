@@ -8,6 +8,11 @@ SET PATH=C:\Program Files (x86)\MSBuild\%TOOLCHAIN_VERSION%\Bin;%PATH%
 SET PATH=C:\msys64\usr\bin;C:\mingw\bin;%PATH%
 pacman --noconfirm -S git tar mingw-w64-x86_64-openssl mingw-w64-x86_64-SDL2 mingw-w64-x86_64-gcc
 
+mkdir C:\OpenSSL
+ps: if (Test-Path env:OPENSSL_VERSION) { Start-FileDownload "http://slproweb.com/download/Win${env:BITS}OpenSSL-${env:OPENSSL_VERSION}.exe" }
+if defined OPENSSL_VERSION Win%BITS%OpenSSL-%OPENSSL_VERSION%.exe /SILENT /VERYSILENT /SP- /DIR="C:\OpenSSL"
+appveyor DownloadFile https://curl.haxx.se/ca/cacert.pem -FileName C:\OpenSSL\cacert.pem
+
 vcpkg install openssl:x86-windows
 vcpkg install openssl:x64-windows
 
