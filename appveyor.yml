@@ -9,8 +9,6 @@ platform:
   - Win32
   - x64
 environment:
-  SSL_CERT_FILE: "C:\\OpenSSL\\cacert.pem"
-  OPENSSL_VERSION: 1_1_0i
   matrix:
     - TOOLCHAIN_VERSION: 14.0
       RUST: nightly-2018-10-24
