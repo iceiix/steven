@@ -9,6 +9,7 @@ platform:
   - Win32
   - x64
 environment:
+  OPENSSL_DIR: C:\OpenSSL
   matrix:
     - TOOLCHAIN_VERSION: 14.0
       RUST: nightly-2018-10-24
