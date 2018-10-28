@@ -6,7 +6,7 @@ REM Appveyor's documentation.
 SET PATH=C:\Program Files (x86)\MSBuild\%TOOLCHAIN_VERSION%\Bin;%PATH%
 
 SET PATH=C:\msys64\usr\bin;C:\mingw\bin;%PATH%
-pacman -S git tar mingw-w64-x86_64-openssl mingw-w64-x86_64-SDL2 mingw-w64-x86_64-gcc
+pacman --noconfirm -S git tar mingw-w64-x86_64-openssl mingw-w64-x86_64-SDL2 mingw-w64-x86_64-gcc
 
 set VCVARSALL="C:\Program Files (x86)\Microsoft Visual Studio %TOOLCHAIN_VERSION%\VC\vcvarsall.bat"
 
