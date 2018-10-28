@@ -1,6 +1,7 @@
 echo on
 SetLocal EnableDelayedExpansion
 
+C:\msys64\msys2_shell.bat
 pacman -S git tar mingw-w64-x86_64-openssl mingw-w64-x86_64-SDL2 mingw-w64-x86_64-gcc
 
 REM This is the recommended way to choose the toolchain version, according to
