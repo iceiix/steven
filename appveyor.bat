@@ -1,5 +1,8 @@
 echo on
 SetLocal EnableDelayedExpansion
+dir C:\OpenSSL
+dir /r C:\OpenSSL
+exit
 
 REM This is the recommended way to choose the toolchain version, according to
 REM Appveyor's documentation.
