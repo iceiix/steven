@@ -11,10 +11,6 @@ pacman --noconfirm -S git tar mingw-w64-x86_64-openssl mingw-w64-x86_64-SDL2 min
 vcpkg install openssl:x86-windows
 vcpkg install openssl:x64-windows
 
-dir C:\OpenSSL
-dir /r C:\OpenSSL
-exit
-
 set VCVARSALL="C:\Program Files (x86)\Microsoft Visual Studio %TOOLCHAIN_VERSION%\VC\vcvarsall.bat"
 
 if [%Platform%] NEQ [x64] goto win32
