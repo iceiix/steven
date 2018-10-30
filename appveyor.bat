@@ -1,67 +1,35 @@
-echo on
-SetLocal EnableDelayedExpansion
+if "%PLATFORM%" == "x86" set RUST_INSTALL=i686-pc-windows-msvc
+if "%PLATFORM%" == "x64" set RUST_INSTALL=x86_64-pc-windows-msvc
+appveyor AddMessage "Platform rust: %RUST_INSTALL%"
+appveyor DownloadFile "https://static.rust-lang.org/dist/rust-nightly-%RUST_INSTALL%.exe" -FileName rust-install.exe
+"./rust-install.exe" /VERYSILENT /NORESTART /DIR="C:\Rust\"
+SET PATH=%PATH%;C:\Rust\bin
+rustc -V
+cargo -V
 
-REM This is the recommended way to choose the toolchain version, according to
-REM Appveyor's documentation.
-SET PATH=C:\Program Files (x86)\MSBuild\%TOOLCHAIN_VERSION%\Bin;%PATH%
+appveyor DownloadFile http://www.npcglib.org/~stathis/downloads/openssl-1.0.1s-vs2015.7z -FileName openssl.7z
+mkdir C:\openssl
+7z x openssl.7z -oC:/openssl/ -y
+set DEP_OPENSSL_INCLUDE=C:\openssl\openssl-1.0.1s-vs2015\include\
+if "%PLATFORM%" == "x64" set OPENSSL_EXT=64
+cp C:\openssl\openssl-1.0.1s-vs2015\lib%OPENSSL_EXT%\libeay32MD.lib C:\Rust\lib\rustlib\%RUST_INSTALL%\lib\eay32.lib
+cp C:/openssl/openssl-1.0.1s-vs2015/lib%OPENSSL_EXT%\ssleay32MD.lib C:\Rust\lib\rustlib\%RUST_INSTALL%\lib\ssl32.lib
 
-SET PATH=C:\msys64\usr\bin;C:\mingw\bin;%PATH%
-pacman --noconfirm -S git tar mingw-w64-x86_64-openssl mingw-w64-x86_64-SDL2 mingw-w64-x86_64-gcc
+appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.4-VC.zip -FileName sdl2-dev.zip
+mkdir C:\sdl2
+7z x sdl2-dev.zip -oC:\sdl2\ -y
+cp C:\sdl2\SDL2-2.0.4\lib\%PLATFORM%\SDL2.lib C:\Rust\lib\rustlib\%RUST_INSTALL%\lib\SDL2.lib
 
-vcpkg install openssl:x86-windows
-vcpkg install openssl:x64-windows
+cargo build
+mkdir dist-debug
+cp target\debug\steven.exe dist-debug
+cp C:\sdl2\SDL2-2.0.4\lib\%PLATFORM%\SDL2.dll dist-debug
+cp C:\openssl\openssl-1.0.1s-vs2015\bin%OPENSSL_EXT%\libeay32MD.dll dist-debug\libeay32MD.dll
+cp C:\openssl\openssl-1.0.1s-vs2015\bin%OPENSSL_EXT%\ssleay32MD.dll dist-debug\ssleay32MD.dll
 
-set VCVARSALL="C:\Program Files (x86)\Microsoft Visual Studio %TOOLCHAIN_VERSION%\VC\vcvarsall.bat"
-
-if [%Platform%] NEQ [x64] goto win32
-set TARGET_ARCH=x86_64
-set TARGET_PROGRAM_FILES=%ProgramFiles%
-call %VCVARSALL% amd64
-if %ERRORLEVEL% NEQ 0 exit 1
-goto download
-
-:win32
-echo on
-if [%Platform%] NEQ [Win32] exit 1
-set TARGET_ARCH=i686
-set TARGET_PROGRAM_FILES=%ProgramFiles(x86)%
-call %VCVARSALL% amd64_x86
-if %ERRORLEVEL% NEQ 0 exit 1
-goto download
-
-:download
-REM vcvarsall turns echo off
-echo on
-
-mkdir build
-set RUSTUP_URL=https://win.rustup.rs/%TARGET_ARCH%
-set RUSTUP_EXE=build\rustup-init-%TARGET_ARCH%.exe
-echo Downloading %RUSTUP_URL%...
-powershell -Command "(New-Object Net.WebClient).DownloadFile('%RUSTUP_URL%', '%RUSTUP_EXE%')"
-if %ERRORLEVEL% NEQ 0 (
-  echo ...downloading rustup failed.
-  exit 1
-)
-
-set TARGET=%TARGET_ARCH%-pc-windows-msvc
-%RUSTUP_EXE% -y --default-host %TARGET% --default-toolchain %RUST%
-if %ERRORLEVEL% NEQ 0 exit 1
-
-set PATH=%USERPROFILE%\.cargo\bin;%cd%\windows_build_tools;%PATH%
-
-if [%Configuration%] == [Release] set CARGO_MODE=--release
-
-set
-
-link /?
-cl /?
-rustc --version
-cargo --version
-
-cargo test -vv %CARGO_MODE%
-if %ERRORLEVEL% NEQ 0 exit 1
-
-REM Verify that `cargo build`, independent from `cargo test`, works; i.e.
-REM verify that non-test builds aren't trying to use test-only features.
-cargo build -vv %CARGO_MODE%
-if %ERRORLEVEL% NEQ 0 exit 1
+cargo build --release
+mkdir dist
+cp target\release\steven.exe dist
+cp C:\sdl2\SDL2-2.0.4\lib\%PLATFORM%\SDL2.dll dist
+cp C:\openssl\openssl-1.0.1s-vs2015\bin%OPENSSL_EXT%\libeay32MD.dll dist\libeay32MD.dll
+cp C:\openssl\openssl-1.0.1s-vs2015\bin%OPENSSL_EXT%\ssleay32MD.dll dist\ssleay32MD.dll
