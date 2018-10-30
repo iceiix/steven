@@ -179,8 +179,7 @@ fn main() {
 
     let proxy = console::ConsoleProxy::new(con.clone());
 
-    // TODO: fix error[E0423]: expected function, found macro `log::set_boxed_logger`
-    //log::set_boxed_logger(Box::new(proxy)).unwrap();
+    log::set_boxed_logger(Box::new(proxy)).unwrap();
     log::set_max_level(log::LevelFilter::Trace);
 
     info!("Starting steven");
