@@ -1,3 +1,4 @@
+echo on
 if "%PLATFORM%" == "x86" set RUST_INSTALL=i686-pc-windows-msvc
 if "%PLATFORM%" == "x64" set RUST_INSTALL=x86_64-pc-windows-msvc
 appveyor AddMessage "Platform rust: %RUST_INSTALL%"
