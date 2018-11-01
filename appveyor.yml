@@ -1,9 +1,6 @@
 version: 1.0.{build}
 image: Visual Studio 2015
 clone_depth: 1
-configuration:
-  - Debug
-  - Release
 platform:
   - Win32
   - x64
