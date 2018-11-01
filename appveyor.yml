@@ -8,13 +8,13 @@ build_script:
 - cmd: >-
     echo on
 
+    echo AddMessage "PLATFORM is %PLATFORM%"
+
     set PLATFORM=x86
 
     if "%PLATFORM%" == "x86" set RUST_INSTALL=i686-pc-windows-msvc
 
     if "%PLATFORM%" == "x64" set RUST_INSTALL=x86_64-pc-windows-msvc
-
-    echo AddMessage "PLATFORM is %PLATFORM%"
 
     echo AddMessage "platform is %platform%"
 
