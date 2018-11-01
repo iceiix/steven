@@ -31,9 +31,7 @@ build_script:
 
     vcpkg integrate install
 
-    vcpkg install openssl:x64-windows
-
-    vcpkg install openssl:x86-windows
+    vcpkg install openssl:%PLATFORM%-windows
 
     set VCPKGRS_DYNAMIC=1
 
