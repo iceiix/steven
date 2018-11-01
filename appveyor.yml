@@ -7,12 +7,6 @@ configuration:
 platform:
   - Win32
   - x64
-environment:
-  matrix:
-    - TOOLCHAIN_VERSION: 14.0
-      RUST: nightly-2018-10-24
-    - TOOLCHAIN_VERSION: 14.0
-      RUST: nightly
 build_script:
 - cmd: >-
     echo on
