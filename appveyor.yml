@@ -2,15 +2,13 @@ version: 1.0.{build}
 image: Visual Studio 2015
 clone_depth: 1
 platform:
-  - Win32
+  - x86
   - x64
 build_script:
 - cmd: >-
     echo on
 
     echo AddMessage "PLATFORM is %PLATFORM%"
-
-    set PLATFORM=x86
 
     if "%PLATFORM%" == "x86" set RUST_INSTALL=i686-pc-windows-msvc
 
