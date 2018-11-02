@@ -990,20 +990,7 @@ impl Read for Conn {
             Option::None => self.stream.read(buf),
             Option::Some(cipher) => {
                 let ret = try!(self.stream.read(buf));
-                println!("decrypting {:?}", &buf[..ret]);
-                let mut data = vec![0; ret + symm::Cipher::aes_128_cfb8().block_size()];
-                let count = cipher.update(&buf[..ret], &mut data).unwrap();
-
-                /*
-                for i in 0..count {
-                    buf[i] = data[i];
-                }
-                */
-
-                println!("ossl = {:?}", &data);
-
                 self.cipher2.as_mut().unwrap().decrypt(&mut buf[..ret]);
-                println!("buf  = {:?}", &buf[..ret]);
 
                 Ok(ret)
             }
@@ -1018,12 +1005,14 @@ impl Write for Conn {
             Option::Some(cipher) => {
                 println!("encrypting buf = {:?}", buf);
                 let mut data = vec![0; buf.len() + symm::Cipher::aes_128_cfb8().block_size()];
+                let count = cipher.update(buf, &mut data).unwrap();
                 println!("ossl data = {:?}", data);
+
                 /* TODO
                 self.cipher2.as_mut().unwrap().encrypt(&mut buf);
                 println!("buf = {:?}", buf);
                 */
-                let count = cipher.update(buf, &mut data).unwrap();
+
                 try!(self.stream.write_all(&data[..count]));
                 Ok(buf.len())
             }
