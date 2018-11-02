@@ -1007,10 +1007,10 @@ impl Write for Conn {
                 let mut data = vec![0; buf.len() + symm::Cipher::aes_128_cfb8().block_size()];
 
                 let count = cipher.update(buf, &mut data).unwrap();
-                println!("ossl data = {:?}", data);
+                println!("data  = {:?}", data);
 
 
-                let mut data2 = vec![0; buf.len() + symm::Cipher::aes_128_cfb8().block_size()];
+                let mut data2 = vec![0; buf.len()];
                 for i in 0..count {
                     data2[i] = buf[i];
                 }
