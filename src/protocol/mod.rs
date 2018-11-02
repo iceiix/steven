@@ -14,7 +14,6 @@
 
 #![allow(dead_code)]
 
-use openssl::symm;
 use aes::Aes128;
 use cfb8::Cfb8;
 use cfb8::stream_cipher::{NewStreamCipher, StreamCipher};
@@ -757,16 +756,12 @@ pub struct Conn {
     direction: Direction,
     pub state: State,
 
-    cipher: Option<symm::Crypter>,
-    cipher2: Option<Aes128Cfb>,
+    cipher: Option<Aes128Cfb>,
 
     compression_threshold: i32,
     compression_read: Option<ZlibDecoder<io::Cursor<Vec<u8>>>>,
     compression_write: Option<ZlibEncoder<io::Cursor<Vec<u8>>>>,
 }
-
-// Needed because symm::Crypter isn't send
-unsafe impl Send for Conn {}
 
 impl Conn {
     pub fn new(target: &str) -> Result<Conn, Error> {
@@ -786,7 +781,6 @@ impl Conn {
             direction: Direction::Serverbound,
             state: State::Handshaking,
             cipher: Option::None,
-            cipher2: Option::None,
             compression_threshold: -1,
             compression_read: Option::None,
             compression_write: Option::None,
@@ -873,16 +867,9 @@ impl Conn {
         }
     }
 
-    pub fn enable_encyption(&mut self, key: &[u8], decrypt: bool) {
-        let cipher = symm::Crypter::new(symm::Cipher::aes_128_cfb8(),
-            if decrypt { symm::Mode::Decrypt } else { symm::Mode::Encrypt },
-            key,
-            Some(key)).unwrap();
+    pub fn enable_encyption(&mut self, key: &[u8], _decrypt: bool) {
+        let cipher = Aes128Cfb::new_var(key, key).unwrap();
         self.cipher = Option::Some(cipher);
-
-        let cipher2 = Aes128Cfb::new_var(key, key).unwrap();
-        println!("enabling encryption with key={:?}", key);
-        self.cipher2 = Option::Some(cipher2);
     }
 
     pub fn set_compresssion(&mut self, threshold: i32) {
@@ -990,7 +977,7 @@ impl Read for Conn {
             Option::None => self.stream.read(buf),
             Option::Some(cipher) => {
                 let ret = try!(self.stream.read(buf));
-                self.cipher2.as_mut().unwrap().decrypt(&mut buf[..ret]);
+                cipher.decrypt(&mut buf[..ret]);
 
                 Ok(ret)
             }
@@ -1003,22 +990,15 @@ impl Write for Conn {
         match self.cipher.as_mut() {
             Option::None => self.stream.write(buf),
             Option::Some(cipher) => {
-                println!("encrypting buf = {:?}", buf);
-                let mut data = vec![0; buf.len() + symm::Cipher::aes_128_cfb8().block_size()];
-
-                let count = cipher.update(buf, &mut data).unwrap();
-                println!("data  = {:?}", data);
-
-
-                let mut data2 = vec![0; buf.len()];
-                for i in 0..count {
-                    data2[i] = buf[i];
+                // TODO: avoid copying, but trait requires non-mutable buf
+                let mut data = vec![0; buf.len()];
+                for i in 0..buf.len() {
+                    data[i] = buf[i];
                 }
 
-                self.cipher2.as_mut().unwrap().encrypt(&mut data2);
-                println!("data2 = {:?}", data2);
+                cipher.encrypt(&mut data);
 
-                try!(self.stream.write_all(&data[..count]));
+                try!(self.stream.write_all(&data));
                 Ok(buf.len())
             }
         }
@@ -1038,7 +1018,6 @@ impl Clone for Conn {
             direction: self.direction,
             state: self.state,
             cipher: Option::None,
-            cipher2: Option::None,
             compression_threshold: self.compression_threshold,
             compression_read: Option::None,
             compression_write: Option::None,
