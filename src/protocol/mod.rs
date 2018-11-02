@@ -15,6 +15,9 @@
 #![allow(dead_code)]
 
 use openssl::symm;
+use aes::Aes128;
+use cfb8::Cfb8;
+use cfb8::stream_cipher::{NewStreamCipher, StreamCipher};
 use serde_json;
 use reqwest;
 use openssl;
@@ -745,6 +748,8 @@ impl ::std::fmt::Display for Error {
     }
 }
 
+type Aes128Cfb = Cfb8<Aes128>;
+
 pub struct Conn {
     stream: TcpStream,
     pub host: String,
@@ -753,6 +758,7 @@ pub struct Conn {
     pub state: State,
 
     cipher: Option<symm::Crypter>,
+    cipher2: Option<Aes128Cfb>,
 
     compression_threshold: i32,
     compression_read: Option<ZlibDecoder<io::Cursor<Vec<u8>>>>,
@@ -780,6 +786,7 @@ impl Conn {
             direction: Direction::Serverbound,
             state: State::Handshaking,
             cipher: Option::None,
+            cipher2: Option::None,
             compression_threshold: -1,
             compression_read: Option::None,
             compression_write: Option::None,
@@ -872,6 +879,10 @@ impl Conn {
             key,
             Some(key)).unwrap();
         self.cipher = Option::Some(cipher);
+
+        let cipher2 = Aes128Cfb::new_var(key, key).unwrap();
+        println!("enabling encryption with key={:?}", key);
+        self.cipher2 = Option::Some(cipher2);
     }
 
     pub fn set_compresssion(&mut self, threshold: i32) {
@@ -979,11 +990,21 @@ impl Read for Conn {
             Option::None => self.stream.read(buf),
             Option::Some(cipher) => {
                 let ret = try!(self.stream.read(buf));
+                println!("decrypting {:?}", &buf[..ret]);
                 let mut data = vec![0; ret + symm::Cipher::aes_128_cfb8().block_size()];
                 let count = cipher.update(&buf[..ret], &mut data).unwrap();
+
+                /*
                 for i in 0..count {
                     buf[i] = data[i];
                 }
+                */
+
+                println!("ossl = {:?}", &data);
+
+                self.cipher2.as_mut().unwrap().decrypt(&mut buf[..ret]);
+                println!("buf  = {:?}", &buf[..ret]);
+
                 Ok(ret)
             }
         }
@@ -995,7 +1016,13 @@ impl Write for Conn {
         match self.cipher.as_mut() {
             Option::None => self.stream.write(buf),
             Option::Some(cipher) => {
+                println!("encrypting buf = {:?}", buf);
                 let mut data = vec![0; buf.len() + symm::Cipher::aes_128_cfb8().block_size()];
+                println!("ossl data = {:?}", data);
+                /* TODO
+                self.cipher2.as_mut().unwrap().encrypt(&mut buf);
+                println!("buf = {:?}", buf);
+                */
                 let count = cipher.update(buf, &mut data).unwrap();
                 try!(self.stream.write_all(&data[..count]));
                 Ok(buf.len())
@@ -1017,6 +1044,7 @@ impl Clone for Conn {
             direction: self.direction,
             state: self.state,
             cipher: Option::None,
+            cipher2: Option::None,
             compression_threshold: self.compression_threshold,
             compression_read: Option::None,
             compression_write: Option::None,
