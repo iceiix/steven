@@ -1005,13 +1005,18 @@ impl Write for Conn {
             Option::Some(cipher) => {
                 println!("encrypting buf = {:?}", buf);
                 let mut data = vec![0; buf.len() + symm::Cipher::aes_128_cfb8().block_size()];
+
                 let count = cipher.update(buf, &mut data).unwrap();
                 println!("ossl data = {:?}", data);
 
-                /* TODO
-                self.cipher2.as_mut().unwrap().encrypt(&mut buf);
-                println!("buf = {:?}", buf);
-                */
+
+                let mut data2 = vec![0; buf.len() + symm::Cipher::aes_128_cfb8().block_size()];
+                for i in 0..count {
+                    data2[i] = buf[i];
+                }
+
+                self.cipher2.as_mut().unwrap().encrypt(&mut data2);
+                println!("data2 = {:?}", data2);
 
                 try!(self.stream.write_all(&data[..count]));
                 Ok(buf.len())
