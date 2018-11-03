@@ -229,18 +229,20 @@ impl Server {
         let rsa = Rsa::public_key_from_der(&packet.public_key.data).unwrap();
         let mut shared = [0; 16];
         rand_bytes(&mut shared).unwrap();
-        println!("shared = {:?}", &shared);
+        println!("shared ({:} bytes) = {:?}", shared.len(), &shared);
         println!("packet.verify_token.data = {:?}", &packet.verify_token.data);
 
         let mut shared_e = vec![0; rsa.size() as usize];
         let mut token_e = vec![0; rsa.size() as usize];
         rsa.public_encrypt(&shared, &mut shared_e, Padding::PKCS1)?;
         rsa.public_encrypt(&packet.verify_token.data, &mut token_e, Padding::PKCS1)?;
-        println!("shared_e = {:?}", &shared_e);
-        println!("token_e = {:?}", &token_e);
+        println!("OpenSSL shared_e({:}) = {:?}", shared_e.len(), &shared_e);
+        println!("OpenSSL token_e({:}) = {:?}", token_e.len(), &token_e);
 
         let shared_e = rsa_public_encrypt_pkcs1(&packet.public_key.data, &shared);
         let token_e = rsa_public_encrypt_pkcs1(&packet.public_key.data, &packet.verify_token.data);
+        println!("new shared_e({:}) = {:?}", shared_e.len(), &shared_e);
+        println!("new token_e({:}) = {:?}", token_e.len(), &token_e);
 
         try!(profile.join_server(&packet.server_id, &shared, &packet.public_key.data));
 
