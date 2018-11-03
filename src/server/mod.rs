@@ -99,6 +99,87 @@ macro_rules! handle_packet {
     )
 }
 
+use num::bigint::{BigInt};
+use simple_asn1::{from_der, ASN1Block};
+
+fn find_bitstrings(asns: Vec<ASN1Block>, mut result: &mut Vec<Vec<u8>>) {
+    for asn in asns.iter() {
+        match asn {
+            ASN1Block::BitString(_, _, _, bytes) => result.push(bytes.to_vec()),
+            ASN1Block::Sequence(_, _,  blocks) => find_bitstrings(blocks.to_vec(), &mut result),
+            _ => (),
+        }
+    }
+}
+
+fn rsa_public_encrypt_pkcs1(der_pubkey: &[u8], message: &[u8]) -> Vec<u8> {
+    // Outer ASN.1 encodes 1.2.840.113549.1.1 OID and wraps a bitstring, find it
+    let asns: Vec<ASN1Block> = from_der(&der_pubkey).unwrap();
+    println!("asns = {:?}", asns);
+    for asn in asns.iter() {
+        println!("asn = {:?}", asn);
+    }
+    let mut result: Vec<Vec<u8>> = vec![];
+    find_bitstrings(asns, &mut result);
+
+    let inner_asn: Vec<ASN1Block> = from_der(&result[0]).unwrap();
+    println!("inner_asn {:?}", inner_asn[0]);
+    let (n, e) =
+    match &inner_asn[0] {
+        ASN1Block::Sequence(_, _, blocks) => {
+            let n = match &blocks[0] {
+                ASN1Block::Integer(_, _, n) => Some(n),
+                _ => None,
+            };
+
+            let e = match &blocks[1] {
+                ASN1Block::Integer(_, _, e) => Some(e),
+                _ => None,
+            };
+            (n, e)
+
+        },
+        _ => (None, None)
+    };
+    let n = n.unwrap();
+    let e = e.unwrap();
+    println!("N={:?}\ne={:?}", n, e);
+
+    // PKCS#1 padding https://tools.ietf.org/html/rfc8017#section-7.2.1 RSAES-PKCS1-V1_5-ENCRYPT ((n, e), M)
+    let k = n.bits() / 8; // bytes in modulus
+    if k != 1024/8 { panic!("expected 1024-bit modulus"); }
+    println!("k = {}", k);
+
+    if message.len() > k - 11 {
+        panic!("message too long");
+    }
+    let mut padding = vec![0; k - message.len() - 3];
+    use openssl::rand::rand_bytes;
+    rand_bytes(&mut padding).unwrap();
+
+    let mut encoded_m = vec![0x00, 0x02];
+    encoded_m.append(&mut padding.to_vec());
+    encoded_m.append(&mut vec![0x00]);
+    encoded_m.extend_from_slice(&message);
+    println!("encoded_m = {:?}", encoded_m);
+
+    // TODO: ensure this is OS2IP https://tools.ietf.org/html/rfc8017#section-4.2
+    let m = BigInt::from_bytes_be(num::bigint::Sign::Plus, &encoded_m);
+
+    // TODO: PKCS#1 padding
+    //
+    let ciphertext_bigint = m.modpow(&e, &n);
+    // TODO: convert bigint to octet string
+    // 4.1. I2OSP https://tools.ietf.org/html/rfc8017#section-4.1
+
+    println!("m = {:?}", m);
+    println!("ciphertext = {:?}", ciphertext_bigint);
+
+    let (_sign, ciphertext) = ciphertext_bigint.to_bytes_be();
+    return ciphertext;
+}
+
+
 impl Server {
 
     pub fn connect(resources: Arc<RwLock<resources::Manager>>, profile: mojang::Profile, address: &str) -> Result<Server, protocol::Error> {
@@ -144,14 +225,22 @@ impl Server {
             };
         }
 
+        println!("packet.public_key.data = {:?}", &packet.public_key.data);
         let rsa = Rsa::public_key_from_der(&packet.public_key.data).unwrap();
         let mut shared = [0; 16];
         rand_bytes(&mut shared).unwrap();
+        println!("shared = {:?}", &shared);
+        println!("packet.verify_token.data = {:?}", &packet.verify_token.data);
 
         let mut shared_e = vec![0; rsa.size() as usize];
         let mut token_e = vec![0; rsa.size() as usize];
         rsa.public_encrypt(&shared, &mut shared_e, Padding::PKCS1)?;
         rsa.public_encrypt(&packet.verify_token.data, &mut token_e, Padding::PKCS1)?;
+        println!("shared_e = {:?}", &shared_e);
+        println!("token_e = {:?}", &token_e);
+
+        let shared_e = rsa_public_encrypt_pkcs1(&packet.public_key.data, &shared);
+        let token_e = rsa_public_encrypt_pkcs1(&packet.public_key.data, &packet.verify_token.data);
 
         try!(profile.join_server(&packet.server_id, &shared, &packet.public_key.data));
 

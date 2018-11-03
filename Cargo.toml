@@ -29,6 +29,8 @@ collision = "0.18.0"
 openssl = "0.10.15"
 aes = "0.3.2"
 cfb8 = "0.3.1"
+num = "0.2.0"
+simple_asn1 = { git = "https://github.com/acw/simple_asn1", rev = "823fc31f6f9ba0636207226901f46d50eb1fdd01" }
 # clippy = "*"
 
 [dependencies.steven_gl]
