@@ -30,7 +30,7 @@ use zip;
 use crate::types::hash::FNVHash;
 use crate::ui;
 
-const RESOURCES_VERSION: &str = "1.9.2";
+const RESOURCES_VERSION: &str = "1.9";
 const VANILLA_CLIENT_URL: &str = "https://launcher.mojang.com/mc/game/1.9.2/client/19106fd5e222dca0f2dde9f66db8384c9a7db957/client.jar";
 const ASSET_VERSION: &str = "1.9";
 const ASSET_INDEX_URL: &str = "https://launchermeta.mojang.com/mc-staging/assets/1.9/13f566a82f5a8a1b5a5552d968a93c2d9b86df66/1.9.json";
