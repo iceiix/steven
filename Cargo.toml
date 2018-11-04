@@ -28,8 +28,7 @@ lazy_static = "1.1.0"
 collision = "0.18.0"
 aes = "0.3.2"
 cfb8 = "0.3.1"
-num = "0.2.0"
-simple_asn1 = { git = "https://github.com/acw/simple_asn1", rev = "823fc31f6f9ba0636207226901f46d50eb1fdd01" }
+rsa_public_encrypt_pkcs1 = { git = "https://github.com/iceiix/rsa_public_encrypt_pkcs1", rev = "20fa2d1c4409424a4eb8791e29fe568222cdf76b" }
 # clippy = "*"
 
 [dependencies.steven_gl]
