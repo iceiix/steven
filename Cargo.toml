@@ -28,7 +28,7 @@ lazy_static = "1.1.0"
 collision = "0.18.0"
 aes = "0.3.2"
 cfb8 = "0.3.1"
-rsa_public_encrypt_pkcs1 = { git = "https://github.com/iceiix/rsa_public_encrypt_pkcs1", rev = "20fa2d1c4409424a4eb8791e29fe568222cdf76b" }
+rsa_public_encrypt_pkcs1 = { git = "https://github.com/iceiix/rsa_public_encrypt_pkcs1", rev = "90d33d6ff3b1c270b0f1641236398d9ae026c3eb" }
 # clippy = "*"
 
 [dependencies.steven_gl]
