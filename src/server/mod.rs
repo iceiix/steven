@@ -198,7 +198,6 @@ fn rsa_public_encrypt_pkcs1(der_pubkey: &[u8], message: &[u8]) -> Vec<u8> {
 impl Server {
 
     pub fn connect(resources: Arc<RwLock<resources::Manager>>, profile: mojang::Profile, address: &str) -> Result<Server, protocol::Error> {
-        use openssl::rand::rand_bytes;
         use openssl::rsa::{Rsa, Padding};
         let mut conn = try!(protocol::Conn::new(address));
 
@@ -243,7 +242,9 @@ impl Server {
         println!("packet.public_key.data = {:?}", &packet.public_key.data);
         let rsa = Rsa::public_key_from_der(&packet.public_key.data).unwrap();
         let mut shared = [0; 16];
-        rand_bytes(&mut shared).unwrap();
+        // TODO: is this cryptographically secure enough?
+        rand::thread_rng().fill(&mut shared);
+
         println!("shared ({:} bytes) = {:?}", shared.len(), &shared);
         println!("packet.verify_token.data = {:?}", &packet.verify_token.data);
 
