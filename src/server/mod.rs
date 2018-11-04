@@ -112,7 +112,7 @@ fn find_bitstrings(asns: Vec<ASN1Block>, mut result: &mut Vec<Vec<u8>>) {
     }
 }
 
-fn rsa_public_encrypt_pkcs1(der_pubkey: &[u8], message: &[u8]) -> Vec<u8> {
+fn rsa_public_encrypt_pkcs1(der_pubkey: &[u8], message: &[u8]) -> Result<Vec<u8>, String> {
     // Outer ASN.1 encodes 1.2.840.113549.1.1 OID and wraps a bitstring, find it
     let asns: Vec<ASN1Block> = from_der(&der_pubkey).unwrap();
     println!("asns = {:?}", asns);
@@ -182,7 +182,7 @@ fn rsa_public_encrypt_pkcs1(der_pubkey: &[u8], message: &[u8]) -> Vec<u8> {
 
     let (_sign, ciphertext) = ciphertext_bigint.to_bytes_be();
 
-    return ciphertext;
+    return Ok(ciphertext);
 }
 
 
@@ -237,8 +237,8 @@ impl Server {
         println!("shared ({:} bytes) = {:?}", shared.len(), &shared);
         println!("packet.verify_token.data = {:?}", &packet.verify_token.data);
 
-        let shared_e = rsa_public_encrypt_pkcs1(&packet.public_key.data, &shared);
-        let token_e = rsa_public_encrypt_pkcs1(&packet.public_key.data, &packet.verify_token.data);
+        let shared_e = rsa_public_encrypt_pkcs1(&packet.public_key.data, &shared).unwrap();
+        let token_e = rsa_public_encrypt_pkcs1(&packet.public_key.data, &packet.verify_token.data).unwrap();
         println!("new shared_e({:}) = {:?}", shared_e.len(), &shared_e);
         println!("new token_e({:}) = {:?}", token_e.len(), &token_e);
 
