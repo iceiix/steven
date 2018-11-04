@@ -172,10 +172,18 @@ fn rsa_public_encrypt_pkcs1(der_pubkey: &[u8], message: &[u8]) -> Vec<u8> {
     // TODO: convert bigint to octet string
     // 4.1. I2OSP https://tools.ietf.org/html/rfc8017#section-4.1
 
-    println!("m = {:?}", m);
-    println!("ciphertext = {:?}", ciphertext_bigint);
+    println!("m = 0x{:}", m.to_str_radix(16));
+    println!("ciphertext = 0x{:}", ciphertext_bigint.to_str_radix(16));
 
     let (_sign, ciphertext) = ciphertext_bigint.to_bytes_be();
+    /* TODO: ?
+    if ciphertext[0] > 0x7f {
+        let mut tmp: Vec<u8> = vec![0];
+        tmp.extend(ciphertext);
+        return tmp
+    }
+    */
+
     return ciphertext;
 }
 
