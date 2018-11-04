@@ -17,17 +17,17 @@ pub use steven_blocks as block;
 use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::hash::BuildHasherDefault;
-use types::{bit, nibble};
-use shared::{Position, Direction};
-use types::hash::FNVHash;
-use protocol;
-use render;
+use crate::types::{bit, nibble};
+use crate::shared::{Position, Direction};
+use crate::types::hash::FNVHash;
+use crate::protocol;
+use crate::render;
 use collision;
 use cgmath::prelude::*;
-use chunk_builder;
-use ecs;
-use entity::block_entity;
-use format;
+use crate::chunk_builder;
+use crate::ecs;
+use crate::entity::block_entity;
+use crate::format;
 
 pub mod biome;
 mod storage;
@@ -317,7 +317,7 @@ impl World {
     }
 
     pub fn compute_render_list(&mut self, renderer: &mut render::Renderer) {
-        use chunk_builder;
+        use crate::chunk_builder;
         use std::collections::VecDeque;
         self.render_list.clear();
 
@@ -548,7 +548,7 @@ impl World {
     pub fn load_chunk(&mut self, x: i32, z: i32, new: bool, mask: u16, data: Vec<u8>) -> Result<(), protocol::Error> {
         use std::io::{Cursor, Read};
         use byteorder::ReadBytesExt;
-        use protocol::{VarInt, Serializable, LenPrefixed};
+        use crate::protocol::{VarInt, Serializable, LenPrefixed};
 
         let mut data = Cursor::new(data);
 
@@ -580,20 +580,20 @@ impl World {
                 let section = chunk.sections[i as usize].as_mut().unwrap();
                 section.dirty = true;
 
-                let mut bit_size = try!(data.read_u8());
+                let mut bit_size = r#try!(data.read_u8());
                 let mut mappings: HashMap<usize, block::Block, BuildHasherDefault<FNVHash>> = HashMap::with_hasher(BuildHasherDefault::default());
                 if bit_size == 0 {
                     bit_size = 13;
                 } else {
-                    let count = try!(VarInt::read_from(&mut data)).0;
+                    let count = r#try!(VarInt::read_from(&mut data)).0;
                     for i in 0 .. count {
-                        let id = try!(VarInt::read_from(&mut data)).0;
+                        let id = r#try!(VarInt::read_from(&mut data)).0;
                         let bl = block::Block::by_vanilla_id(id as usize);
                         mappings.insert(i as usize, bl);
                     }
                 }
 
-                let bits = try!(LenPrefixed::<VarInt, u64>::read_from(&mut data)).data;
+                let bits = r#try!(LenPrefixed::<VarInt, u64>::read_from(&mut data)).data;
                 let m = bit::Map::from_raw(bits, bit_size as usize);
 
                 for bi in 0 .. 4096 {
@@ -614,12 +614,12 @@ impl World {
                     }
                 }
 
-                try!(data.read_exact(&mut section.block_light.data));
-                try!(data.read_exact(&mut section.sky_light.data));
+                r#try!(data.read_exact(&mut section.block_light.data));
+                r#try!(data.read_exact(&mut section.sky_light.data));
             }
 
             if new {
-                try!(data.read_exact(&mut chunk.biomes));
+                r#try!(data.read_exact(&mut chunk.biomes));
             }
 
             chunk.calculate_heightmap();

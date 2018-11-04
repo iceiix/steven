@@ -147,10 +147,10 @@ impl TextComponent {
 
 impl fmt::Display for TextComponent {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        try!(write!(f, "{}", self.text));
+        r#try!(write!(f, "{}", self.text));
         if let Some(ref extra) = self.modifier.extra {
             for c in extra {
-                try!(write!(f, "{}", c));
+                r#try!(write!(f, "{}", c));
             }
         }
         Result::Ok(())

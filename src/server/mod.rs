@@ -12,25 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use protocol::{self, mojang, packet};
-use world;
-use world::block;
+use crate::protocol::{self, mojang, packet};
+use crate::world;
+use crate::world::block;
 use rand::{self, Rng};
 use std::sync::{Arc, RwLock};
 use std::sync::mpsc;
 use std::thread;
 use std::collections::HashMap;
 use std::hash::BuildHasherDefault;
-use types::hash::FNVHash;
-use resources;
-use render;
-use settings::Stevenkey;
-use ecs;
-use entity;
+use crate::types::hash::FNVHash;
+use crate::resources;
+use crate::render;
+use crate::settings::Stevenkey;
+use crate::ecs;
+use crate::entity;
 use cgmath::prelude::*;
-use types::Gamemode;
-use shared::{Axis, Position};
-use format;
+use crate::types::Gamemode;
+use crate::shared::{Axis, Position};
+use crate::format;
 use rsa_public_encrypt_pkcs1;
 
 mod sun;
@@ -103,24 +103,24 @@ macro_rules! handle_packet {
 impl Server {
 
     pub fn connect(resources: Arc<RwLock<resources::Manager>>, profile: mojang::Profile, address: &str) -> Result<Server, protocol::Error> {
-        let mut conn = try!(protocol::Conn::new(address));
+        let mut conn = r#try!(protocol::Conn::new(address));
 
         let host = conn.host.clone();
         let port = conn.port;
-        try!(conn.write_packet(protocol::packet::handshake::serverbound::Handshake {
+        r#try!(conn.write_packet(protocol::packet::handshake::serverbound::Handshake {
              protocol_version: protocol::VarInt(protocol::SUPPORTED_PROTOCOL),
              host: host,
              port: port,
              next: protocol::VarInt(2),
          }));
         conn.state = protocol::State::Login;
-        try!(conn.write_packet(protocol::packet::login::serverbound::LoginStart {
+        r#try!(conn.write_packet(protocol::packet::login::serverbound::LoginStart {
             username: profile.username.clone(),
         }));
 
         let packet;
         loop {
-            match try!(conn.read_packet()) {
+            match r#try!(conn.read_packet()) {
                 protocol::packet::Packet::SetInitialCompression(val) => {
                     conn.set_compresssion(val.threshold.0);
                 },
@@ -156,9 +156,9 @@ impl Server {
         println!("new shared_e({:}) = {:?}", shared_e.len(), &shared_e);
         println!("new token_e({:}) = {:?}", token_e.len(), &token_e);
 
-        try!(profile.join_server(&packet.server_id, &shared, &packet.public_key.data));
+        r#try!(profile.join_server(&packet.server_id, &shared, &packet.public_key.data));
 
-        try!(conn.write_packet(protocol::packet::login::serverbound::EncryptionResponse {
+        r#try!(conn.write_packet(protocol::packet::login::serverbound::EncryptionResponse {
             shared_secret: protocol::LenPrefixedBytes::new(shared_e),
             verify_token: protocol::LenPrefixedBytes::new(token_e),
         }));
@@ -171,7 +171,7 @@ impl Server {
 
         let uuid;
         loop {
-           match try!(read.read_packet()) {
+           match r#try!(read.read_packet()) {
                protocol::packet::Packet::SetInitialCompression(val) => {
                    read.set_compresssion(val.threshold.0);
                    write.set_compresssion(val.threshold.0);
@@ -508,7 +508,7 @@ impl Server {
     }
 
     pub fn on_right_click(&mut self, renderer: &mut render::Renderer) {
-        use shared::Direction;
+        use crate::shared::Direction;
         if self.player.is_some() {
             if let Some((pos, _, face, at)) = target::trace_ray(&self.world, 4.0, renderer.camera.pos.to_vec(), renderer.view_vector.cast().unwrap(), target::test_block) {
                 self.write_packet(packet::play::serverbound::PlayerBlockPlacement {
@@ -722,7 +722,7 @@ impl Server {
             },
             Some(nbt) => {
                 if block_update.action == 9 {
-                    use format;
+                    use crate::format;
                     let line1 = format::Component::from_string(nbt.1.get("Text1").unwrap().as_str().unwrap());
                     let line2 = format::Component::from_string(nbt.1.get("Text2").unwrap().as_str().unwrap());
                     let line3 = format::Component::from_string(nbt.1.get("Text3").unwrap().as_str().unwrap());
@@ -740,7 +740,7 @@ impl Server {
     }
 
     fn on_player_info(&mut self, player_info: packet::play::clientbound::PlayerInfo) {
-        use protocol::packet::PlayerDetail::*;
+        use crate::protocol::packet::PlayerDetail::*;
         use base64;
         use serde_json;
         for detail in player_info.inner.players {

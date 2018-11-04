@@ -23,18 +23,18 @@ pub mod clouds;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use std::io::Write;
-use resources;
-use gl;
+use crate::resources;
+use crate::gl;
 use image;
 use image::{GenericImage, GenericImageView};
 use byteorder::{WriteBytesExt, NativeEndian};
 use serde_json;
 use cgmath::prelude::*;
-use world;
+use crate::world;
 use collision;
 
 use std::hash::BuildHasherDefault;
-use types::hash::FNVHash;
+use crate::types::hash::FNVHash;
 use std::sync::atomic::{AtomicIsize, Ordering};
 use std::thread;
 use std::sync::mpsc;
@@ -863,12 +863,12 @@ impl TextureManager {
         use std::io::{Error, ErrorKind};
         let path = format!("skin-cache/{}/{}.png", &hash[..2], hash);
         let cache_path = Path::new(&path);
-        try!(fs::create_dir_all(cache_path.parent().unwrap()));
+        r#try!(fs::create_dir_all(cache_path.parent().unwrap()));
         let mut buf = vec![];
         if fs::metadata(cache_path).is_ok() {
             // We have a cached image
-            let mut file = try!(fs::File::open(cache_path));
-            try!(file.read_to_end(&mut buf));
+            let mut file = r#try!(fs::File::open(cache_path));
+            r#try!(file.read_to_end(&mut buf));
         } else {
             // Need to download it
             let url = &format!("http://textures.minecraft.net/texture/{}", hash);
@@ -888,8 +888,8 @@ impl TextureManager {
             }
 
             // Save to cache
-            let mut file = try!(fs::File::create(cache_path));
-            try!(file.write_all(&buf));
+            let mut file = r#try!(fs::File::create(cache_path));
+            r#try!(file.write_all(&buf));
         }
         let mut img = match image::load_from_memory(&buf) {
             Ok(val) => val,
@@ -957,11 +957,11 @@ impl TextureManager {
             if name.starts_with("steven-dynamic:") {
                 let n = &name["steven-dynamic:".len()..];
                 let (width, height, data) = {
-                    let dyn = match self.dynamic_textures.get(n) {
+                    let r#dyn = match self.dynamic_textures.get(n) {
                         Some(val) => val,
                         None => continue,
                     };
-                    let img = &dyn.1;
+                    let img = &r#dyn.1;
                     let (width, height) = img.dimensions();
                     (width, height, img.to_rgba().into_vec())
                 };
