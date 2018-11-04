@@ -100,7 +100,6 @@ macro_rules! handle_packet {
     )
 }
 
-
 impl Server {
 
     pub fn connect(resources: Arc<RwLock<resources::Manager>>, profile: mojang::Profile, address: &str) -> Result<Server, protocol::Error> {
