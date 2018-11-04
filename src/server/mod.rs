@@ -382,7 +382,7 @@ impl Server {
                             TeleportPlayer => on_teleport,
                             TimeUpdate => on_time_update,
                             ChangeGameState => on_game_state_change,
-                            UpdateBlockEntity => on_block_entity_update,
+                            UpdateSign => on_sign_update,
                             PlayerInfo => on_player_info,
                             Disconnect => on_disconnect,
                             // Entities
@@ -713,6 +713,21 @@ impl Server {
         }
     }
 
+    fn on_sign_update(&mut self, mut update_sign: packet::play::clientbound::UpdateSign) {
+        use crate::format;
+        format::convert_legacy(&mut update_sign.line1);
+        format::convert_legacy(&mut update_sign.line2);
+        format::convert_legacy(&mut update_sign.line3);
+        format::convert_legacy(&mut update_sign.line4);
+        self.world.add_block_entity_action(world::BlockEntityAction::UpdateSignText(
+            update_sign.location,
+            update_sign.line1,
+            update_sign.line2,
+            update_sign.line3,
+            update_sign.line4,
+        ));
+    }
+
     fn on_block_entity_update(&mut self, block_update: packet::play::clientbound::UpdateBlockEntity) {
         match block_update.nbt {
             None => {
@@ -831,26 +846,6 @@ impl Server {
             chunk_data.bitmask.0 as u16,
             chunk_data.data.data
         ).unwrap();
-        for optional_block_entity in chunk_data.block_entities.data {
-            if let Some(block_entity) = optional_block_entity {
-                let x = block_entity.1.get("x").unwrap().as_int().unwrap();
-                let y = block_entity.1.get("y").unwrap().as_int().unwrap();
-                let z = block_entity.1.get("z").unwrap().as_int().unwrap();
-                let tile_id = block_entity.1.get("id").unwrap().as_str().unwrap();
-                let action;
-                match tile_id {
-                    // Fake a sign update
-                    "Sign" => action = 9,
-                    // Not something we care about, so break the loop
-                    _ => continue,
-                }
-                self.on_block_entity_update(packet::play::clientbound::UpdateBlockEntity {
-                    location: Position::new(x, y, z),
-                    action,
-                    nbt: Some(block_entity.clone()),
-                });
-            }
-        }
     }
 
     fn on_chunk_unload(&mut self, chunk_unload: packet::play::clientbound::ChunkUnload) {
