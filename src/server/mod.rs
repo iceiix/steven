@@ -114,6 +114,7 @@ fn find_bitstrings(asns: Vec<ASN1Block>, mut result: &mut Vec<Vec<u8>>) {
 
 fn rsa_public_encrypt_pkcs1(der_pubkey: &[u8], message: &[u8]) -> Result<Vec<u8>, String> {
     // Outer ASN.1 encodes 1.2.840.113549.1.1 OID and wraps a bitstring, find it
+    // TODO: instead of unwrap(), try! and return simple_asn1::ASN1DecodeErr or an ErrorStack
     let asns: Vec<ASN1Block> = from_der(&der_pubkey).unwrap();
     let mut result: Vec<Vec<u8>> = vec![];
     find_bitstrings(asns, &mut result);
@@ -203,11 +204,9 @@ fn rsa_public_encrypt_pkcs1(der_pubkey: &[u8], message: &[u8]) -> Result<Vec<u8>
     /* 1.  If the message representative m is not between 0 and n - 1,
      *     output "message representative out of range" and stop.
      */
-    /* TODO
-    if m < 0 || m > n - 1 {
+    if m.sign() != num::bigint::Sign::Plus || m > n - 1 {
         return Err("RSA error: message representative out of range".to_string());
     }
-    */
 
     // 2.  Let c = m^e mod n.
     let ciphertext_bigint = m.modpow(&e, &n);
