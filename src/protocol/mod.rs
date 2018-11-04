@@ -248,11 +248,11 @@ impl Serializable for bool {
         Result::Ok(buf.read_u8()? != 0)
     }
     fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), Error> {
-        r#try!(buf.write_u8(if *self {
+        buf.write_u8(if *self {
             1
         } else {
             0
-        }));
+        })?;
         Result::Ok(())
     }
 }
@@ -873,12 +873,12 @@ impl Conn {
         use self::packet::Packet;
         let host = self.host.clone();
         let port = self.port;
-        r#try!(self.write_packet(Handshake {
+        self.write_packet(Handshake {
             protocol_version: VarInt(SUPPORTED_PROTOCOL),
             host: host,
             port: port,
             next: VarInt(1),
-        }));
+        })?;
         self.state = State::Status;
 
         self.write_packet(StatusRequest { empty: () })?;
@@ -913,21 +913,21 @@ impl Conn {
             version: StatusVersion {
                 name: version.get("name").and_then(Value::as_str).ok_or(invalid_status())?
                           .to_owned(),
-                protocol: r#try!(version.get("protocol")
+                protocol: version.get("protocol")
                                       .and_then(Value::as_i64)
-                                      .ok_or(invalid_status())) as i32,
+                                      .ok_or(invalid_status())? as i32,
             },
             players: StatusPlayers {
-                max: r#try!(players.get("max")
+                max: players.get("max")
                                  .and_then(Value::as_i64)
-                                 .ok_or(invalid_status())) as i32,
-                online: r#try!(players.get("online")
+                                 .ok_or(invalid_status())? as i32,
+                online: players.get("online")
                                     .and_then(Value::as_i64)
-                                    .ok_or(invalid_status())) as i32,
+                                    .ok_or(invalid_status())? as i32,
                 sample: Vec::new(), /* TODO */
             },
-            description: format::Component::from_value(r#try!(val.get("description")
-                                                               .ok_or(invalid_status()))),
+            description: format::Component::from_value(val.get("description")
+                                                               .ok_or(invalid_status())?),
             favicon: val.get("favicon").and_then(Value::as_str).map(|v| v.to_owned()),
         },
             ping))
