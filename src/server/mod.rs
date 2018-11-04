@@ -115,14 +115,14 @@ fn find_bitstrings(asns: Vec<ASN1Block>, mut result: &mut Vec<Vec<u8>>) {
 fn rsa_public_encrypt_pkcs1(der_pubkey: &[u8], message: &[u8]) -> Result<Vec<u8>, String> {
     // Outer ASN.1 encodes 1.2.840.113549.1.1 OID and wraps a bitstring, find it
     // TODO: instead of unwrap(), try! and return simple_asn1::ASN1DecodeErr or an ErrorStack
-    let asns: Vec<ASN1Block> = from_der(&der_pubkey).unwrap();
+    let asns: Vec<ASN1Block> = from_der(&der_pubkey).expect("ASN.1 from_der failed to decode public key");
     let mut result: Vec<Vec<u8>> = vec![];
     find_bitstrings(asns, &mut result);
     if result.len() == 0 {
         return Err("ASN.1 BitString not found in DER encoding of public key".to_string());
     }
 
-    let inner_asn: Vec<ASN1Block> = from_der(&result[0]).unwrap();
+    let inner_asn: Vec<ASN1Block> = from_der(&result[0]).expect("ASN.1 from_der failed to decode BitString");
     let (n, e) =
     match &inner_asn[0] {
         ASN1Block::Sequence(_, _, blocks) => {
