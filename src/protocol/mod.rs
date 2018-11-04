@@ -38,7 +38,6 @@ use crate::shared::Position;
 
 pub const SUPPORTED_PROTOCOL: i32 = 109;
 
-
 /// Helper macro for defining packets
 #[macro_export]
 macro_rules! state_packets {
