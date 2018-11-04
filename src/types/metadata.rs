@@ -64,40 +64,40 @@ impl Serializable for Metadata {
     fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, protocol::Error> {
         let mut m = Metadata::new();
         loop {
-            let index = (u8::read_from(buf))? as i32;
+            let index = u8::read_from(buf)? as i32;
             if index == 0xFF {
                 break;
             }
-            let ty = (u8::read_from(buf))?;
+            let ty = u8::read_from(buf)?;
             match ty {
-                0 => m.put_raw(index, (i8::read_from(buf))?),
-                1 => m.put_raw(index, (protocol::VarInt::read_from(buf))?.0),
-                2 => m.put_raw(index, (f32::read_from(buf))?),
-                3 => m.put_raw(index, (String::read_from(buf))?),
-                4 => m.put_raw(index, (format::Component::read_from(buf))?),
-                5 => m.put_raw(index, (Option::<item::Stack>::read_from(buf))?),
-                6 => m.put_raw(index, (bool::read_from(buf))?),
+                0 => m.put_raw(index, i8::read_from(buf)?),
+                1 => m.put_raw(index, protocol::VarInt::read_from(buf)?.0),
+                2 => m.put_raw(index, f32::read_from(buf)?),
+                3 => m.put_raw(index, String::read_from(buf)?),
+                4 => m.put_raw(index, format::Component::read_from(buf)?),
+                5 => m.put_raw(index, Option::<item::Stack>::read_from(buf)?),
+                6 => m.put_raw(index, bool::read_from(buf)?),
                 7 => m.put_raw(index,
-                               [(f32::read_from(buf))?,
-                                (f32::read_from(buf))?,
-                                (f32::read_from(buf))?]),
-                8 => m.put_raw(index, (Position::read_from(buf))?),
+                               [f32::read_from(buf)?,
+                                f32::read_from(buf)?,
+                                f32::read_from(buf)?]),
+                8 => m.put_raw(index, Position::read_from(buf)?),
                 9 => {
-                    if (bool::read_from(buf))? {
-                        m.put_raw(index, (Option::<Position>::read_from(buf))?);
+                    if bool::read_from(buf)? {
+                        m.put_raw(index, Option::<Position>::read_from(buf)?);
                     } else {
                         m.put_raw::<Option<Position>>(index, None);
                     }
                 }
-                10 => m.put_raw(index, (protocol::VarInt::read_from(buf))?),
+                10 => m.put_raw(index, protocol::VarInt::read_from(buf)?),
                 11 => {
-                    if (bool::read_from(buf))? {
-                        m.put_raw(index, (Option::<protocol::UUID>::read_from(buf))?);
+                    if bool::read_from(buf)? {
+                        m.put_raw(index, Option::<protocol::UUID>::read_from(buf)?);
                     } else {
                         m.put_raw::<Option<protocol::UUID>>(index, None);
                     }
                 }
-                12 => m.put_raw(index, (protocol::VarInt::read_from(buf))?.0 as u16),
+                12 => m.put_raw(index, protocol::VarInt::read_from(buf)?.0 as u16),
                 _ => return Err(protocol::Error::Err("unknown metadata type".to_owned())),
             }
         }
@@ -106,76 +106,76 @@ impl Serializable for Metadata {
 
     fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), protocol::Error> {
         for (k, v) in &self.map {
-            ((*k as u8).write_to(buf))?;
+            (*k as u8).write_to(buf)?;
             match *v {
                 Value::Byte(ref val) => {
-                    (u8::write_to(&0, buf))?;
-                    (val.write_to(buf))?;
+                    u8::write_to(&0, buf)?;
+                    val.write_to(buf)?;
                 }
                 Value::Int(ref val) => {
-                    (u8::write_to(&1, buf))?;
-                    (protocol::VarInt(*val).write_to(buf))?;
+                    u8::write_to(&1, buf)?;
+                    protocol::VarInt(*val).write_to(buf)?;
                 }
                 Value::Float(ref val) => {
-                    (u8::write_to(&2, buf))?;
-                    (val.write_to(buf))?;
+                    u8::write_to(&2, buf)?;
+                    val.write_to(buf)?;
                 }
                 Value::String(ref val) => {
-                    (u8::write_to(&3, buf))?;
-                    (val.write_to(buf))?;
+                    u8::write_to(&3, buf)?;
+                    val.write_to(buf)?;
                 }
                 Value::FormatComponent(ref val) => {
-                    (u8::write_to(&4, buf))?;
-                    (val.write_to(buf))?;
+                    u8::write_to(&4, buf)?;
+                    val.write_to(buf)?;
                 }
                 Value::OptionalItemStack(ref val) => {
-                    (u8::write_to(&5, buf))?;
-                    (val.write_to(buf))?;
+                    u8::write_to(&5, buf)?;
+                    val.write_to(buf)?;
                 }
                 Value::Bool(ref val) => {
-                    (u8::write_to(&6, buf))?;
-                    (val.write_to(buf))?;
+                    u8::write_to(&6, buf)?;
+                    val.write_to(buf)?;
                 }
                 Value::Vector(ref val) => {
-                    (u8::write_to(&7, buf))?;
-                    (val[0].write_to(buf))?;
-                    (val[1].write_to(buf))?;
-                    (val[2].write_to(buf))?;
+                    u8::write_to(&7, buf)?;
+                    val[0].write_to(buf)?;
+                    val[1].write_to(buf)?;
+                    val[2].write_to(buf)?;
                 }
                 Value::Position(ref val) => {
-                    (u8::write_to(&8, buf))?;
-                    (val.write_to(buf))?;
+                    u8::write_to(&8, buf)?;
+                    val.write_to(buf)?;
                 }
                 Value::OptionalPosition(ref val) => {
-                    (u8::write_to(&9, buf))?;
-                    (val.is_some().write_to(buf))?;
-                    (val.write_to(buf))?;
+                    u8::write_to(&9, buf)?;
+                    val.is_some().write_to(buf)?;
+                    val.write_to(buf)?;
                 }
                 Value::Direction(ref val) => {
-                    (u8::write_to(&10, buf))?;
-                    (val.write_to(buf))?;
+                    u8::write_to(&10, buf)?;
+                    val.write_to(buf)?;
                 }
                 Value::OptionalUUID(ref val) => {
-                    (u8::write_to(&11, buf))?;
-                    (val.is_some().write_to(buf))?;
-                    (val.write_to(buf))?;
+                    u8::write_to(&11, buf)?;
+                    val.is_some().write_to(buf)?;
+                    val.write_to(buf)?;
                 }
                 Value::Block(ref val) => {
-                    (u8::write_to(&11, buf))?;
-                    (protocol::VarInt(*val as i32).write_to(buf))?;
+                    u8::write_to(&11, buf)?;
+                    protocol::VarInt(*val as i32).write_to(buf)?;
                 }
             }
         }
-        (u8::write_to(&0xFF, buf))?;
+        u8::write_to(&0xFF, buf)?;
         Ok(())
     }
 }
 
 impl fmt::Debug for Metadata {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        (write!(f, "Metadata[ "))?;
+        write!(f, "Metadata[ ")?;
         for (k, v) in &self.map {
-            (write!(f, "{:?}={:?}, ", k, v))?;
+            write!(f, "{:?}={:?}, ", k, v)?;
         }
         write!(f, "]")
     }
