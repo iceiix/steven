@@ -45,10 +45,6 @@ build_script:
 
     cp C:\sdl2\SDL2-2.0.4\lib\%PLATFORM%\SDL2.dll dist-debug
 
-    cp C:\tools\vcpkg\installed\%PLATFORM%-windows\bin\libeay32.dll dist-debug
-
-    cp C:\tools\vcpkg\installed\%PLATFORM%-windows\bin\ssleay32.dll dist-debug
-
 
     cargo build --release
 
@@ -58,9 +54,6 @@ build_script:
 
     cp C:\sdl2\SDL2-2.0.4\lib\%PLATFORM%\SDL2.dll dist
 
-    cp C:\tools\vcpkg\installed\%PLATFORM%-windows\bin\libeay32.dll dist
-
-    cp C:\tools\vcpkg\installed\%PLATFORM%-windows\bin\ssleay32.dll dist
 artifacts:
 - path: dist
 - path: dist-debug
