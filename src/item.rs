@@ -39,26 +39,26 @@ impl Default for Stack {
 
 impl Serializable for Option<Stack> {
     fn read_from<R: io::Read>(buf: &mut R) -> Result<Option<Stack>, protocol::Error> {
-        let id = r#try!(buf.read_i16::<BigEndian>());
+        let id = (buf.read_i16::<BigEndian>())?;
         if id == -1 {
             return Ok(None);
         }
         Ok(Some(Stack {
             id: id as isize,
-            count: r#try!(buf.read_u8()) as isize,
-            damage: r#try!(buf.read_i16::<BigEndian>()) as isize,
-            tag: r#try!(Serializable::read_from(buf)),
+            count: (buf.read_u8())? as isize,
+            damage: (buf.read_i16::<BigEndian>())? as isize,
+            tag: (Serializable::read_from(buf))?,
         }))
     }
     fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), protocol::Error> {
         match *self {
             Some(ref val) => {
-                r#try!(buf.write_i16::<BigEndian>(val.id as i16));
-                r#try!(buf.write_u8(val.count as u8));
-                r#try!(buf.write_i16::<BigEndian>(val.damage as i16));
-                r#try!(val.tag.write_to(buf));
+                (buf.write_i16::<BigEndian>(val.id as i16))?;
+                (buf.write_u8(val.count as u8))?;
+                (buf.write_i16::<BigEndian>(val.damage as i16))?;
+                (val.tag.write_to(buf))?;
             }
-            None => r#try!(buf.write_i16::<BigEndian>(-1)),
+            None => (buf.write_i16::<BigEndian>(-1))?,
         }
         Result::Ok(())
     }
