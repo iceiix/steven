@@ -154,9 +154,15 @@ fn rsa_public_encrypt_pkcs1(der_pubkey: &[u8], message: &[u8]) -> Vec<u8> {
     if message.len() > k - 11 {
         panic!("message too long");
     }
-    let mut padding = vec![0; k - message.len() - 3];
-    use openssl::rand::rand_bytes;
-    rand_bytes(&mut padding).unwrap();
+
+    // Fill padding (PS) with _nonzero_ bytes
+    let mut padding = vec![1; k - message.len() - 3];
+    use rand;
+    let mut i = 0;
+    while i < padding.len() {
+        padding[i] = rand::thread_rng().gen_range(1, 255);
+        i += 1;
+    }
 
     let mut encoded_m = vec![0x00, 0x02];
     encoded_m.append(&mut padding.to_vec());
