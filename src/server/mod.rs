@@ -170,26 +170,17 @@ fn rsa_public_encrypt_pkcs1(der_pubkey: &[u8], message: &[u8]) -> Vec<u8> {
     encoded_m.extend_from_slice(&message);
     println!("encoded_m = {:?}", encoded_m);
 
-    // TODO: ensure this is OS2IP https://tools.ietf.org/html/rfc8017#section-4.2
+    // OS2IP https://tools.ietf.org/html/rfc8017#section-4.2
     let m = BigInt::from_bytes_be(num::bigint::Sign::Plus, &encoded_m);
 
-    // TODO: PKCS#1 padding
-    //
     let ciphertext_bigint = m.modpow(&e, &n);
-    // TODO: convert bigint to octet string
+    // Convert bigint to octet string
     // 4.1. I2OSP https://tools.ietf.org/html/rfc8017#section-4.1
 
     println!("m = 0x{:}", m.to_str_radix(16));
     println!("ciphertext = 0x{:}", ciphertext_bigint.to_str_radix(16));
 
     let (_sign, ciphertext) = ciphertext_bigint.to_bytes_be();
-    /* TODO: ?
-    if ciphertext[0] > 0x7f {
-        let mut tmp: Vec<u8> = vec![0];
-        tmp.extend(ciphertext);
-        return tmp
-    }
-    */
 
     return ciphertext;
 }
@@ -198,7 +189,6 @@ fn rsa_public_encrypt_pkcs1(der_pubkey: &[u8], message: &[u8]) -> Vec<u8> {
 impl Server {
 
     pub fn connect(resources: Arc<RwLock<resources::Manager>>, profile: mojang::Profile, address: &str) -> Result<Server, protocol::Error> {
-        use openssl::rsa::{Rsa, Padding};
         let mut conn = try!(protocol::Conn::new(address));
 
         let host = conn.host.clone();
@@ -240,20 +230,12 @@ impl Server {
         }
 
         println!("packet.public_key.data = {:?}", &packet.public_key.data);
-        let rsa = Rsa::public_key_from_der(&packet.public_key.data).unwrap();
         let mut shared = [0; 16];
         // TODO: is this cryptographically secure enough?
         rand::thread_rng().fill(&mut shared);
 
         println!("shared ({:} bytes) = {:?}", shared.len(), &shared);
         println!("packet.verify_token.data = {:?}", &packet.verify_token.data);
-
-        let mut shared_e = vec![0; rsa.size() as usize];
-        let mut token_e = vec![0; rsa.size() as usize];
-        rsa.public_encrypt(&shared, &mut shared_e, Padding::PKCS1)?;
-        rsa.public_encrypt(&packet.verify_token.data, &mut token_e, Padding::PKCS1)?;
-        println!("OpenSSL shared_e({:}) = {:?}", shared_e.len(), &shared_e);
-        println!("OpenSSL token_e({:}) = {:?}", token_e.len(), &token_e);
 
         let shared_e = rsa_public_encrypt_pkcs1(&packet.public_key.data, &shared);
         let token_e = rsa_public_encrypt_pkcs1(&packet.public_key.data, &packet.verify_token.data);

@@ -21,7 +21,6 @@ use std::time::{Instant, Duration};
 extern crate byteorder;
 #[macro_use]
 extern crate serde_json;
-extern crate openssl;
 extern crate num;
 extern crate simple_asn1;
 extern crate aes;
