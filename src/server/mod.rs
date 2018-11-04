@@ -143,7 +143,8 @@ fn rsa_public_encrypt_pkcs1(der_pubkey: &[u8], message: &[u8]) -> Vec<u8> {
     };
     let n = n.unwrap();
     let e = e.unwrap();
-    println!("N={:?}\ne={:?}", n, e);
+    println!("N=0x{:}", n.to_str_radix(16));
+    println!("e=0x{:}", e.to_str_radix(16));
 
     // PKCS#1 padding https://tools.ietf.org/html/rfc8017#section-7.2.1 RSAES-PKCS1-V1_5-ENCRYPT ((n, e), M)
     let k = n.bits() / 8; // bytes in modulus
