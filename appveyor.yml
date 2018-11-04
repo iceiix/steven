@@ -28,14 +28,6 @@ build_script:
 
     cargo -V
 
-
-    vcpkg integrate install
-
-    vcpkg install openssl:%PLATFORM%-windows
-
-    set VCPKGRS_DYNAMIC=1
-
-
     appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.4-VC.zip -FileName sdl2-dev.zip
 
     mkdir C:\sdl2
