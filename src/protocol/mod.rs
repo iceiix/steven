@@ -36,7 +36,7 @@ use flate2::Compression;
 use std::time::{Instant, Duration};
 use crate::shared::Position;
 
-pub const SUPPORTED_PROTOCOL: i32 = 107;
+pub const SUPPORTED_PROTOCOL: i32 = 74;
 
 
 /// Helper macro for defining packets
@@ -928,8 +928,8 @@ impl Conn {
 
     pub fn read_packet(&mut self) -> Result<packet::Packet, Error> {
         let len = VarInt::read_from(self)?.0 as usize;
-        let mut ibuf = vec![0; len];
-        self.read_exact(&mut ibuf)?;
+        let mut ibuf = Vec::with_capacity(len);
+        self.take(len as u64).read_to_end(&mut ibuf)?;
 
         let mut buf = io::Cursor::new(ibuf);
 

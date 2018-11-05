@@ -612,9 +612,9 @@ impl Server {
         if let Some(entity) = self.entity_map.get(&entity_telport.entity_id.0) {
             let target_position = self.entities.get_component_mut(*entity, self.target_position).unwrap();
             let target_rotation = self.entities.get_component_mut(*entity, self.target_rotation).unwrap();
-            target_position.position.x = entity_telport.x;
-            target_position.position.y = entity_telport.y;
-            target_position.position.z = entity_telport.z;
+            target_position.position.x = entity_telport.x.into();
+            target_position.position.y = entity_telport.y.into();
+            target_position.position.z = entity_telport.z.into();
             target_rotation.yaw = -((entity_telport.yaw as f64) / 256.0) * PI * 2.0;
             target_rotation.pitch = -((entity_telport.pitch as f64) / 256.0) * PI * 2.0;
         }
@@ -661,12 +661,12 @@ impl Server {
         let target_position = self.entities.get_component_mut(entity, self.target_position).unwrap();
         let rotation = self.entities.get_component_mut(entity, self.rotation).unwrap();
         let target_rotation = self.entities.get_component_mut(entity, self.target_rotation).unwrap();
-        position.position.x = spawn.x;
-        position.position.y = spawn.y;
-        position.position.z = spawn.z;
-        target_position.position.x = spawn.x;
-        target_position.position.y = spawn.y;
-        target_position.position.z = spawn.z;
+        position.position.x = spawn.x.into();
+        position.position.y = spawn.y.into();
+        position.position.z = spawn.z.into();
+        target_position.position.x = spawn.x.into();
+        target_position.position.y = spawn.y.into();
+        target_position.position.z = spawn.z.into();
         rotation.yaw = -((spawn.yaw as f64) / 256.0) * PI * 2.0;
         rotation.pitch = -((spawn.pitch as f64) / 256.0) * PI * 2.0;
         target_rotation.yaw = rotation.yaw;
@@ -707,8 +707,13 @@ impl Server {
                 velocity.velocity.z = 0.0;
             }
 
-            self.write_packet(packet::play::serverbound::TeleportConfirm {
-                teleport_id: teleport.teleport_id,
+            self.write_packet(packet::play::serverbound::PlayerPositionLook {
+                x: teleport.x,
+                y: teleport.y,
+                z: teleport.z,
+                yaw: teleport.yaw,
+                pitch: teleport.pitch,
+                on_ground: false,
             });
         }
     }

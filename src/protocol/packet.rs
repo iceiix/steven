@@ -48,16 +48,10 @@ state_packets!(
     }
     play Play {
         serverbound Serverbound {
-            /// TeleportConfirm is sent by the client as a reply to a telport from
-            /// the server.
-            packet TeleportConfirm {
-                field teleport_id: VarInt =,
-            }
             /// TabComplete is sent by the client when the client presses tab in
             /// the chat box.
             packet TabComplete {
                 field text: String =,
-                field assume_command: bool =,
                 field has_target: bool =,
                 field target: Option<Position> = when(|p: &TabComplete| p.has_target),
             }
@@ -74,7 +68,7 @@ state_packets!(
             packet ClientSettings {
                 field locale: String =,
                 field view_distance: u8 =,
-                field chat_mode: VarInt =,
+                field chat_mode: u8 =,
                 field chat_colors: bool =,
                 field displayed_skin_parts: u8 =,
                 field main_hand: VarInt =,
@@ -96,7 +90,7 @@ state_packets!(
                 field slot: i16 =,
                 field button: u8 =,
                 field action_number: u16 =,
-                field mode: VarInt =,
+                field mode: u8 =,
                 field clicked_item: Option<item::Stack> =,
             }
             /// CloseWindow is sent when the client closes a window.
@@ -153,19 +147,6 @@ state_packets!(
             packet Player {
                 field on_ground: bool =,
             }
-            /// Sent by the client when in a vehicle instead of the normal move packet.
-            packet VehicleMove {
-                field x: f64 =,
-                field y: f64 =,
-                field z: f64 =,
-                field yaw: f32 =,
-                field pitch: f32 =,
-            }
-            /// TODO: Document
-            packet SteerBoat {
-                field unknown: bool =,
-                field unknown2: bool =,
-            }
             /// ClientAbilities is used to modify the players current abilities.
             /// Currently flying is the only one
             packet ClientAbilities {
@@ -176,7 +157,7 @@ state_packets!(
             /// PlayerDigging is sent when the client starts/stops digging a block.
             /// It also can be sent for droppping items and eating/shooting.
             packet PlayerDigging {
-                field status: VarInt =,
+                field status: u8 =,
                 field location: Position =,
                 field face: u8 =,
             }
@@ -248,9 +229,9 @@ state_packets!(
                 field entity_id: VarInt =,
                 field uuid: UUID =,
                 field ty: u8 =,
-                field x: f64 =,
-                field y: f64 =,
-                field z: f64 =,
+                field x: i32 =,
+                field y: i32 =,
+                field z: i32 =,
                 field pitch: i8 =,
                 field yaw: i8 =,
                 field data: i32 =,
@@ -263,9 +244,9 @@ state_packets!(
             /// gained when collected.
             packet SpawnExperienceOrb {
                 field entity_id: VarInt =,
-                field x: f64 =,
-                field y: f64 =,
-                field z: f64 =,
+                field x: i32 =,
+                field y: i32 =,
+                field z: i32 =,
                 field count: i16 =,
             }
             /// SpawnGlobalEntity spawns an entity which is visible from anywhere in the
@@ -273,9 +254,9 @@ state_packets!(
             packet SpawnGlobalEntity {
                 field entity_id: VarInt =,
                 field ty: u8 =,
-                field x: f64 =,
-                field y: f64 =,
-                field z: f64 =,
+                field x: i32 =,
+                field y: i32 =,
+                field z: i32 =,
             }
             /// SpawnMob is used to spawn a living entity into the world when it is in
             /// range of the client.
@@ -283,9 +264,9 @@ state_packets!(
                 field entity_id: VarInt =,
                 field uuid: UUID =,
                 field ty: u8 =,
-                field x: f64 =,
-                field y: f64 =,
-                field z: f64 =,
+                field x: i32 =,
+                field y: i32 =,
+                field z: i32 =,
                 field yaw: i8 =,
                 field pitch: i8 =,
                 field head_pitch: i8 =,
@@ -298,7 +279,6 @@ state_packets!(
             /// the client. The title effects the size and the texture of the painting.
             packet SpawnPainting {
                 field entity_id: VarInt =,
-                field uuid: UUID =,
                 field title: String =,
                 field location: Position =,
                 field direction: u8 =,
@@ -309,9 +289,9 @@ state_packets!(
             packet SpawnPlayer {
                 field entity_id: VarInt =,
                 field uuid: UUID =,
-                field x: f64 =,
-                field y: f64 =,
-                field z: f64 =,
+                field x: i32 =,
+                field y: i32 =,
+                field z: i32 =,
                 field yaw: i8 =,
                 field pitch: i8 =,
                 field metadata: types::Metadata =,
@@ -440,16 +420,6 @@ state_packets!(
                 field channel: String =,
                 field data: Vec<u8> =,
             }
-            /// Plays a sound by name on the client
-            packet NamedSoundEffect {
-                field name: String =,
-                field category: VarInt =,
-                field x: i32 =,
-                field y: i32 =,
-                field z: i32 =,
-                field volume: f32 =,
-                field pitch: u8 =,
-            }
             /// Disconnect causes the client to disconnect displaying the passed reason.
             packet Disconnect {
                 field reason: format::Component =,
@@ -477,6 +447,10 @@ state_packets!(
             packet ChunkUnload {
                 field x: i32 =,
                 field z: i32 =,
+            }
+            /// SetCompression updates the compression threshold.
+            packet SetCompression {
+                field threshold: VarInt =,
             }
             /// ChangeGameState is used to modify the game's state like gamemode or
             /// weather.
@@ -525,6 +499,15 @@ state_packets!(
                 field data1: VarInt = when(|p: &Particle| p.particle_id == 36 || p.particle_id == 37 || p.particle_id == 38),
                 field data2: VarInt = when(|p: &Particle| p.particle_id == 36),
             }
+            /// SoundEffect plays the named sound at the target location.
+            packet SoundEffect {
+                field name: String =,
+                field x: i32 =,
+                field y: i32 =,
+                field z: i32 =,
+                field volume: f32 =,
+                field pitch: u8 =,
+            }
             /// JoinGame is sent after completing the login process. This
             /// sets the initial state for the client.
             packet JoinGame {
@@ -559,17 +542,17 @@ state_packets!(
             /// EntityMove moves the entity with the id by the offsets provided.
             packet EntityMove {
                 field entity_id: VarInt =,
-                field delta_x: i16 =,
-                field delta_y: i16 =,
-                field delta_z: i16 =,
+                field delta_x: i8 =,
+                field delta_y: i8 =,
+                field delta_z: i8 =,
                 field on_ground: bool =,
             }
             /// EntityLookAndMove is a combination of EntityMove and EntityLook.
             packet EntityLookAndMove {
                 field entity_id: VarInt =,
-                field delta_x: i16 =,
-                field delta_y: i16 =,
-                field delta_z: i16 =,
+                field delta_x: i8 =,
+                field delta_y: i8 =,
+                field delta_z: i8 =,
                 field yaw: i8 =,
                 field pitch: i8 =,
                 field on_ground: bool =,
@@ -584,14 +567,6 @@ state_packets!(
             /// Entity does nothing. It is a result of subclassing used in Minecraft.
             packet Entity {
                 field entity_id: VarInt =,
-            }
-            /// Teleports the player's vehicle
-            packet VehicleTeleport {
-                field x: f64 =,
-                field y: f64 =,
-                field z: f64 =,
-                field yaw: f32 =,
-                field pitch: f32 =,
             }
             /// SignEditorOpen causes the client to open the editor for a sign so that
             /// it can write to it. Only sent in vanilla when the player places a sign.
@@ -629,7 +604,6 @@ state_packets!(
                 field yaw: f32 =,
                 field pitch: f32 =,
                 field flags: u8 =,
-                field teleport_id: VarInt =,
             }
             /// EntityUsedBed is sent by the server when a player goes to bed.
             packet EntityUsedBed {
@@ -700,6 +674,7 @@ state_packets!(
             packet EntityAttach {
                 field entity_id: i32 =,
                 field vehicle: i32 =,
+                field leash: bool =,
             }
             /// EntityVelocity sets the velocity of an entity in 1/8000 of a block
             /// per a tick.
@@ -735,11 +710,6 @@ state_packets!(
                 field mode: u8 =,
                 field value: String = when(|p: &ScoreboardObjective| p.mode == 0 || p.mode == 2),
                 field ty: String = when(|p: &ScoreboardObjective| p.mode == 0 || p.mode == 2),
-            }
-            /// SetPassengers mounts entities to an entity
-            packet SetPassengers {
-                field entity_id: VarInt =,
-                field passengers: LenPrefixed<VarInt, VarInt> =,
             }
             /// Teams creates and updates teams
             packet Teams {
@@ -780,9 +750,9 @@ state_packets!(
                 field action: VarInt =,
                 field title: Option<format::Component> = when(|p: &Title| p.action.0 == 0),
                 field sub_title: Option<format::Component> = when(|p: &Title| p.action.0 == 1),
-                field fade_in: Option<i32> = when(|p: &Title| p.action.0 == 2),
-                field fade_stay: Option<i32> = when(|p: &Title| p.action.0 == 2),
-                field fade_out: Option<i32> = when(|p: &Title| p.action.0 == 2),
+                field fade_in: Option<format::Component> = when(|p: &Title| p.action.0 == 2),
+                field fade_stay: Option<format::Component> = when(|p: &Title| p.action.0 == 2),
+                field fade_out: Option<format::Component> = when(|p: &Title| p.action.0 == 2),
             }
             /// UpdateSign sets or changes the text on a sign.
             packet UpdateSign {
@@ -791,16 +761,6 @@ state_packets!(
                 field line2: format::Component =,
                 field line3: format::Component =,
                 field line4: format::Component =,
-            }
-            /// SoundEffect plays the named sound at the target location.
-            packet SoundEffect {
-                field name: VarInt =,
-                field category: VarInt =,
-                field x: i32 =,
-                field y: i32 =,
-                field z: i32 =,
-                field volume: f32 =,
-                field pitch: u8 =,
             }
             /// PlayerListHeaderFooter updates the header/footer of the player list.
             packet PlayerListHeaderFooter {
@@ -817,9 +777,9 @@ state_packets!(
             /// sent if the entity moves further than EntityMove allows.
             packet EntityTeleport {
                 field entity_id: VarInt =,
-                field x: f64 =,
-                field y: f64 =,
-                field z: f64 =,
+                field x: i32 =,
+                field y: i32 =,
+                field z: i32 =,
                 field yaw: i8 =,
                 field pitch: i8 =,
                 field on_ground: bool =,

@@ -580,11 +580,9 @@ impl World {
                 let section = chunk.sections[i as usize].as_mut().unwrap();
                 section.dirty = true;
 
-                let mut bit_size = data.read_u8()?;
+                let bit_size = data.read_u8()?;
                 let mut mappings: HashMap<usize, block::Block, BuildHasherDefault<FNVHash>> = HashMap::with_hasher(BuildHasherDefault::default());
-                if bit_size == 0 {
-                    bit_size = 13;
-                } else {
+                if bit_size <= 8 {
                     let count = VarInt::read_from(&mut data)?.0;
                     for i in 0 .. count {
                         let id = VarInt::read_from(&mut data)?.0;
