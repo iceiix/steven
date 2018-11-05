@@ -81,6 +81,7 @@ macro_rules! state_packets {
                 use crate::shared::Position;
 
 
+                #[allow(non_upper_case_globals)]
                 pub mod internal_ids {
 pub const Handshake: i32 = 0x00;
 pub const TeleportConfirm: i32 = 0x00;
