@@ -17,6 +17,7 @@ use std::thread;
 use std::sync::mpsc;
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::collections::HashMap;
 
 use crate::ui;
 use crate::render;
@@ -36,6 +37,7 @@ pub struct ServerList {
     disconnect_reason: Option<Component>,
 
     needs_reload: Rc<RefCell<bool>>,
+    server_protocol_versions: HashMap<String, i32>,
 }
 
 struct UIElements {
@@ -68,6 +70,7 @@ struct Server {
 }
 
 struct PingInfo {
+    address: String, 
     motd: format::Component,
     ping: Duration,
     exists: bool,
@@ -94,6 +97,7 @@ impl ServerList {
             elements: None,
             disconnect_reason,
             needs_reload: Rc::new(RefCell::new(false)),
+            server_protocol_versions: HashMap::new(),
         }
     }
 
@@ -147,9 +151,12 @@ impl ServerList {
                     };
                     false
                 });
+                // TODO: move getting protocol version out of refresh
+                let protocol_version: i32 = *self.server_protocol_versions.get(&address).unwrap_or(&protocol::SUPPORTED_PROTOCOL);
+                println!("self.server_protocol_versions.get = {:?}", self.server_protocol_versions);
                 backr.add_click_func(move |_, game| {
                     game.screen_sys.replace_screen(Box::new(super::connecting::Connecting::new(&address)));
-                    game.connect_to(&address);
+                    game.connect_to(&address, protocol_version);
                     true
                 });
             }
@@ -271,6 +278,7 @@ impl ServerList {
                             None
                         };
                         drop(send.send(PingInfo {
+                            address: address,
                             motd: desc,
                             ping: res.1,
                             exists: true,
@@ -286,6 +294,7 @@ impl ServerList {
                         let mut msg = TextComponent::new(&e);
                         msg.modifier.color = Some(format::Color::Red);
                         let _ = send.send(PingInfo {
+                            address: address,
                             motd: Component::Text(msg),
                             ping: Duration::new(99999, 0),
                             exists: false,
@@ -461,6 +470,7 @@ impl super::Screen for ServerList {
             if !s.done_ping {
                 match s.recv.try_recv() {
                     Ok(res) => {
+                        println!("ping ok!\n");
                         s.done_ping = true;
                         s.motd.borrow_mut().set_text(res.motd);
                         // Selects the icon for the given ping range
@@ -475,6 +485,7 @@ impl super::Screen for ServerList {
                             _ => 56.0 / 256.0,
                         };
                         s.ping.borrow_mut().texture_coords.1 = y;
+                        println!("got res={:?}", res.exists);
                         if res.exists {
                             {
                                 let mut players = s.players.borrow_mut();
@@ -488,6 +499,8 @@ impl super::Screen for ServerList {
                                     format!("Out of date {}/{}", res.online, res.max)
                                 };
                                 players.text = txt;
+                                println!("inserting address={:?}, version={:?}", res.address, res.protocol_version);
+                                self.server_protocol_versions.insert(res.address, res.protocol_version);
                             }
                             let mut txt = TextComponent::new(&res.protocol_name);
                             txt.modifier.color = Some(format::Color::Yellow);
