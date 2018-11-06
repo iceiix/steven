@@ -235,6 +235,15 @@ state_packets!(
                 field cursor_y: f32 =,
                 field cursor_z: f32 =,
             }
+            /// (Integer version, pre-1.11) PlayerBlockPlacement is sent when the client tries to place a block.
+            packet PlayerBlockPlacementInt {
+                field location: Position =,
+                field face: VarInt =,
+                field hand: VarInt =,
+                field cursor_x: u8 =,
+                field cursor_y: u8 =,
+                field cursor_z: u8 =,
+            }
             /// UseItem is sent when the client tries to use an item.
             packet UseItem {
                 field hand: VarInt =,
@@ -293,6 +302,24 @@ state_packets!(
                 field velocity_z: i16 =,
                 field metadata: types::Metadata =,
             }
+            /// (Integer version, pre-1.11) SpawnMob is used to spawn a living entity into the world when it is in
+            /// range of the client.
+            packet SpawnMobInt {
+                field entity_id: VarInt =,
+                field uuid: UUID =,
+                field ty: u8 =,
+                field x: f64 =,
+                field y: f64 =,
+                field z: f64 =,
+                field yaw: i8 =,
+                field pitch: i8 =,
+                field head_pitch: i8 =,
+                field velocity_x: i16 =,
+                field velocity_y: i16 =,
+                field velocity_z: i16 =,
+                field metadata: types::Metadata =,
+            }
+
             /// SpawnPainting spawns a painting into the world when it is in range of
             /// the client. The title effects the size and the texture of the painting.
             packet SpawnPainting {
@@ -785,6 +812,16 @@ state_packets!(
                 field fade_stay: Option<i32> = when(|p: &Title| p.action.0 == 3),
                 field fade_out: Option<i32> = when(|p: &Title| p.action.0 == 3),
             }
+            /// (Shifted version, pre-1.11) Title configures an on-screen title.
+            packet TitleShifted {
+                field action: VarInt =,
+                field title: Option<format::Component> = when(|p: &TitleShifted| p.action.0 == 0),
+                field sub_title: Option<format::Component> = when(|p: &TitleShifted| p.action.0 == 1),
+                field fade_in: Option<i32> = when(|p: &TitleShifted| p.action.0 == 2),
+                field fade_stay: Option<i32> = when(|p: &TitleShifted| p.action.0 == 2),
+                field fade_out: Option<i32> = when(|p: &TitleShifted| p.action.0 == 2),
+            }
+
             /// SoundEffect plays the named sound at the target location.
             packet SoundEffect {
                 field name: VarInt =,
@@ -806,6 +843,12 @@ state_packets!(
                 field collected_entity_id: VarInt =,
                 field collector_entity_id: VarInt =,
                 field number_of_items: VarInt =,
+            }
+            /// (Uncounted version, pre-1.11) CollectItem causes the collected item to fly towards the collector. This
+            /// does not destroy the entity.
+            packet CollectItemUncounted {
+                field collected_entity_id: VarInt =,
+                field collector_entity_id: VarInt =,
             }
             /// EntityTeleport teleports the entity to the target location. This is
             /// sent if the entity moves further than EntityMove allows.
