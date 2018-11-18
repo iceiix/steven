@@ -330,8 +330,6 @@ impl Renderer {
         gl::blend_func(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
         gl::disable(gl::MULTISAMPLE);
 
-        self.ui.tick(width, height);
-
         gl::check_gl_error();
 
         self.frame_id = self.frame_id.wrapping_add(1);
