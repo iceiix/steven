@@ -284,8 +284,6 @@ impl Renderer {
     }
 
     pub fn tick(&mut self, world: &mut world::World, delta: f64, width: u32, height: u32) {
-        self.update_textures(delta);
-
         let trans = self.trans.as_mut().unwrap();
         trans.main.bind();
 
