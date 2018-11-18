@@ -303,44 +303,6 @@ impl Renderer {
         );
         gl::clear(gl::ClearFlags::Color | gl::ClearFlags::Depth);
 
-        // Chunk rendering
-        self.chunk_shader.program.use_program();
-
-        self.chunk_shader.perspective_matrix.set_matrix4(&self.perspective_matrix);
-        self.chunk_shader.camera_matrix.set_matrix4(&self.camera_matrix);
-        self.chunk_shader.texture.set_int(0);
-        self.chunk_shader.light_level.set_float(self.light_level);
-        self.chunk_shader.sky_offset.set_float(self.sky_offset);
-
-        for (pos, info) in world.get_render_list() {
-            if let Some(solid) = info.solid.as_ref() {
-                if solid.count > 0 {
-                    self.chunk_shader.offset.set_int3(pos.0, pos.1 * 4096, pos.2);
-                    solid.array.bind();
-                    gl::draw_elements(gl::TRIANGLES, solid.count as i32, self.element_buffer_type, 0);
-                }
-            }
-        }
-
-        // Line rendering
-        // Model rendering
-        self.model.draw(&self.frustum, &self.perspective_matrix, &self.camera_matrix, self.light_level, self.sky_offset);
-        if world.copy_cloud_heightmap(&mut self.clouds.heightmap_data) {
-            self.clouds.dirty = true;
-        }
-        self.clouds.draw(&self.camera.pos, &self.perspective_matrix, &self.camera_matrix, self.light_level, self.sky_offset, delta);
-
-        // Trans chunk rendering
-        self.chunk_shader_alpha.program.use_program();
-        self.chunk_shader_alpha.perspective_matrix.set_matrix4(&self.perspective_matrix);
-        self.chunk_shader_alpha.camera_matrix.set_matrix4(&self.camera_matrix);
-        self.chunk_shader_alpha.texture.set_int(0);
-        self.chunk_shader_alpha.light_level.set_float(self.light_level);
-        self.chunk_shader_alpha.sky_offset.set_float(self.sky_offset);
-
-        // Copy the depth buffer
-        trans.main.bind_read();
-        trans.trans.bind_draw();
         gl::blit_framebuffer(
             0, 0, width as i32, height as i32,
             0, 0, width as i32, height as i32,
