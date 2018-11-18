@@ -620,8 +620,7 @@ impl TransInfo {
 
         let fb_color = gl::Texture::new();
         fb_color.bind(gl::TEXTURE_2D);
-let data = vec![100; (width as usize) * (height as usize) * 4];
-        fb_color.image_2d_ex(gl::TEXTURE_2D, 0, width, height, gl::RGBA8, gl::RGBA, gl::UNSIGNED_BYTE, Some(&data));
+        fb_color.image_2d_ex(gl::TEXTURE_2D, 0, width, height, gl::RGBA8, gl::RGBA, gl::UNSIGNED_BYTE, None);
         main.texture_2d(gl::COLOR_ATTACHMENT_0, gl::TEXTURE_2D, &fb_color, 0);
 
         gl::check_framebuffer_status();
