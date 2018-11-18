@@ -309,8 +309,6 @@ impl Renderer {
         gl::enable(gl::BLEND);
         gl::depth_mask(false);
         trans.trans.bind();
-        gl::clear_color(0.0, 0.0, 0.0, 1.0);
-        gl::clear(gl::ClearFlags::Color);
         gl::clear_buffer(gl::COLOR, 0, &[0.0, 0.0, 0.0, 1.0]);
         gl::clear_buffer(gl::COLOR, 1, &[0.0, 0.0, 0.0, 0.0]);
         gl::blend_func_separate(gl::ONE_FACTOR, gl::ONE_FACTOR, gl::ZERO_FACTOR, gl::ONE_MINUS_SRC_ALPHA);
