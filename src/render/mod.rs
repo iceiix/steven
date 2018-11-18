@@ -292,8 +292,6 @@ impl Renderer {
         gl::active_texture(0);
         self.gl_texture.bind(gl::TEXTURE_2D_ARRAY);
 
-        gl::enable(gl::MULTISAMPLE);
-
         let time_offset = self.sky_offset * 0.9;
         gl::clear_color(
              (122.0 / 255.0) * time_offset,
@@ -328,7 +326,6 @@ impl Renderer {
         gl::enable(gl::DEPTH_TEST);
         gl::depth_mask(true);
         gl::blend_func(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
-        gl::disable(gl::MULTISAMPLE);
 
         gl::check_gl_error();
 
