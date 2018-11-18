@@ -297,13 +297,6 @@ impl Renderer {
              1.0
         );
         gl::clear(gl::ClearFlags::Color | gl::ClearFlags::Depth);
-
-        gl::blit_framebuffer(
-            0, 0, width as i32, height as i32,
-            0, 0, width as i32, height as i32,
-            gl::ClearFlags::Depth, gl::NEAREST
-        );
-
         trans.trans.bind();
         gl::clear_buffer(gl::COLOR, 0, &[0.0, 0.0, 0.0, 1.0]);
         gl::clear_buffer(gl::COLOR, 1, &[0.0, 0.0, 0.0, 0.0]);
