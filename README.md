@@ -84,6 +84,7 @@ Build with Visual Studio 2015. May build with other compilers, but not tested
 Download [SDL2-devel-2.0.4-VC.zip](https://www.libsdl.org/release/SDL2-devel-2.0.4-VC.zip), extract and
 copy SDL2-2.0.4\lib\x64\SDL2.lib to C:\Rust\lib\rustlib\x86_64-pc-windows-msvc\lib\SDL2.lib.
 
+## Running
 
 ### Standalone
 
