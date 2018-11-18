@@ -619,9 +619,9 @@ impl TransInfo {
         main.bind();
 
         let fb_color = gl::Texture::new();
-        fb_color.bind(gl::TEXTURE_2D);
-        fb_color.image_2d_ex(gl::TEXTURE_2D, 0, width, height, gl::RGBA8, gl::RGBA, gl::UNSIGNED_BYTE, None);
-        main.texture_2d(gl::COLOR_ATTACHMENT_0, gl::TEXTURE_2D, &fb_color, 0);
+        fb_color.bind(gl::TEXTURE_2D_MULTISAMPLE);
+        fb_color.image_2d_sample(gl::TEXTURE_2D_MULTISAMPLE, NUM_SAMPLES, width, height, gl::RGBA8, false);
+        main.texture_2d(gl::COLOR_ATTACHMENT_0, gl::TEXTURE_2D_MULTISAMPLE, &fb_color, 0);
 
         gl::check_framebuffer_status();
 
@@ -655,7 +655,7 @@ impl TransInfo {
 
     fn draw(&mut self, shader: &TransShader) {
         gl::active_texture(0);
-        self.fb_color.bind(gl::TEXTURE_2D);
+        self.fb_color.bind(gl::TEXTURE_2D_MULTISAMPLE);
 
         shader.program.use_program();
         shader.color.set_int(0);

@@ -1,4 +1,4 @@
-uniform sampler2D tcolor;
+uniform sampler2DMS tcolor;
 
 out vec4 fragColor;
 
