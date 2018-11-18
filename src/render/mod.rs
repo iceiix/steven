@@ -579,7 +579,6 @@ impl Renderer {
 struct TransInfo {
     main: gl::Framebuffer,
     fb_color: gl::Texture,
-    _fb_depth: gl::Texture,
     trans: gl::Framebuffer,
     _depth: gl::Texture,
 
@@ -624,10 +623,6 @@ impl TransInfo {
         fb_color.image_2d_sample(gl::TEXTURE_2D_MULTISAMPLE, NUM_SAMPLES, width, height, gl::RGBA8, false);
         main.texture_2d(gl::COLOR_ATTACHMENT_0, gl::TEXTURE_2D_MULTISAMPLE, &fb_color, 0);
 
-        let fb_depth = gl::Texture::new();
-        fb_depth.bind(gl::TEXTURE_2D_MULTISAMPLE);
-        fb_depth.image_2d_sample(gl::TEXTURE_2D_MULTISAMPLE, NUM_SAMPLES, width, height, gl::DEPTH_COMPONENT24, false);
-        main.texture_2d(gl::DEPTH_ATTACHMENT, gl::TEXTURE_2D_MULTISAMPLE, &fb_depth, 0);
         gl::check_framebuffer_status();
 
         gl::unbind_framebuffer();
@@ -650,7 +645,6 @@ impl TransInfo {
         TransInfo {
             main,
             fb_color,
-            _fb_depth: fb_depth,
             trans,
             _depth: trans_depth,
 
