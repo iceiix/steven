@@ -42,9 +42,6 @@ use std::sync::mpsc;
 
 const ATLAS_SIZE: usize = 1024;
 
-// TEMP
-const NUM_SAMPLES: i32 = 1;
-
 pub struct Camera {
     pub pos: cgmath::Point3<f64>,
     pub yaw: f64,
@@ -618,7 +615,7 @@ impl TransInfo {
 
         let fb_color = gl::Texture::new();
         fb_color.bind(gl::TEXTURE_2D_MULTISAMPLE);
-        fb_color.image_2d_sample(gl::TEXTURE_2D_MULTISAMPLE, NUM_SAMPLES, width, height, gl::RGBA8, false);
+        fb_color.image_2d_sample(gl::TEXTURE_2D_MULTISAMPLE, 0, width, height, gl::RGBA8, false);
         main.texture_2d(gl::COLOR_ATTACHMENT_0, gl::TEXTURE_2D_MULTISAMPLE, &fb_color, 0);
 
         gl::check_framebuffer_status();
