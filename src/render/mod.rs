@@ -289,7 +289,6 @@ impl Renderer {
 
         gl::active_texture(0);
         self.gl_texture.bind(gl::TEXTURE_2D_ARRAY);
-
         gl::clear_color(
              (122.0 / 255.0),
              (165.0 / 255.0),
@@ -304,7 +303,6 @@ impl Renderer {
         gl::check_framebuffer_status();
         gl::unbind_framebuffer();
         trans.draw(&self.trans_shader);
-
 
         gl::check_gl_error();
 
