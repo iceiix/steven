@@ -306,12 +306,10 @@ impl Renderer {
             gl::ClearFlags::Depth, gl::NEAREST
         );
 
-        gl::enable(gl::BLEND);
         gl::depth_mask(false);
         trans.trans.bind();
         gl::clear_buffer(gl::COLOR, 0, &[0.0, 0.0, 0.0, 1.0]);
         gl::clear_buffer(gl::COLOR, 1, &[0.0, 0.0, 0.0, 0.0]);
-        gl::blend_func_separate(gl::ONE_FACTOR, gl::ONE_FACTOR, gl::ZERO_FACTOR, gl::ONE_MINUS_SRC_ALPHA);
 
         gl::check_framebuffer_status();
         gl::unbind_framebuffer();
@@ -322,7 +320,6 @@ impl Renderer {
 
         gl::enable(gl::DEPTH_TEST);
         gl::depth_mask(true);
-        gl::blend_func(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
 
         gl::check_gl_error();
 
