@@ -313,7 +313,6 @@ impl Renderer {
         gl::check_framebuffer_status();
         gl::unbind_framebuffer();
         gl::clear(gl::ClearFlags::Color);
-        gl::disable(gl::BLEND);
         trans.draw(&self.trans_shader);
 
 
