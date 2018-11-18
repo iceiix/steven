@@ -306,7 +306,6 @@ impl Renderer {
             gl::ClearFlags::Depth, gl::NEAREST
         );
 
-        gl::depth_mask(false);
         trans.trans.bind();
         gl::clear_buffer(gl::COLOR, 0, &[0.0, 0.0, 0.0, 1.0]);
         gl::clear_buffer(gl::COLOR, 1, &[0.0, 0.0, 0.0, 0.0]);
@@ -319,7 +318,6 @@ impl Renderer {
         trans.draw(&self.trans_shader);
 
         gl::enable(gl::DEPTH_TEST);
-        gl::depth_mask(true);
 
         gl::check_gl_error();
 
