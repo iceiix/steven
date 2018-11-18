@@ -318,16 +318,6 @@ impl Renderer {
         gl::clear_buffer(gl::COLOR, 1, &[0.0, 0.0, 0.0, 0.0]);
         gl::blend_func_separate(gl::ONE_FACTOR, gl::ONE_FACTOR, gl::ZERO_FACTOR, gl::ONE_MINUS_SRC_ALPHA);
 
-        for (pos, info) in world.get_render_list().into_iter().rev() {
-            if let Some(trans) = info.trans.as_ref() {
-                if trans.count > 0 {
-                    self.chunk_shader_alpha.offset.set_int3(pos.0, pos.1 * 4096, pos.2);
-                    trans.array.bind();
-                    gl::draw_elements(gl::TRIANGLES, trans.count as i32, self.element_buffer_type, 0);
-                }
-            }
-        }
-
         gl::check_framebuffer_status();
         gl::unbind_framebuffer();
         gl::disable(gl::DEPTH_TEST);
