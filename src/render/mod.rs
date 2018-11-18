@@ -600,7 +600,6 @@ init_shader! {
             required accum => "taccum",
             required revealage => "trevealage",
             required color => "tcolor",
-            required samples => "samples",
         },
     }
 }
@@ -694,7 +693,6 @@ impl TransInfo {
         shader.accum.set_int(0);
         shader.revealage.set_int(1);
         shader.color.set_int(2);
-        shader.samples.set_int(NUM_SAMPLES);
         self.array.bind();
         gl::draw_arrays(gl::TRIANGLES, 0, 6);
     }
