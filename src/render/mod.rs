@@ -42,6 +42,9 @@ use std::sync::mpsc;
 
 const ATLAS_SIZE: usize = 1024;
 
+// TEMP
+const NUM_SAMPLES: i32 = 2;
+
 pub struct Camera {
     pub pos: cgmath::Point3<f64>,
     pub yaw: f64,
@@ -281,25 +284,101 @@ impl Renderer {
     }
 
     pub fn tick(&mut self, world: &mut world::World, delta: f64, width: u32, height: u32) {
+        self.update_textures(delta);
+
         let trans = self.trans.as_mut().unwrap();
         trans.main.bind();
 
         gl::active_texture(0);
         self.gl_texture.bind(gl::TEXTURE_2D_ARRAY);
+
+        gl::enable(gl::MULTISAMPLE);
+
+        let time_offset = self.sky_offset * 0.9;
         gl::clear_color(
-             (122.0 / 255.0),
-             (165.0 / 255.0),
-             (247.0 / 255.0),
+             (122.0 / 255.0) * time_offset,
+             (165.0 / 255.0) * time_offset,
+             (247.0 / 255.0) * time_offset,
              1.0
         );
         gl::clear(gl::ClearFlags::Color | gl::ClearFlags::Depth);
+
+        // Chunk rendering
+        self.chunk_shader.program.use_program();
+
+        self.chunk_shader.perspective_matrix.set_matrix4(&self.perspective_matrix);
+        self.chunk_shader.camera_matrix.set_matrix4(&self.camera_matrix);
+        self.chunk_shader.texture.set_int(0);
+        self.chunk_shader.light_level.set_float(self.light_level);
+        self.chunk_shader.sky_offset.set_float(self.sky_offset);
+
+        for (pos, info) in world.get_render_list() {
+            if let Some(solid) = info.solid.as_ref() {
+                if solid.count > 0 {
+                    self.chunk_shader.offset.set_int3(pos.0, pos.1 * 4096, pos.2);
+                    solid.array.bind();
+                    gl::draw_elements(gl::TRIANGLES, solid.count as i32, self.element_buffer_type, 0);
+                }
+            }
+        }
+
+        // Line rendering
+        // Model rendering
+        self.model.draw(&self.frustum, &self.perspective_matrix, &self.camera_matrix, self.light_level, self.sky_offset);
+        if world.copy_cloud_heightmap(&mut self.clouds.heightmap_data) {
+            self.clouds.dirty = true;
+        }
+        self.clouds.draw(&self.camera.pos, &self.perspective_matrix, &self.camera_matrix, self.light_level, self.sky_offset, delta);
+
+        // Trans chunk rendering
+        self.chunk_shader_alpha.program.use_program();
+        self.chunk_shader_alpha.perspective_matrix.set_matrix4(&self.perspective_matrix);
+        self.chunk_shader_alpha.camera_matrix.set_matrix4(&self.camera_matrix);
+        self.chunk_shader_alpha.texture.set_int(0);
+        self.chunk_shader_alpha.light_level.set_float(self.light_level);
+        self.chunk_shader_alpha.sky_offset.set_float(self.sky_offset);
+
+        // Copy the depth buffer
+        trans.main.bind_read();
+        trans.trans.bind_draw();
+        gl::blit_framebuffer(
+            0, 0, width as i32, height as i32,
+            0, 0, width as i32, height as i32,
+            gl::ClearFlags::Depth, gl::NEAREST
+        );
+
+        gl::enable(gl::BLEND);
+        gl::depth_mask(false);
         trans.trans.bind();
+        gl::clear_color(0.0, 0.0, 0.0, 1.0);
+        gl::clear(gl::ClearFlags::Color);
         gl::clear_buffer(gl::COLOR, 0, &[0.0, 0.0, 0.0, 1.0]);
         gl::clear_buffer(gl::COLOR, 1, &[0.0, 0.0, 0.0, 0.0]);
+        gl::blend_func_separate(gl::ONE_FACTOR, gl::ONE_FACTOR, gl::ZERO_FACTOR, gl::ONE_MINUS_SRC_ALPHA);
+
+        for (pos, info) in world.get_render_list().into_iter().rev() {
+            if let Some(trans) = info.trans.as_ref() {
+                if trans.count > 0 {
+                    self.chunk_shader_alpha.offset.set_int3(pos.0, pos.1 * 4096, pos.2);
+                    trans.array.bind();
+                    gl::draw_elements(gl::TRIANGLES, trans.count as i32, self.element_buffer_type, 0);
+                }
+            }
+        }
 
         gl::check_framebuffer_status();
         gl::unbind_framebuffer();
+        gl::disable(gl::DEPTH_TEST);
+        gl::clear(gl::ClearFlags::Color);
+        gl::disable(gl::BLEND);
         trans.draw(&self.trans_shader);
+
+        gl::enable(gl::DEPTH_TEST);
+        gl::depth_mask(true);
+        gl::blend_func(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
+        gl::disable(gl::MULTISAMPLE);
+
+        self.ui.tick(width, height);
 
         gl::check_gl_error();
 
@@ -574,7 +653,10 @@ impl Renderer {
 struct TransInfo {
     main: gl::Framebuffer,
     fb_color: gl::Texture,
+    _fb_depth: gl::Texture,
     trans: gl::Framebuffer,
+    accum: gl::Texture,
+    revealage: gl::Texture,
     _depth: gl::Texture,
 
     array: gl::VertexArray,
@@ -589,7 +671,10 @@ init_shader! {
             required position => "aPosition",
         },
         uniform = {
+            required accum => "taccum",
+            required revealage => "trevealage",
             required color => "tcolor",
+            required samples => "samples",
         },
     }
 }
@@ -599,6 +684,20 @@ impl TransInfo {
         let trans = gl::Framebuffer::new();
         trans.bind();
 
+        let accum = gl::Texture::new();
+        accum.bind(gl::TEXTURE_2D);
+        accum.image_2d_ex(gl::TEXTURE_2D, 0, width, height, gl::RGBA16F, gl::RGBA, gl::FLOAT, None);
+        accum.set_parameter(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR);
+        accum.set_parameter(gl::TEXTURE_2D, gl::TEXTURE_MAX_LEVEL, gl::LINEAR);
+        trans.texture_2d(gl::COLOR_ATTACHMENT_0, gl::TEXTURE_2D, &accum, 0);
+
+        let revealage = gl::Texture::new();
+        revealage.bind(gl::TEXTURE_2D);
+        revealage.image_2d_ex(gl::TEXTURE_2D, 0, width, height, gl::R16F, gl::RED, gl::FLOAT, None);
+        revealage.set_parameter(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR);
+        revealage.set_parameter(gl::TEXTURE_2D, gl::TEXTURE_MAX_LEVEL, gl::LINEAR);
+        trans.texture_2d(gl::COLOR_ATTACHMENT_1, gl::TEXTURE_2D, &revealage, 0);
+
         let trans_depth = gl::Texture::new();
         trans_depth.bind(gl::TEXTURE_2D);
         trans_depth.image_2d_ex(gl::TEXTURE_2D, 0, width, height, gl::DEPTH_COMPONENT24, gl::DEPTH_COMPONENT, gl::UNSIGNED_BYTE, None);
@@ -607,6 +706,8 @@ impl TransInfo {
         trans.texture_2d(gl::DEPTH_ATTACHMENT, gl::TEXTURE_2D, &trans_depth, 0);
 
         chunk_shader.program.use_program();
+        gl::bind_frag_data_location(&chunk_shader.program, 0, "accum");
+        gl::bind_frag_data_location(&chunk_shader.program, 1, "revealage");
         gl::check_framebuffer_status();
         gl::draw_buffers(&[gl::COLOR_ATTACHMENT_0, gl::COLOR_ATTACHMENT_1]);
 
@@ -615,9 +716,13 @@ impl TransInfo {
 
         let fb_color = gl::Texture::new();
         fb_color.bind(gl::TEXTURE_2D_MULTISAMPLE);
-        fb_color.image_2d_sample(gl::TEXTURE_2D_MULTISAMPLE, 0, width, height, gl::RGBA8, false);
+        fb_color.image_2d_sample(gl::TEXTURE_2D_MULTISAMPLE, NUM_SAMPLES, width, height, gl::RGBA8, false);
         main.texture_2d(gl::COLOR_ATTACHMENT_0, gl::TEXTURE_2D_MULTISAMPLE, &fb_color, 0);
 
+        let fb_depth = gl::Texture::new();
+        fb_depth.bind(gl::TEXTURE_2D_MULTISAMPLE);
+        fb_depth.image_2d_sample(gl::TEXTURE_2D_MULTISAMPLE, NUM_SAMPLES, width, height, gl::DEPTH_COMPONENT24, false);
+        main.texture_2d(gl::DEPTH_ATTACHMENT, gl::TEXTURE_2D_MULTISAMPLE, &fb_depth, 0);
         gl::check_framebuffer_status();
 
         gl::unbind_framebuffer();
@@ -640,7 +745,10 @@ impl TransInfo {
         TransInfo {
             main,
             fb_color,
+            _fb_depth: fb_depth,
             trans,
+            accum,
+            revealage,
             _depth: trans_depth,
 
             array,
@@ -650,10 +758,17 @@ impl TransInfo {
 
     fn draw(&mut self, shader: &TransShader) {
         gl::active_texture(0);
+        self.accum.bind(gl::TEXTURE_2D);
+        gl::active_texture(1);
+        self.revealage.bind(gl::TEXTURE_2D);
+        gl::active_texture(2);
         self.fb_color.bind(gl::TEXTURE_2D_MULTISAMPLE);
 
         shader.program.use_program();
-        shader.color.set_int(0);
+        shader.accum.set_int(0);
+        shader.revealage.set_int(1);
+        shader.color.set_int(2);
+        shader.samples.set_int(NUM_SAMPLES);
         self.array.bind();
         gl::draw_arrays(gl::TRIANGLES, 0, 6);
     }
