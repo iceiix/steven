@@ -223,6 +223,12 @@ fn main() {
         last_frame = now;
         let delta = (diff.subsec_nanos() as f64) / frame_time;
         let (width, height) = window.drawable_size();
+println!("drawable_size = {}x{}", width, height);
+let (window_width, window_height) = window.size();
+println!("size = {}x{}", window_width, window_height);
+let (scale_x, scale_y) = (width / window_width, height / window_height);
+println!("scale = {}x{}", scale_x, scale_y);
+//game.renderer.set_scale(scale_x, scale_y); // only for 2D sdl2::render
 
         let version = {
             let mut res = game.resource_manager.write().unwrap();
