@@ -175,6 +175,7 @@ fn main() {
                             .build()
                             .expect("Could not create sdl window.");
     sdl2::hint::set_with_priority("SDL_MOUSE_RELATIVE_MODE_WARP", "1", &sdl2::hint::Hint::Override);
+    //sdl2::hint::set_with_priority("SDL_VIDEO_HIGHDPI_DISABLED", "1", &sdl2::hint::Hint::Override);
     let gl_attr = sdl_video.gl_attr();
     gl_attr.set_stencil_size(0);
     gl_attr.set_depth_size(24);
