@@ -252,7 +252,6 @@ impl Renderer {
         }
 
         if self.height != height || self.width != width {
-println!("resized from {}x{} to {}x{}", self.height, self.width, height, width);
             self.width = width;
             self.height = height;
             gl::viewport(0, 0, width as i32, height as i32);
