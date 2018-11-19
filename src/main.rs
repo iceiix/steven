@@ -169,7 +169,7 @@ fn main() {
     let sdl = sdl2::init().unwrap();
     let sdl_video = sdl.video().unwrap();
     let window = sdl2::video::WindowBuilder::new(&sdl_video, "Steven", 854, 480)
-                            .allow_highdpi()
+                            //.allow_highdpi()
                             .opengl()
                             .resizable()
                             .build()
