@@ -311,14 +311,6 @@ impl Renderer {
         }
         self.clouds.draw(&self.camera.pos, &self.perspective_matrix, &self.camera_matrix, self.light_level, self.sky_offset, delta);
 
-        // Trans chunk rendering
-        self.chunk_shader_alpha.program.use_program();
-        self.chunk_shader_alpha.perspective_matrix.set_matrix4(&self.perspective_matrix);
-        self.chunk_shader_alpha.camera_matrix.set_matrix4(&self.camera_matrix);
-        self.chunk_shader_alpha.texture.set_int(0);
-        self.chunk_shader_alpha.light_level.set_float(self.light_level);
-        self.chunk_shader_alpha.sky_offset.set_float(self.sky_offset);
-
         // Copy the depth buffer
         trans.main.bind_read();
         trans.trans.bind_draw();
@@ -327,7 +319,6 @@ impl Renderer {
             0, 0, width as i32, height as i32,
             gl::ClearFlags::Depth, gl::NEAREST
         );
-
         gl::enable(gl::BLEND);
         gl::depth_mask(false);
         trans.trans.bind();
@@ -336,16 +327,6 @@ impl Renderer {
         gl::clear_buffer(gl::COLOR, 0, &[0.0, 0.0, 0.0, 1.0]);
         gl::clear_buffer(gl::COLOR, 1, &[0.0, 0.0, 0.0, 0.0]);
         gl::blend_func_separate(gl::ONE_FACTOR, gl::ONE_FACTOR, gl::ZERO_FACTOR, gl::ONE_MINUS_SRC_ALPHA);
-
-        for (pos, info) in world.get_render_list().into_iter().rev() {
-            if let Some(trans) = info.trans.as_ref() {
-                if trans.count > 0 {
-                    self.chunk_shader_alpha.offset.set_int3(pos.0, pos.1 * 4096, pos.2);
-                    trans.array.bind();
-                    gl::draw_elements(gl::TRIANGLES, trans.count as i32, self.element_buffer_type, 0);
-                }
-            }
-        }
 
         gl::check_framebuffer_status();
         gl::unbind_framebuffer();
