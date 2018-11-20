@@ -222,6 +222,7 @@ impl Manager {
                 collection.shader.lighting.map(|v| v.set_float2(model.block_light, model.sky_light));
                 collection.shader.model_matrix.map(|v| v.set_matrix4_multi(&model.matrix));
                 collection.shader.color_mul.map(|v| v.set_float_mutli_raw(model.colors.as_ptr() as *const _, model.colors.len()));
+println!("about to draw model {:?} {:?}", model.count, self.index_type);
                 gl::draw_elements(gl::TRIANGLES, model.count, self.index_type, 0);
             }
         }
