@@ -22,7 +22,7 @@ Feel free to pop in to say hi, [Webchat can be found here](https://irc.spi.gt/ir
 Windows users can download pre-compiled builds from here: https://ci.appveyor.com/project/iceiix/steven
 (Select your platform, Click the artifacts tab and download Steven.zip)
 
-The Visual Studio 2015 Redistributable is required to run these builds.
+The Visual Studio 2017 Redistributable is required to run these builds.
 
 ## Building
 
@@ -78,7 +78,7 @@ brew install sdl2
 ```
 
 ### Installing dependencies on Windows
-Install [Visual Studio 2015 or 2017](https://visualstudio.microsoft.com/vs/older-downloads)
+Install [Visual Studio 2017](https://visualstudio.microsoft.com/vs/older-downloads)
 with the Visual C++ option. May build with other compilers, but not tested
 (previously was built with MinGW and the GNU toolchain).
 
