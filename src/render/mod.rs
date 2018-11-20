@@ -303,25 +303,6 @@ impl Renderer {
         );
         gl::clear(gl::ClearFlags::Color | gl::ClearFlags::Depth);
 
-        // Chunk rendering
-        self.chunk_shader.program.use_program();
-
-        self.chunk_shader.perspective_matrix.set_matrix4(&self.perspective_matrix);
-        self.chunk_shader.camera_matrix.set_matrix4(&self.camera_matrix);
-        self.chunk_shader.texture.set_int(0);
-        self.chunk_shader.light_level.set_float(self.light_level);
-        self.chunk_shader.sky_offset.set_float(self.sky_offset);
-
-        for (pos, info) in world.get_render_list() {
-            if let Some(solid) = info.solid.as_ref() {
-                if solid.count > 0 {
-                    self.chunk_shader.offset.set_int3(pos.0, pos.1 * 4096, pos.2);
-                    solid.array.bind();
-                    gl::draw_elements(gl::TRIANGLES, solid.count as i32, self.element_buffer_type, 0);
-                }
-            }
-        }
-
         // Line rendering
         // Model rendering
         self.model.draw(&self.frustum, &self.perspective_matrix, &self.camera_matrix, self.light_level, self.sky_offset);
