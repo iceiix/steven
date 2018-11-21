@@ -201,6 +201,7 @@ impl Manager {
     }
 
     pub fn draw(&mut self, frustum: &Frustum<f32>, perspective_matrix: &Matrix4<f32>, camera_matrix: &Matrix4<f32>, light_level: f32, sky_offset: f32) {
+println!("draw() frustum={:?}, perspective_matrix={:?}, camera_matrix={:?}, light_level={:?}, sky_offset={:?}", frustum, perspective_matrix, camera_matrix, light_level, sky_offset);
         gl::enable(gl::BLEND);
         for collection in &self.collections {
             collection.shader.program.use_program();
