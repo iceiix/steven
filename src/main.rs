@@ -168,7 +168,7 @@ fn main() {
 
     let sdl = sdl2::init().unwrap();
     let sdl_video = sdl.video().unwrap();
-    let window = sdl2::video::WindowBuilder::new(&sdl_video, "Steven", 854, 480)
+    let mut window = sdl2::video::WindowBuilder::new(&sdl_video, "Steven", 854, 480)
                             .opengl()
                             .resizable()
                             .build()
@@ -262,12 +262,12 @@ fn main() {
         window.gl_swap_window();
 
         for event in events.poll_iter() {
-            handle_window_event(&window, &mut game, &mut ui_container, event);
+            handle_window_event(&mut window, &mut game, &mut ui_container, event);
         }
     }
 }
 
-fn handle_window_event(window: &sdl2::video::Window,
+fn handle_window_event(window: &mut sdl2::video::Window,
                        game: &mut Game,
                        ui_container: &mut ui::Container,
                        event: sdl2::event::Event) {
