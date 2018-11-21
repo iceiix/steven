@@ -58,7 +58,6 @@ pub const CL_KEYBIND_OPEN_INV: console::CVar<i64> = create_keybind!(E, "cl_keybi
 pub const CL_KEYBIND_SNEAK: console::CVar<i64> = create_keybind!(LShift, "cl_keybind_sneak", "Keybinding for sneaking");
 pub const CL_KEYBIND_SPRINT: console::CVar<i64> = create_keybind!(LCtrl, "cl_keybind_sprint", "Keybinding for sprinting");
 pub const CL_KEYBIND_JUMP: console::CVar<i64> = create_keybind!(Space, "cl_keybind_jump", "Keybinding for jumping");
-pub const CL_KEYBIND_FULLSCREEN: console::CVar<i64> = create_keybind!(Space, "cl_keybind_fullscreen", "Keybinding for full screen");
 
 pub fn register_vars(vars: &mut console::Vars) {
     vars.register(R_MAX_FPS);
@@ -73,7 +72,6 @@ pub fn register_vars(vars: &mut console::Vars) {
     vars.register(CL_KEYBIND_SNEAK);
     vars.register(CL_KEYBIND_SPRINT);
     vars.register(CL_KEYBIND_JUMP);
-    vars.register(CL_KEYBIND_FULLSCREEN);
 }
 
 #[derive(Hash, PartialEq, Eq)]
@@ -86,14 +84,13 @@ pub enum Stevenkey {
     Sneak,
     Sprint,
     Jump,
-    FullScreen,
 }
 
 impl Stevenkey {
     pub fn values() -> Vec<Stevenkey> {
         vec!(Stevenkey::Forward, Stevenkey::Backward, Stevenkey::Left,
             Stevenkey::Right, Stevenkey::OpenInv, Stevenkey::Sneak,
-            Stevenkey::Sprint, Stevenkey::Jump, Stevenkey::FullScreen)
+            Stevenkey::Sprint, Stevenkey::Jump)
     }
 
     pub fn get_by_keycode(keycode: Keycode, vars: &console::Vars) -> Option<Stevenkey> {
@@ -114,8 +111,7 @@ impl Stevenkey {
             Stevenkey::OpenInv => CL_KEYBIND_OPEN_INV,
             Stevenkey::Sneak => CL_KEYBIND_SNEAK,
             Stevenkey::Sprint => CL_KEYBIND_SPRINT,
-            Stevenkey::Jump => CL_KEYBIND_JUMP,
-            Stevenkey::FullScreen => CL_KEYBIND_FULLSCREEN,
+            Stevenkey::Jump => CL_KEYBIND_JUMP
         }
     }
 }

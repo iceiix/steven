@@ -346,7 +346,7 @@ fn handle_window_event(window: &mut sdl2::video::Window,
         Event::KeyDown{keycode: Some(Keycode::Backquote), ..} => {
             game.console.lock().unwrap().toggle();
         }
-        Event::KeyDown{keycode: Some(Keycode::F11), ..} => { // TODO: use settings::Stevenkey::FullScreen
+        Event::KeyDown{keycode: Some(Keycode::F11), ..} => { // TODO: configurable binding in settings::Stevenkey
             let state = match window.fullscreen_state() {
                 sdl2::video::FullscreenType::Off => sdl2::video::FullscreenType::Desktop,
                 sdl2::video::FullscreenType::True => sdl2::video::FullscreenType::Off,
