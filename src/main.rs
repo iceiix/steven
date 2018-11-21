@@ -347,7 +347,13 @@ fn handle_window_event(window: &mut sdl2::video::Window,
             game.console.lock().unwrap().toggle();
         }
         Event::KeyDown{keycode: Some(Keycode::F11), ..} => { // TODO: use settings::Stevenkey::FullScreen
-            println!("TODO: toggle fullscreen");
+            let state = match window.fullscreen_state() {
+                sdl2::video::FullscreenType::Off => sdl2::video::FullscreenType::True,
+                sdl2::video::FullscreenType::True => sdl2::video::FullscreenType::Off,
+                sdl2::video::FullscreenType::Desktop => sdl2::video::FullscreenType::Off,
+            };
+
+            window.set_fullscreen(state).expect(&format!("failed to set fullscreen to {:?}", state));
         }
         Event::KeyDown{keycode: Some(key), keymod, ..} => {
             if game.focused {
