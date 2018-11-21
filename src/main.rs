@@ -346,7 +346,7 @@ fn handle_window_event(window: &sdl2::video::Window,
         Event::KeyDown{keycode: Some(Keycode::Backquote), ..} => {
             game.console.lock().unwrap().toggle();
         }
-        Event::KeyDown{keycode: Some(Keycode::F11), ..} => {
+        Event::KeyDown{keycode: Some(Keycode::F11), ..} => { // TODO: use settings::Stevenkey::FullScreen
             println!("TODO: toggle fullscreen");
         }
         Event::KeyDown{keycode: Some(key), keymod, ..} => {
