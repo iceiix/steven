@@ -14,8 +14,6 @@
 
 #![recursion_limit="300"]
 
-use std::time::{Instant, Duration};
-use log::info;
 extern crate steven_shared as shared;
 
 #[macro_use]
@@ -40,30 +38,22 @@ pub mod chunk_builder;
 pub mod model;
 pub mod entity;
 
-use std::sync::{Arc, RwLock, Mutex};
-use std::rc::Rc;
-use std::marker::PhantomData;
-use std::thread;
-use std::sync::mpsc;
-use crate::protocol::mojang;
+use std::sync::{Arc, RwLock};
 use sdl2::Sdl;
-use sdl2::keyboard;
 
 pub struct Game {
     renderer: render::Renderer,
-    resource_manager: Arc<RwLock<resources::Manager>>,
     should_close: bool,
 
     server: server::Server,
     focused: bool,
 
-    connect_reply: Option<mpsc::Receiver<Result<server::Server, protocol::Error>>>,
 
     sdl: Sdl,
 }
 
 impl Game {
-    pub fn connect_to(&mut self, address: &str) {
+    pub fn connect_to(&mut self, _address: &str) {
     }
 }
 
@@ -104,9 +94,7 @@ fn main() {
         server: server::Server::dummy_server(resource_manager.clone()),
         focused: false,
         renderer,
-        resource_manager: resource_manager.clone(),
         should_close: false,
-        connect_reply: None,
         sdl,
     };
     game.renderer.camera.pos = cgmath::Point3::new(0.5, 13.2, 0.5);
@@ -114,7 +102,6 @@ fn main() {
     let mut events = game.sdl.event_pump().unwrap();
     while !game.should_close {
 
-        let now = Instant::now();
         let delta = 0f64;
         let (width, height) = window.size();
 
@@ -144,7 +131,6 @@ fn handle_window_event(window: &sdl2::video::Window,
                        ui_container: &mut ui::Container,
                        event: sdl2::event::Event) {
     use sdl2::event::Event;
-    use sdl2::keyboard::Keycode;
     use sdl2::mouse::MouseButton;
     use std::f64::consts::PI;
 
