@@ -34,7 +34,7 @@ use crate::format;
 use rsa_public_encrypt_pkcs1;
 use log::{error, debug, warn};
 
-mod sun;
+pub mod sun;
 pub mod plugin_messages;
 pub mod target;
 

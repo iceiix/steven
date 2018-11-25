@@ -40,6 +40,7 @@ pub mod entity;
 
 use std::sync::{Arc, RwLock};
 use sdl2::Sdl;
+use crate::server::sun;
 
 pub struct Game {
     renderer: render::Renderer,
@@ -47,7 +48,6 @@ pub struct Game {
 
     server: server::Server,
     focused: bool,
-
 
     sdl: Sdl,
 }
@@ -70,7 +70,6 @@ fn main() {
                             .resizable()
                             .build()
                             .expect("Could not create sdl window.");
-    sdl2::hint::set_with_priority("SDL_MOUSE_RELATIVE_MODE_WARP", "1", &sdl2::hint::Hint::Override);
     let gl_attr = sdl_video.gl_attr();
     gl_attr.set_stencil_size(0);
     gl_attr.set_depth_size(24);
@@ -100,12 +99,13 @@ fn main() {
     game.renderer.camera.pos = cgmath::Point3::new(0.5, 13.2, 0.5);
 
     let mut events = game.sdl.event_pump().unwrap();
+    let mut sun_model = sun::SunModel::new(&mut game.renderer);
     while !game.should_close {
 
         let delta = 0f64;
         let (width, height) = window.size();
 
-        game.server.tick(&mut game.renderer, delta);
+        sun_model.tick(&mut game.renderer, 0.0, 0);
 
         game.renderer.update_camera(width, height);
         game.server.world.compute_render_list(&mut game.renderer);
