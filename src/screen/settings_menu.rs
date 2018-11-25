@@ -51,7 +51,6 @@ impl super::Screen for SettingsMenu {
                 .attach(&mut *audio_settings);
             audio_settings.add_text(txt);
             audio_settings.add_click_func(|_, game| {
-                game.screen_sys.add_screen(Box::new(AudioSettingsMenu::new(game.vars.clone())));
                 true
             });
         }
@@ -70,7 +69,6 @@ impl super::Screen for SettingsMenu {
                 .attach(&mut *video_settings);
             video_settings.add_text(txt);
             video_settings.add_click_func(|_, game| {
-                game.screen_sys.add_screen(Box::new(VideoSettingsMenu::new(game.vars.clone())));
                 true
             });
         }
@@ -120,7 +118,6 @@ impl super::Screen for SettingsMenu {
                 .attach(&mut *done_button);
             done_button.add_text(txt);
             done_button.add_click_func(|_, game| {
-                game.screen_sys.pop_screen();
                 game.focused = true;
                 true
             });
@@ -142,7 +139,6 @@ impl super::Screen for SettingsMenu {
                 disconnect_button.add_text(txt);
                 disconnect_button.add_click_func(|_, game| {
                     game.server.disconnect(None);
-                    game.screen_sys.replace_screen(Box::new(super::ServerList::new(None)));
                     true
                 });
             }
@@ -292,7 +288,6 @@ impl super::Screen for VideoSettingsMenu {
                 .attach(&mut *done_button);
             done_button.add_text(txt);
             done_button.add_click_func(|_, game| {
-                game.screen_sys.pop_screen();
                 game.focused = true;
                 true
             });
@@ -376,7 +371,6 @@ impl super::Screen for AudioSettingsMenu {
                 .attach(&mut *done_button);
             done_button.add_text(txt);
             done_button.add_click_func(|_, game| {
-                game.screen_sys.pop_screen();
                 game.focused = true;
                 true
             });

@@ -148,7 +148,6 @@ impl ServerList {
                     false
                 });
                 backr.add_click_func(move |_, game| {
-                    game.screen_sys.replace_screen(Box::new(super::connecting::Connecting::new(&address)));
                     game.connect_to(&address);
                     true
                 });
@@ -231,9 +230,6 @@ impl ServerList {
                 let sname = name.clone();
                 let saddr = address.clone();
                 btn.add_click_func(move |_, game| {
-                    game.screen_sys.replace_screen(Box::new(super::edit_server::EditServerEntry::new(
-                        Some((index, sname.clone(), saddr.clone()))
-                    )));
                     true
                 })
             }
@@ -342,9 +338,6 @@ impl super::Screen for ServerList {
                 .attach(&mut *add);
             add.add_text(txt);
             add.add_click_func(move |_, game| {
-                game.screen_sys.replace_screen(Box::new(super::edit_server::EditServerEntry::new(
-                    None
-                )));
                 true
             })
         }
@@ -364,7 +357,6 @@ impl super::Screen for ServerList {
                 .alignment(ui::VAttach::Middle, ui::HAttach::Center)
                 .attach(&mut *options);
             options.add_click_func(|_, game| {
-                game.screen_sys.add_screen(Box::new(super::SettingsMenu::new(game.vars.clone(), false)));
                 true
             });
         }

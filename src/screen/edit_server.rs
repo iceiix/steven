@@ -131,7 +131,6 @@ impl super::Screen for EditServerEntry {
                     &server_name.borrow().input,
                     &server_address.borrow().input,
                 );
-                game.screen_sys.replace_screen(Box::new(super::ServerList::new(None)));
                 true
             });
         }
@@ -150,7 +149,6 @@ impl super::Screen for EditServerEntry {
                 .attach(&mut *cancel);
             cancel.add_text(txt);
             cancel.add_click_func(|_, game| {
-                game.screen_sys.replace_screen(Box::new(super::ServerList::new(None)));
                 true
             });
         }

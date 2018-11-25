@@ -62,7 +62,6 @@ const CL_BRAND: console::CVar<String> = console::CVar {
 
 pub struct Game {
     renderer: render::Renderer,
-    screen_sys: screen::ScreenSystem,
     resource_manager: Arc<RwLock<resources::Manager>>,
     console: Arc<Mutex<console::Console>>,
     vars: Rc<console::Vars>,
@@ -101,11 +100,6 @@ impl Game {
             }
         }
 
-        if let Some(disconnect_reason) = self.server.disconnect_reason.take() {
-            self.screen_sys.replace_screen(Box::new(screen::ServerList::new(
-                Some(disconnect_reason)
-            )));
-        }
         if !self.server.is_connected() {
             self.focused = false;
         }
@@ -116,7 +110,6 @@ impl Game {
                 clear_reply = true;
                 match server {
                     Ok(val) => {
-                        self.screen_sys.pop_screen();
                         self.focused = true;
                         self.server.remove(&mut self.renderer);
                         self.server = val;
@@ -130,9 +123,6 @@ impl Game {
                                 format::Component::Text(msg)
                             },
                         };
-                        self.screen_sys.replace_screen(Box::new(screen::ServerList::new(
-                            Some(msg)
-                        )));
                     }
                 }
             }
@@ -195,14 +185,11 @@ fn main() {
     let mut last_frame = Instant::now();
     let frame_time = 1e9f64 / 60.0;
 
-    let mut screen_sys = screen::ScreenSystem::new();
-
     let textures = renderer.get_textures();
     let mut game = Game {
         server: server::Server::dummy_server(resource_manager.clone()),
         focused: false,
         renderer,
-        screen_sys,
         resource_manager: resource_manager.clone(),
         console: con,
         vars,
@@ -242,7 +229,6 @@ fn main() {
         game.server.world.compute_render_list(&mut game.renderer);
         game.chunk_builder.tick(&mut game.server.world, &mut game.renderer, version);
 
-        game.screen_sys.tick(delta, &mut game.renderer, &mut ui_container);
         game.console
             .lock()
             .unwrap()
@@ -309,13 +295,6 @@ fn handle_window_event(window: &sdl2::video::Window,
         Event::MouseButtonUp{mouse_btn: MouseButton::Left, x, y, ..} => {
             let (width, height) = window.size();
 
-            if game.server.is_connected() && !game.focused && !game.screen_sys.is_current_closable() {
-                game.focused = true;
-                if !mouse.relative_mouse_mode() {
-                    mouse.set_relative_mouse_mode(true);
-                }
-                return;
-            }
             if !game.focused {
                 if mouse.relative_mouse_mode() {
                     mouse.set_relative_mouse_mode(false);
@@ -326,20 +305,6 @@ fn handle_window_event(window: &sdl2::video::Window,
         Event::MouseButtonDown{mouse_btn: MouseButton::Right, ..} => {
             if game.focused {
                 game.server.on_right_click(&mut game.renderer);
-            }
-        }
-        Event::MouseWheel{x, y, ..} => {
-            game.screen_sys.on_scroll(x as f64, y as f64);
-        }
-        Event::KeyUp{keycode: Some(Keycode::Escape), ..} => {
-            if game.focused {
-                mouse.set_relative_mouse_mode(false);
-                game.focused = false;
-                game.screen_sys.replace_screen(Box::new(screen::SettingsMenu::new(game.vars.clone(), true)));
-            } else if game.screen_sys.is_current_closable() {
-                mouse.set_relative_mouse_mode(true);
-                game.focused = true;
-                game.screen_sys.pop_screen();
             }
         }
         Event::KeyDown{keycode: Some(Keycode::Backquote), ..} => {
