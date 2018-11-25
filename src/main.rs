@@ -196,7 +196,6 @@ fn main() {
     let frame_time = 1e9f64 / 60.0;
 
     let mut screen_sys = screen::ScreenSystem::new();
-    screen_sys.add_screen(Box::new(screen::Login::new(vars.clone())));
 
     let textures = renderer.get_textures();
     let mut game = Game {
