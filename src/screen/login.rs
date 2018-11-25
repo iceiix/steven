@@ -197,7 +197,6 @@ impl super::Screen for Login {
                         self.vars.set(auth::CL_UUID, val.id.clone());
                         self.vars.set(auth::AUTH_TOKEN, val.access_token.clone());
                         elements.profile = val;
-                        return Some(Box::new(super::ServerList::new(None)));
                     },
                     Err(err) => {
                         elements.login_error.borrow_mut().text = format!("{}", err);

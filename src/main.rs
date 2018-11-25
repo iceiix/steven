@@ -114,15 +114,7 @@ impl Game {
                         self.server.remove(&mut self.renderer);
                         self.server = val;
                     },
-                    Err(err) => {
-                        let msg = match err {
-                            protocol::Error::Disconnect(val) => val,
-                            err => {
-                                let mut msg = format::TextComponent::new(&format!("{}", err));
-                                msg.modifier.color = Some(format::Color::Red);
-                                format::Component::Text(msg)
-                            },
-                        };
+                    Err(_) => {
                     }
                 }
             }
