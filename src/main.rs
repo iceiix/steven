@@ -92,13 +92,7 @@ impl Game {
         });
     }
 
-    pub fn tick(&mut self, delta: f64) {
-        if !self.server.is_connected() {
-            self.renderer.camera.yaw += 0.005 * delta;
-            if self.renderer.camera.yaw > ::std::f64::consts::PI * 2.0 {
-                self.renderer.camera.yaw = 0.0;
-            }
-        }
+    pub fn tick(&mut self, _delta: f64) {
 
         if !self.server.is_connected() {
             self.focused = false;
@@ -198,7 +192,8 @@ fn main() {
         let now = Instant::now();
         let diff = now.duration_since(last_frame);
         last_frame = now;
-        let delta = (diff.subsec_nanos() as f64) / frame_time;
+        //let delta = (diff.subsec_nanos() as f64) / frame_time;
+        let delta = 0f64;
         let (width, height) = window.size();
 
         let version = {
@@ -214,18 +209,17 @@ fn main() {
         }
         let fps_cap = *game.vars.get(settings::R_MAX_FPS);
 
-        game.tick(delta);
         game.server.tick(&mut game.renderer, delta);
 
         game.renderer.update_camera(width, height);
         game.server.world.compute_render_list(&mut game.renderer);
-        game.chunk_builder.tick(&mut game.server.world, &mut game.renderer, version);
 
-        game.console
-            .lock()
-            .unwrap()
-            .tick(&mut ui_container, &game.renderer, delta, width as f64);
-        ui_container.tick(&mut game.renderer, delta, width as f64, height as f64);
+        game.renderer.camera.yaw = -7.2697720829739465;
+        game.renderer.camera.pitch = 2.9733976253414633;
+        game.renderer.camera.pos.x = -208.76533603647485;
+        game.renderer.camera.pos.y = 65.62010000000001;
+        game.renderer.camera.pos.z = 90.9279311085242;
+ 
         game.renderer.tick(&mut game.server.world, delta, width, height);
 
 

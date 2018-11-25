@@ -280,6 +280,7 @@ impl Renderer {
 
     pub fn tick(&mut self, world: &mut world::World, delta: f64, width: u32, height: u32) {
         self.update_textures(delta);
+        self.update_camera(width, height);
 
         let trans = self.trans.as_mut().unwrap();
         trans.main.bind();
@@ -289,7 +290,7 @@ impl Renderer {
 
         gl::enable(gl::MULTISAMPLE);
 
-        let time_offset = self.sky_offset * 0.9;
+        let time_offset = 0.9;
         gl::clear_color(
              (122.0 / 255.0) * time_offset,
              (165.0 / 255.0) * time_offset,
@@ -326,8 +327,6 @@ impl Renderer {
         gl::depth_mask(true);
         gl::blend_func(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
         gl::disable(gl::MULTISAMPLE);
-
-        self.ui.tick(width, height);
 
         gl::check_gl_error();
 
