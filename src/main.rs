@@ -90,32 +90,6 @@ impl Game {
             tx.send(server::Server::connect(resources, profile, &address)).unwrap();
         });
     }
-
-    pub fn tick(&mut self, _delta: f64) {
-
-        if !self.server.is_connected() {
-            self.focused = false;
-        }
-
-        let mut clear_reply = false;
-        if let Some(ref recv) = self.connect_reply {
-            if let Ok(server) = recv.try_recv() {
-                clear_reply = true;
-                match server {
-                    Ok(val) => {
-                        self.focused = true;
-                        self.server.remove(&mut self.renderer);
-                        self.server = val;
-                    },
-                    Err(_) => {
-                    }
-                }
-            }
-        }
-        if clear_reply {
-            self.connect_reply = None;
-        }
-    }
 }
 
 fn main() {
@@ -138,7 +112,7 @@ fn main() {
 
     info!("Starting steven");
 
-    let (res, mut resui) = resources::Manager::new();
+    let (res, _resui) = resources::Manager::new();
     let resource_manager = Arc::new(RwLock::new(res));
 
     let sdl = sdl2::init().unwrap();
@@ -186,12 +160,6 @@ fn main() {
         let now = Instant::now();
         let delta = 0f64;
         let (width, height) = window.size();
-
-        let _version = {
-            let mut res = game.resource_manager.write().unwrap();
-            res.tick(&mut resui, &mut ui_container, delta);
-            res.version()
-        };
 
         let vsync_changed = *game.vars.get(settings::R_VSYNC);
         if vsync != vsync_changed {
