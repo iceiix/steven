@@ -37,7 +37,6 @@ pub mod console;
 pub mod server;
 pub mod world;
 pub mod chunk_builder;
-pub mod auth;
 pub mod model;
 pub mod entity;
 
@@ -50,21 +49,9 @@ use crate::protocol::mojang;
 use sdl2::Sdl;
 use sdl2::keyboard;
 
-const CL_BRAND: console::CVar<String> = console::CVar {
-    ty: PhantomData,
-    name: "cl_brand",
-    description: "cl_brand has the value of the clients current 'brand'. e.g. \"Steven\" or \
-                  \"Vanilla\"",
-    mutable: false,
-    serializable: false,
-    default: &|| "Steven".to_owned(),
-};
-
 pub struct Game {
     renderer: render::Renderer,
     resource_manager: Arc<RwLock<resources::Manager>>,
-    console: Arc<Mutex<console::Console>>,
-    vars: Rc<console::Vars>,
     should_close: bool,
 
     server: server::Server,
@@ -77,40 +64,11 @@ pub struct Game {
 
 impl Game {
     pub fn connect_to(&mut self, address: &str) {
-        let (tx, rx) = mpsc::channel();
-        self.connect_reply = Some(rx);
-        let address = address.to_owned();
-        let resources = self.resource_manager.clone();
-        let profile = mojang::Profile {
-            username: self.vars.get(auth::CL_USERNAME).clone(),
-            id: self.vars.get(auth::CL_UUID).clone(),
-            access_token: self.vars.get(auth::AUTH_TOKEN).clone(),
-        };
-        thread::spawn(move || {
-            tx.send(server::Server::connect(resources, profile, &address)).unwrap();
-        });
     }
 }
 
 fn main() {
-    let con = Arc::new(Mutex::new(console::Console::new()));
-    let (vars, mut vsync) = {
-        let mut vars = console::Vars::new();
-        vars.register(CL_BRAND);
-        auth::register_vars(&mut vars);
-        settings::register_vars(&mut vars);
-        vars.load_config();
-        vars.save_config();
-        let vsync = *vars.get(settings::R_VSYNC);
-        (Rc::new(vars), vsync)
-    };
-
-    let proxy = console::ConsoleProxy::new(con.clone());
-
-    log::set_boxed_logger(Box::new(proxy)).unwrap();
-    log::set_max_level(log::LevelFilter::Trace);
-
-    info!("Starting steven");
+    println!("Starting steven");
 
     let (res, _resui) = resources::Manager::new();
     let resource_manager = Arc::new(RwLock::new(res));
@@ -135,6 +93,7 @@ fn main() {
 
     gl::init(&sdl_video);
 
+    let vsync = true;
     sdl_video.gl_set_swap_interval(if vsync { 1 } else { 0 });
 
 
@@ -146,8 +105,6 @@ fn main() {
         focused: false,
         renderer,
         resource_manager: resource_manager.clone(),
-        console: con,
-        vars,
         should_close: false,
         connect_reply: None,
         sdl,
@@ -160,13 +117,6 @@ fn main() {
         let now = Instant::now();
         let delta = 0f64;
         let (width, height) = window.size();
-
-        let vsync_changed = *game.vars.get(settings::R_VSYNC);
-        if vsync != vsync_changed {
-            vsync = vsync_changed;
-            sdl_video.gl_set_swap_interval(if vsync { 1 } else { 0 });
-        }
-        let fps_cap = *game.vars.get(settings::R_MAX_FPS);
 
         game.server.tick(&mut game.renderer, delta);
 
@@ -181,14 +131,6 @@ fn main() {
  
         game.renderer.tick(&mut game.server.world, delta, width, height);
 
-
-        if fps_cap > 0 && !vsync {
-            let frame_time = now.elapsed();
-            let sleep_interval = Duration::from_millis(1000 / fps_cap as u64);
-            if frame_time < sleep_interval {
-                thread::sleep(sleep_interval - frame_time);
-            }
-        }
         window.gl_swap_window();
 
         for event in events.poll_iter() {
@@ -250,29 +192,6 @@ fn handle_window_event(window: &sdl2::video::Window,
         Event::MouseButtonDown{mouse_btn: MouseButton::Right, ..} => {
             if game.focused {
                 game.server.on_right_click(&mut game.renderer);
-            }
-        }
-        Event::KeyDown{keycode: Some(Keycode::Backquote), ..} => {
-            game.console.lock().unwrap().toggle();
-        }
-        Event::KeyDown{keycode: Some(key), keymod, ..} => {
-            if game.focused {
-                if let Some(steven_key) = settings::Stevenkey::get_by_keycode(key, &game.vars) {
-                    game.server.key_press(true, steven_key);
-                }
-            } else {
-                let ctrl_pressed = keymod.intersects(keyboard::LCTRLMOD | keyboard::RCTRLMOD);
-                ui_container.key_press(game, key, true, ctrl_pressed);
-            }
-        }
-        Event::KeyUp{keycode: Some(key), keymod, ..} => {
-            if game.focused {
-                if let Some(steven_key) = settings::Stevenkey::get_by_keycode(key, &game.vars) {
-                    game.server.key_press(false, steven_key);
-                }
-            } else {
-                let ctrl_pressed = keymod.intersects(keyboard::LCTRLMOD | keyboard::RCTRLMOD);
-                ui_container.key_press(game, key, false, ctrl_pressed);
             }
         }
         Event::TextInput{text, ..} => {
