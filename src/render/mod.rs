@@ -308,14 +308,6 @@ impl Renderer {
         }
         self.clouds.draw(&self.camera.pos, &self.perspective_matrix, &self.camera_matrix, self.light_level, self.sky_offset, delta);
 
-        // Copy the depth buffer
-        trans.main.bind_read();
-        trans.trans.bind_draw();
-        gl::blit_framebuffer(
-            0, 0, width as i32, height as i32,
-            0, 0, width as i32, height as i32,
-            gl::ClearFlags::Depth, gl::NEAREST
-        );
         gl::enable(gl::BLEND);
         gl::depth_mask(false);
         trans.trans.bind();
