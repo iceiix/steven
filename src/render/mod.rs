@@ -32,7 +32,7 @@ use serde_json;
 use cgmath::prelude::*;
 use crate::world;
 use collision;
-use log::{error, trace};
+use log::{error};
 
 use std::hash::BuildHasherDefault;
 use crate::types::hash::FNVHash;
@@ -899,38 +899,6 @@ impl TextureManager {
             }
         }
         Ok(img)
-    }
-
-    fn update_textures(&mut self, version: usize) {
-        self.pending_uploads.clear();
-        self.atlases.clear();
-        self.animated_textures.clear();
-        self.version = version;
-        let map = self.textures.clone();
-        self.textures.clear();
-
-        self.free_dynamics.clear();
-
-        self.add_defaults();
-
-        for name in map.keys() {
-            if name.starts_with("steven-dynamic:") {
-                let n = &name["steven-dynamic:".len()..];
-                let (width, height, data) = {
-                    let dynamic_texture = match self.dynamic_textures.get(n) {
-                        Some(val) => val,
-                        None => continue,
-                    };
-                    let img = &dynamic_texture.1;
-                    let (width, height) = img.dimensions();
-                    (width, height, img.to_rgba().into_vec())
-                };
-                let new_tex = self.put_texture("steven-dynamic", n, width as u32, height as u32, data);
-                self.dynamic_textures.get_mut(n).unwrap().0 = new_tex;
-            } else if !self.textures.contains_key(name) {
-                self.load_texture(name);
-            }
-        }
     }
 
     fn get_skin(&self, url: &str) -> Option<Texture> {
