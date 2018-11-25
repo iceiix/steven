@@ -125,14 +125,6 @@ impl super::Screen for EditServerEntry {
             let index = self.entry_info.as_ref().map(|v| v.0);
             let server_name = server_name.clone();
             let server_address = server_address.clone();
-            done.add_click_func(move |_, game| {
-                Self::save_servers(
-                    index,
-                    &server_name.borrow().input,
-                    &server_address.borrow().input,
-                );
-                true
-            });
         }
 
         // Cancel
@@ -148,9 +140,6 @@ impl super::Screen for EditServerEntry {
                 .alignment(ui::VAttach::Middle, ui::HAttach::Center)
                 .attach(&mut *cancel);
             cancel.add_text(txt);
-            cancel.add_click_func(|_, game| {
-                true
-            });
         }
 
         self.elements = Some(UIElements {

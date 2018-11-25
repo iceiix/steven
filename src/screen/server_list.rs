@@ -147,10 +147,6 @@ impl ServerList {
                     };
                     false
                 });
-                backr.add_click_func(move |_, game| {
-                    game.connect_to(&address);
-                    true
-                });
             }
 
             // Server name
@@ -229,9 +225,6 @@ impl ServerList {
                 let index = index;
                 let sname = name.clone();
                 let saddr = address.clone();
-                btn.add_click_func(move |_, game| {
-                    true
-                })
             }
 
             let mut server = Server {
@@ -317,10 +310,6 @@ impl super::Screen for ServerList {
                 .attach(&mut *refresh);
             refresh.add_text(txt);
             let nr = self.needs_reload.clone();
-            refresh.add_click_func(move |_, _| {
-                *nr.borrow_mut() = true;
-                true
-            })
         }
 
         // Add a new server to the list
@@ -337,9 +326,6 @@ impl super::Screen for ServerList {
                 .alignment(ui::VAttach::Middle, ui::HAttach::Center)
                 .attach(&mut *add);
             add.add_text(txt);
-            add.add_click_func(move |_, game| {
-                true
-            })
         }
 
         // Options menu
@@ -356,9 +342,6 @@ impl super::Screen for ServerList {
                 .size(40.0, 40.0)
                 .alignment(ui::VAttach::Middle, ui::HAttach::Center)
                 .attach(&mut *options);
-            options.add_click_func(|_, game| {
-                true
-            });
         }
 
         // Disclaimer

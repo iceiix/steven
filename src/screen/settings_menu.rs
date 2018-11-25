@@ -50,9 +50,6 @@ impl super::Screen for SettingsMenu {
                 .alignment(ui::VAttach::Middle, ui::HAttach::Center)
                 .attach(&mut *audio_settings);
             audio_settings.add_text(txt);
-            audio_settings.add_click_func(|_, game| {
-                true
-            });
         }
         buttons.push(audio_settings);
 
@@ -68,9 +65,6 @@ impl super::Screen for SettingsMenu {
                 .alignment(ui::VAttach::Middle, ui::HAttach::Center)
                 .attach(&mut *video_settings);
             video_settings.add_text(txt);
-            video_settings.add_click_func(|_, game| {
-                true
-            });
         }
         buttons.push(video_settings);
 
@@ -117,10 +111,6 @@ impl super::Screen for SettingsMenu {
                 .alignment(ui::VAttach::Middle, ui::HAttach::Center)
                 .attach(&mut *done_button);
             done_button.add_text(txt);
-            done_button.add_click_func(|_, game| {
-                game.focused = true;
-                true
-            });
         }
         buttons.push(done_button);
 
@@ -137,10 +127,6 @@ impl super::Screen for SettingsMenu {
                     .alignment(ui::VAttach::Middle, ui::HAttach::Center)
                     .attach(&mut *disconnect_button);
                 disconnect_button.add_text(txt);
-                disconnect_button.add_click_func(|_, game| {
-                    game.server.disconnect(None);
-                    true
-                });
             }
             buttons.push(disconnect_button);
         }
@@ -247,12 +233,6 @@ impl super::Screen for VideoSettingsMenu {
                 .attach(&mut *vsync_setting);
             let txt_vsync = txt.clone();
             vsync_setting.add_text(txt);
-            vsync_setting.add_click_func(move |_, game| {
-                let r_vsync = !*game.vars.get(settings::R_VSYNC);
-                txt_vsync.borrow_mut().text = format!("VSync: {}", if r_vsync { "Enabled" } else { "Disabled" });
-                game.vars.set(settings::R_VSYNC, r_vsync);
-                true
-            });
         }
         buttons.push(vsync_setting);
 
@@ -287,10 +267,6 @@ impl super::Screen for VideoSettingsMenu {
                 .alignment(ui::VAttach::Middle, ui::HAttach::Center)
                 .attach(&mut *done_button);
             done_button.add_text(txt);
-            done_button.add_click_func(|_, game| {
-                game.focused = true;
-                true
-            });
         }
         buttons.push(done_button);
         self.elements = Some(UIElements {
@@ -370,10 +346,6 @@ impl super::Screen for AudioSettingsMenu {
                 .alignment(ui::VAttach::Middle, ui::HAttach::Center)
                 .attach(&mut *done_button);
             done_button.add_text(txt);
-            done_button.add_click_func(|_, game| {
-                game.focused = true;
-                true
-            });
         }
         buttons.push(done_button);
 

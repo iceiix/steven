@@ -75,10 +75,6 @@ impl super::Screen for Login {
             let mut btn = login_btn.borrow_mut();
             btn.add_text(login_btn_text.clone());
             let tl = try_login.clone();
-            btn.add_click_func(move |_, _| {
-                tl.set(true);
-                true
-            });
         }
 
 
