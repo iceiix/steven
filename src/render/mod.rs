@@ -263,8 +263,6 @@ impl Renderer {
         self.camera.pos.y = 65.62010000000001;
         self.camera.pos.z = 90.9279311085242;
 
-        println!("yaw = {}, pitch = {}, x = {}, y = {}, z = {}", self.camera.yaw,
-                 self.camera.pitch, self.camera.pos.x, self.camera.pos.y, self.camera.pos.z);
         self.view_vector = cgmath::Vector3::new(
             ((self.camera.yaw - PI64/2.0).cos() * -self.camera.pitch.cos()) as f32,
             (-self.camera.pitch.sin()) as f32,
