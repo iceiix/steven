@@ -69,7 +69,6 @@ pub struct Game {
 
     server: server::Server,
     focused: bool,
-    chunk_builder: chunk_builder::ChunkBuilder,
 
     connect_reply: Option<mpsc::Receiver<Result<server::Server, protocol::Error>>>,
 
@@ -168,10 +167,6 @@ fn main() {
     let renderer = render::Renderer::new(resource_manager.clone());
     let mut ui_container = ui::Container::new();
 
-    let mut last_frame = Instant::now();
-    let frame_time = 1e9f64 / 60.0;
-
-    let textures = renderer.get_textures();
     let mut game = Game {
         server: server::Server::dummy_server(resource_manager.clone()),
         focused: false,
@@ -180,7 +175,6 @@ fn main() {
         console: con,
         vars,
         should_close: false,
-        chunk_builder: chunk_builder::ChunkBuilder::new(resource_manager, textures),
         connect_reply: None,
         sdl,
     };
@@ -190,13 +184,10 @@ fn main() {
     while !game.should_close {
 
         let now = Instant::now();
-        let diff = now.duration_since(last_frame);
-        last_frame = now;
-        //let delta = (diff.subsec_nanos() as f64) / frame_time;
         let delta = 0f64;
         let (width, height) = window.size();
 
-        let version = {
+        let _version = {
             let mut res = game.resource_manager.write().unwrap();
             res.tick(&mut resui, &mut ui_container, delta);
             res.version()

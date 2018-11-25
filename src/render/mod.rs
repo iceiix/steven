@@ -240,22 +240,20 @@ impl Renderer {
     pub fn update_camera(&mut self, width: u32, height: u32) {
         use std::f64::consts::PI as PI64;
 
-        if self.height != height || self.width != width {
-            self.width = width;
-            self.height = height;
-            gl::viewport(0, 0, width as i32, height as i32);
+        self.width = width;
+        self.height = height;
+        gl::viewport(0, 0, width as i32, height as i32);
 
-            self.perspective_matrix = cgmath::Matrix4::from(
-                cgmath::PerspectiveFov {
-                    fovy: cgmath::Rad::from(cgmath::Deg(90f32)),
-                    aspect: (width as f32 / height as f32),
-                    near: 0.1f32,
-                    far: 500.0f32,
-                }
-            );
+        self.perspective_matrix = cgmath::Matrix4::from(
+            cgmath::PerspectiveFov {
+                fovy: cgmath::Rad::from(cgmath::Deg(90f32)),
+                aspect: (width as f32 / height as f32),
+                near: 0.1f32,
+                far: 500.0f32,
+            }
+        );
 
-            self.init_trans(width, height);
-        }
+        self.init_trans(width, height);
 
         self.camera.yaw = -7.2697720829739465;
         self.camera.pitch = 2.9733976253414633;
