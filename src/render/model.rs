@@ -2,8 +2,8 @@
 use super::glsl;
 use super::shaders;
 use crate::gl;
-use cgmath::{Point3, Matrix4, SquareMatrix};
-use collision::{self, Frustum, Sphere};
+use cgmath::{Matrix4, SquareMatrix};
+use collision::{self, Frustum};
 use std::collections::HashMap;
 use std::hash::BuildHasherDefault;
 use std::sync::{Arc, RwLock};
@@ -200,7 +200,7 @@ impl Manager {
         }
     }
 
-    pub fn draw(&mut self, frustum: &Frustum<f32>, perspective_matrix: &Matrix4<f32>, camera_matrix: &Matrix4<f32>) {
+    pub fn draw(&mut self, _frustum: &Frustum<f32>, perspective_matrix: &Matrix4<f32>, camera_matrix: &Matrix4<f32>) {
         gl::enable(gl::BLEND);
         for collection in &self.collections {
             collection.shader.program.use_program();
@@ -210,12 +210,6 @@ impl Manager {
             gl::blend_func(collection.blend_s, collection.blend_d);
 
             for model in collection.models.values() {
-                if model.radius > 0.0 && frustum.contains(&Sphere {
-                    center: Point3::new(model.x, -model.y, model.z),
-                    radius: model.radius
-                }) == collision::Relation::Out {
-                    continue;
-                }
                 model.array.bind();
                 collection.shader.lighting.map(|v| v.set_float2(model.block_light, model.sky_light));
                 collection.shader.model_matrix.map(|v| v.set_matrix4_multi(&model.matrix));
