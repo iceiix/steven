@@ -58,7 +58,6 @@ pub struct Renderer {
     pub model: model::Manager,
 
     gl_texture: gl::Texture,
-    texture_layers: usize,
 
     trans_shader: TransShader,
 
@@ -137,7 +136,6 @@ impl Renderer {
             ui,
             resources: res,
             gl_texture: tex,
-            texture_layers: 1,
 
             trans_shader,
 
@@ -314,28 +312,6 @@ impl Renderer {
     fn do_pending_textures(&mut self) {
         let len = {
             let tex = self.textures.read().unwrap();
-            // Rebuild the texture if it needs resizing
-            if self.texture_layers != tex.atlases.len() {
-                let len = ATLAS_SIZE * ATLAS_SIZE * 4 * tex.atlases.len();
-                let mut data = Vec::with_capacity(len);
-                unsafe {
-                    data.set_len(len);
-                }
-                self.gl_texture.get_pixels(gl::TEXTURE_2D_ARRAY,
-                                           0,
-                                           gl::RGBA,
-                                           gl::UNSIGNED_BYTE,
-                                           &mut data[..]);
-                self.gl_texture.image_3d(gl::TEXTURE_2D_ARRAY,
-                                         0,
-                                         ATLAS_SIZE as u32,
-                                         ATLAS_SIZE as u32,
-                                         tex.atlases.len() as u32,
-                                         gl::RGBA,
-                                         gl::UNSIGNED_BYTE,
-                                         &data[..]);
-                self.texture_layers = tex.atlases.len();
-            }
             tex.pending_uploads.len()
         };
         if len > 0 {
