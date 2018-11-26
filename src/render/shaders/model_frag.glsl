@@ -13,9 +13,4 @@ out vec4 fragColor;
 #include lookup_texture
 
 void main() {
-	vec4 col = atlasTexture();
-	if (col.a <= 0.05) discard;
-	col *= vColor;
-	col.rgb *= vLighting;
-	fragColor = col * colorMul[int(vID)];
 }

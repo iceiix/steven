@@ -21,14 +21,4 @@ out vec3 vLighting;
 #include get_light
 
 void main() {
-	vec3 pos = vec3(aPosition.x, -aPosition.y, aPosition.z);
-	gl_Position = perspectiveMatrix * cameraMatrix * modelMatrix[id] * vec4(pos, 1.0);
-
-	vColor = aColor;
-	vTextureInfo = aTextureInfo;
-	vTextureOffset = aTextureOffset.xy / 16.0;
-	vAtlas = aTextureOffset.z;
-	vID = float(id);
-
-	vLighting = getLight(lighting);
 }
