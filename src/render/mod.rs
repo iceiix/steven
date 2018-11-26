@@ -75,9 +75,6 @@ pub struct Renderer {
 
     pub width: u32,
     pub height: u32,
-
-    skin_request: mpsc::Sender<String>,
-    skin_reply: mpsc::Receiver<(String, Option<image::DynamicImage>)>,
 }
 
 #[derive(Default)]
@@ -117,7 +114,7 @@ impl Renderer {
         tex.set_parameter(gl::TEXTURE_2D_ARRAY, gl::TEXTURE_WRAP_S, gl::CLAMP_TO_EDGE);
         tex.set_parameter(gl::TEXTURE_2D_ARRAY, gl::TEXTURE_WRAP_T, gl::CLAMP_TO_EDGE);
 
-        let (textures, skin_req, skin_reply) = TextureManager::new(res.clone());
+        let (textures, _skin_req, _skin_reply) = TextureManager::new(res.clone());
         let textures = Arc::new(RwLock::new(textures));
 
         let mut greg = glsl::Registry::new();
@@ -157,9 +154,6 @@ impl Renderer {
             frame_id: 1,
 
             trans: None,
-
-            skin_request: skin_req,
-            skin_reply,
         }
     }
 
@@ -209,9 +203,6 @@ impl Renderer {
 
         let trans = self.trans.as_mut().unwrap();
         trans.main.bind();
-
-        gl::active_texture(0);
-        self.gl_texture.bind(gl::TEXTURE_2D_ARRAY);
 
         gl::clear_color(
              122.0 / 255.0,
@@ -332,25 +323,6 @@ impl Renderer {
     }
 
     fn update_textures(&mut self) {
-        {
-            let mut tex = self.textures.write().unwrap();
-            while let Ok((hash, img)) = self.skin_reply.try_recv() {
-                if let Some(img) = img {
-                    tex.update_skin(hash, img);
-                }
-            }
-            let mut old_skins = vec![];
-            for (skin, refcount) in &tex.skins {
-                if refcount.load(Ordering::Relaxed) == 0 {
-                    old_skins.push(skin.clone());
-                }
-            }
-            for skin in old_skins {
-                tex.skins.remove(&skin);
-                tex.remove_dynamic(&format!("skin-{}", skin));
-            }
-        }
-        self.gl_texture.bind(gl::TEXTURE_2D_ARRAY);
         self.do_pending_textures();
     }
 
@@ -408,13 +380,12 @@ impl Renderer {
         match tex {
             Some(val) => val,
             None => {
-                let mut t = textures.write().unwrap();
+                let t = textures.write().unwrap();
                 // Make sure it hasn't already been loaded since we switched
                 // locks.
                 if let Some(val) = t.get_skin(url) {
                     val
                 } else {
-                    t.load_skin(self, url);
                     t.get_skin(url).unwrap()
                 }
             }
@@ -721,38 +692,6 @@ impl TextureManager {
         if let Some(skin) = self.skins.get(hash) {
             skin.fetch_sub(1, Ordering::Relaxed);
         }
-    }
-
-    fn load_skin(&mut self, renderer: &Renderer, url: &str) {
-        let hash = &url["http://textures.minecraft.net/texture/".len()..];
-        let res = self.resources.clone();
-        // TODO: This shouldn't be hardcoded to steve but instead
-        // have a way to select alex as a default.
-        let img = if let Some(mut val) = res.read().unwrap().open("minecraft", "textures/entity/steve.png") {
-            let mut data = Vec::new();
-            val.read_to_end(&mut data).unwrap();
-            image::load_from_memory(&data).unwrap()
-        } else {
-            image::DynamicImage::new_rgba8(64, 64)
-        };
-        self.put_dynamic(&format!("skin-{}", hash), img);
-        self.skins.insert(hash.to_owned(), AtomicIsize::new(0));
-        renderer.skin_request.send(hash.to_owned()).unwrap();
-    }
-
-    fn update_skin(&mut self, hash: String, img: image::DynamicImage) {
-        if !self.skins.contains_key(&hash) { return; }
-        let name = format!("steven-dynamic:skin-{}", hash);
-        let tex = self.get_texture(&name).unwrap();
-        let rect = atlas::Rect {
-            x: tex.x,
-            y: tex.y,
-            width: tex.width,
-            height: tex.height,
-        };
-
-        self.pending_uploads.push((tex.atlas, rect, img.to_rgba().into_vec()));
-        self.dynamic_textures.get_mut(&format!("skin-{}", hash)).unwrap().1 = img;
     }
 
     fn get_texture(&self, name: &str) -> Option<Texture> {
