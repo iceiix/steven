@@ -276,7 +276,7 @@ impl Renderer {
         self.frustum = collision::Frustum::from_matrix4(self.perspective_matrix * self.camera_matrix).unwrap();
     }
 
-    pub fn tick(&mut self, world: &mut _world::World, delta: f64, width: u32, height: u32) {
+    pub fn tick(&mut self, _world: &mut world::World, delta: f64, width: u32, height: u32) {
         self.update_textures(delta);
         self.update_camera(width, height);
 
