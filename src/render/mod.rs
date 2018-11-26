@@ -173,18 +173,10 @@ impl Renderer {
         shaders::add_shaders(&mut greg);
         let ui = ui::UIState::new(&greg, textures.clone(), res.clone());
 
-        gl::enable(gl::DEPTH_TEST);
-
         // Shaders
         let chunk_shader = ChunkShader::new(&greg);
         let chunk_shader_alpha = ChunkShaderAlpha::new(&greg);
         let trans_shader = TransShader::new(&greg);
-
-        // UI
-        // Line Drawer
-
-        gl::blend_func(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
-        gl::depth_func(gl::LESS_OR_EQUAL);
 
         Renderer {
             resource_version: version,
@@ -296,12 +288,10 @@ impl Renderer {
 
         gl::check_framebuffer_status();
         gl::unbind_framebuffer();
-        gl::disable(gl::DEPTH_TEST);
         gl::clear(gl::ClearFlags::Color);
         gl::disable(gl::BLEND);
         trans.draw(&self.trans_shader);
 
-        gl::enable(gl::DEPTH_TEST);
         gl::depth_mask(true);
         gl::check_gl_error();
 
