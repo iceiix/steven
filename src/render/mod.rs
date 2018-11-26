@@ -18,7 +18,6 @@ pub mod glsl;
 pub mod shaders;
 pub mod ui;
 pub mod model;
-pub mod clouds;
 
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
@@ -57,7 +56,6 @@ pub struct Renderer {
     textures: Arc<RwLock<TextureManager>>,
     pub ui: ui::UIState,
     pub model: model::Manager,
-    pub clouds: clouds::Clouds,
 
     gl_texture: gl::Texture,
     texture_layers: usize,
@@ -187,7 +185,6 @@ impl Renderer {
 
         // UI
         // Line Drawer
-        // Clouds
 
         gl::blend_func(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
         gl::depth_func(gl::LESS_OR_EQUAL);
@@ -195,7 +192,6 @@ impl Renderer {
         Renderer {
             resource_version: version,
             model: model::Manager::new(&greg),
-            clouds: clouds::Clouds::new(&greg, textures.clone()),
             textures,
             ui,
             resources: res,
