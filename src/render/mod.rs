@@ -83,9 +83,6 @@ pub struct Renderer {
     pub width: u32,
     pub height: u32,
 
-    // Light renderering
-    pub light_level: f32,
-    pub sky_offset: f32,
     skin_request: mpsc::Sender<String>,
     skin_reply: mpsc::Receiver<(String, Option<image::DynamicImage>)>,
 }
@@ -230,8 +227,6 @@ impl Renderer {
 
             trans: None,
 
-            light_level: 0.8,
-            sky_offset: 1.0,
             skin_request: skin_req,
             skin_reply,
         }
@@ -296,7 +291,7 @@ impl Renderer {
         gl::clear(gl::ClearFlags::Color | gl::ClearFlags::Depth);
 
         // Model rendering
-        self.model.draw(&self.frustum, &self.perspective_matrix, &self.camera_matrix, self.light_level, self.sky_offset);
+        self.model.draw(&self.frustum, &self.perspective_matrix, &self.camera_matrix, 0.8, 1.0);
 
         gl::enable(gl::BLEND);
         gl::depth_mask(false);

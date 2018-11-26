@@ -427,7 +427,7 @@ impl Server {
         self.target_info.clear(renderer);
     }
 
-    fn update_time(&mut self, renderer: &mut render::Renderer, delta: f64) {
+    fn update_time(&mut self, _renderer: &mut render::Renderer, delta: f64) {
         if self.tick_time {
             self.world_time_target += delta / 3.0;
             self.world_time_target = (24000.0 + self.world_time_target) % 24000.0;
@@ -442,30 +442,6 @@ impl Server {
         } else {
             self.world_time = self.world_time_target;
         }
-        renderer.sky_offset = self.calculate_sky_offset();
-    }
-
-    fn calculate_sky_offset(&self) -> f32 {
-        use std::f32::consts::PI;
-        let mut offset = ((1.0 + self.world_time as f32) / 24000.0) - 0.25;
-        if offset < 0.0 {
-            offset += 1.0;
-        } else if offset > 1.0 {
-            offset -= 1.0;
-        }
-
-        let prev_offset = offset;
-        offset = 1.0 - (((offset * PI).cos() + 1.0) / 2.0);
-        offset = prev_offset + (offset - prev_offset) / 3.0;
-
-        offset = 1.0 - ((offset * PI * 2.0).cos() * 2.0 + 0.2);
-        if offset > 1.0 {
-            offset = 1.0;
-        } else if offset < 0.0 {
-            offset = 0.0;
-        }
-        offset = 1.0 - offset;
-        offset * 0.8 + 0.2
     }
 
     pub fn minecraft_tick(&mut self) {
