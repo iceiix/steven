@@ -27,7 +27,6 @@ use crate::gl;
 use image;
 use image::{GenericImage, GenericImageView};
 use byteorder::{WriteBytesExt, NativeEndian};
-use serde_json;
 use cgmath::prelude::*;
 use collision;
 use log::{error};
