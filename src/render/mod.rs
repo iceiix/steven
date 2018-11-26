@@ -276,7 +276,7 @@ impl Renderer {
         self.frustum = collision::Frustum::from_matrix4(self.perspective_matrix * self.camera_matrix).unwrap();
     }
 
-    pub fn tick(&mut self, world: &mut world::World, delta: f64, width: u32, height: u32) {
+    pub fn tick(&mut self, world: &mut _world::World, delta: f64, width: u32, height: u32) {
         self.update_textures(delta);
         self.update_camera(width, height);
 
@@ -297,13 +297,8 @@ impl Renderer {
         );
         gl::clear(gl::ClearFlags::Color | gl::ClearFlags::Depth);
 
-        // Line rendering
         // Model rendering
         self.model.draw(&self.frustum, &self.perspective_matrix, &self.camera_matrix, self.light_level, self.sky_offset);
-        if world.copy_cloud_heightmap(&mut self.clouds.heightmap_data) {
-            self.clouds.dirty = true;
-        }
-        self.clouds.draw(&self.camera.pos, &self.perspective_matrix, &self.camera_matrix, self.light_level, self.sky_offset, delta);
 
         gl::enable(gl::BLEND);
         gl::depth_mask(false);
