@@ -101,13 +101,9 @@ fn main() {
     let mut events = game.sdl.event_pump().unwrap();
     let mut sun_model = sun::SunModel::new(&mut game.renderer);
     while !game.should_close {
-
-        let delta = 0f64;
-        let (width, height) = window.size();
-
         sun_model.tick(&mut game.renderer, 0.0, 0);
 
-        game.renderer.update_camera(width, height);
+        game.renderer.update_camera();
         game.server.world.compute_render_list(&mut game.renderer);
 
         game.renderer.camera.yaw = -7.2697720829739465;
@@ -116,7 +112,7 @@ fn main() {
         game.renderer.camera.pos.y = 65.62010000000001;
         game.renderer.camera.pos.z = 90.9279311085242;
  
-        game.renderer.tick(&mut game.server.world, delta, width, height);
+        game.renderer.tick(&mut game.server.world);
 
         window.gl_swap_window();
 

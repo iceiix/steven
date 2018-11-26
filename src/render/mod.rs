@@ -165,9 +165,11 @@ impl Renderer {
         }
     }
 
-    pub fn update_camera(&mut self, width: u32, height: u32) {
+    pub fn update_camera(&mut self) {
         use std::f64::consts::PI as PI64;
 
+        let width = 854;
+        let height = 480;
         self.width = width;
         self.height = height;
         gl::viewport(0, 0, width as i32, height as i32);
@@ -204,9 +206,8 @@ impl Renderer {
         self.frustum = collision::Frustum::from_matrix4(self.perspective_matrix * self.camera_matrix).unwrap();
     }
 
-    pub fn tick(&mut self, _world: &mut world::World, delta: f64, width: u32, height: u32) {
-        self.update_textures(delta);
-        self.update_camera(width, height);
+    pub fn tick(&mut self, _world: &mut world::World) {
+        self.update_textures();
 
         let trans = self.trans.as_mut().unwrap();
         trans.main.bind();
@@ -332,7 +333,7 @@ impl Renderer {
         }
     }
 
-    fn update_textures(&mut self, delta: f64) {
+    fn update_textures(&mut self) {
         {
             let mut tex = self.textures.write().unwrap();
             while let Ok((hash, img)) = self.skin_reply.try_recv() {
@@ -353,30 +354,6 @@ impl Renderer {
         }
         self.gl_texture.bind(gl::TEXTURE_2D_ARRAY);
         self.do_pending_textures();
-
-        for ani in &mut self.textures.write().unwrap().animated_textures {
-            if ani.remaining_time <= 0.0 {
-                ani.current_frame = (ani.current_frame + 1) % ani.frames.len();
-                ani.remaining_time += ani.frames[ani.current_frame].time as f64;
-                let offset = ani.texture.width * ani.texture.width *
-                             ani.frames[ani.current_frame].index * 4;
-                let offset2 = offset + ani.texture.width * ani.texture.width * 4;
-                self.gl_texture.sub_image_3d(gl::TEXTURE_2D_ARRAY,
-                                             0,
-                                             ani.texture.get_x() as u32,
-                                             ani.texture.get_y() as u32,
-                                             ani.texture.atlas as u32,
-                                             ani.texture.get_width() as u32,
-                                             ani.texture.get_height() as u32,
-                                             1,
-                                             gl::RGBA,
-                                             gl::UNSIGNED_BYTE,
-                                             &ani.data[offset..offset2]);
-            } else {
-                ani.remaining_time -= delta / 3.0;
-            }
-        }
-
     }
 
     fn init_trans(&mut self, width: u32, height: u32) {
@@ -573,7 +550,6 @@ pub struct TextureManager {
     resources: Arc<RwLock<resources::Manager>>,
     atlases: Vec<atlas::Atlas>,
 
-    animated_textures: Vec<AnimatedTexture>,
     pending_uploads: Vec<(i32, atlas::Rect, Vec<u8>)>,
 
     dynamic_textures: HashMap<String, (Texture, image::DynamicImage), BuildHasherDefault<FNVHash>>,
@@ -597,7 +573,6 @@ impl TextureManager {
             },
             resources: res,
             atlases: Vec::new(),
-            animated_textures: Vec::new(),
             pending_uploads: Vec::new(),
 
             dynamic_textures: HashMap::with_hasher(BuildHasherDefault::default()),
@@ -803,78 +778,11 @@ impl TextureManager {
             val.read_to_end(&mut data).unwrap();
             if let Ok(img) = image::load_from_memory(&data) {
                 let (width, height) = img.dimensions();
-                // Might be animated
-                if (name.starts_with("blocks/") || name.starts_with("items/")) && width != height {
-                    let id = img.to_rgba().into_vec();
-                    let frame = id[..(width * width * 4) as usize].to_owned();
-                    if let Some(mut ani) = self.load_animation(plugin, name, &img, id) {
-                        ani.texture = self.put_texture(plugin, name, width, width, frame);
-                        self.animated_textures.push(ani);
-                        return;
-                    }
-                }
                 self.put_texture(plugin, name, width, height, img.to_rgba().into_vec());
                 return;
             }
         }
         self.insert_texture_dummy(plugin, name);
-    }
-
-    fn load_animation(&mut self,
-                      plugin: &str,
-                      name: &str,
-                      img: &image::DynamicImage,
-                      data: Vec<u8>)
-                      -> Option<AnimatedTexture> {
-        let path = format!("textures/{}.png.mcmeta", name);
-        let res = self.resources.clone();
-        if let Some(val) = res.read().unwrap().open(plugin, &path) {
-            let meta: serde_json::Value = serde_json::from_reader(val).unwrap();
-            let animation = meta.get("animation").unwrap();
-            let frame_time = animation.get("frametime").and_then(|v| v.as_i64()).unwrap_or(1);
-            let interpolate = animation.get("interpolate")
-                                       .and_then(|v| v.as_bool())
-                                       .unwrap_or(false);
-            let frames = if let Some(frames) = animation.get("frames")
-                                                        .and_then(|v| v.as_array()) {
-                let mut out = Vec::with_capacity(frames.len());
-                for frame in frames {
-                    if let Some(index) = frame.as_i64() {
-                        out.push(AnimationFrame {
-                            index: index as usize,
-                            time: frame_time,
-                        })
-                    } else {
-                        out.push(AnimationFrame{
-                            index: frame.get("index").unwrap().as_i64().unwrap() as usize,
-                            time: frame_time * frame.get("frameTime").unwrap().as_i64().unwrap(),
-                        })
-                    }
-                }
-                out
-            } else {
-                let (width, height) = img.dimensions();
-                let count = height / width;
-                let mut frames = Vec::with_capacity(count as usize);
-                for i in 0..count {
-                    frames.push(AnimationFrame {
-                        index: i as usize,
-                        time: frame_time,
-                    })
-                }
-                frames
-            };
-
-            return Some(AnimatedTexture {
-                frames,
-                data,
-                interpolate,
-                current_frame: 0,
-                remaining_time: 0.0,
-                texture: self.get_texture("steven:missing_texture").unwrap(),
-            });
-        }
-        None
     }
 
     fn put_texture(&mut self,
@@ -995,21 +903,6 @@ impl TextureManager {
         let desc = self.dynamic_textures.remove(name).unwrap();
         self.free_dynamics.push(desc.0);
     }
-}
-
-#[allow(dead_code)]
-struct AnimatedTexture {
-    frames: Vec<AnimationFrame>,
-    data: Vec<u8>,
-    interpolate: bool,
-    current_frame: usize,
-    remaining_time: f64,
-    texture: Texture,
-}
-
-struct AnimationFrame {
-    index: usize,
-    time: i64,
 }
 
 #[derive(Clone, Debug)]
