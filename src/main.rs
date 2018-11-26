@@ -104,7 +104,6 @@ fn main() {
         sun_model.tick(&mut game.renderer, 0.0, 0);
 
         game.renderer.update_camera();
-        game.server.world.compute_render_list(&mut game.renderer);
 
         game.renderer.camera.yaw = -7.2697720829739465;
         game.renderer.camera.pitch = 2.9733976253414633;
