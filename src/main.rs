@@ -47,7 +47,6 @@ pub struct Game {
     should_close: bool,
 
     server: server::Server,
-    focused: bool,
 
     sdl: Sdl,
 }
@@ -65,7 +64,7 @@ fn main() {
 
     let sdl = sdl2::init().unwrap();
     let sdl_video = sdl.video().unwrap();
-    let mut window = sdl2::video::WindowBuilder::new(&sdl_video, "Steven", 854, 480)
+    let window = sdl2::video::WindowBuilder::new(&sdl_video, "Steven", 854, 480)
                             .opengl()
                             .resizable()
                             .build()
@@ -87,11 +86,9 @@ fn main() {
 
 
     let renderer = render::Renderer::new(resource_manager.clone());
-    let mut ui_container = ui::Container::new();
 
     let mut game = Game {
         server: server::Server::dummy_server(resource_manager.clone()),
-        focused: false,
         renderer,
         should_close: false,
         sdl,
@@ -116,72 +113,17 @@ fn main() {
         window.gl_swap_window();
 
         for event in events.poll_iter() {
-            handle_window_event(&mut window, &mut game, &mut ui_container, event);
+            handle_window_event(&mut game, event);
         }
     }
 }
 
-fn handle_window_event(window: &mut sdl2::video::Window,
-                       game: &mut Game,
-                       ui_container: &mut ui::Container,
+fn handle_window_event( game: &mut Game,
                        event: sdl2::event::Event) {
     use sdl2::event::Event;
-    use sdl2::mouse::MouseButton;
-    use std::f64::consts::PI;
-
-    let mouse = window.subsystem().sdl().mouse();
 
     match event {
         Event::Quit{..} => game.should_close = true,
-
-        Event::MouseMotion{x, y, xrel, yrel, ..} => {
-            let (width, height) = window.size();
-            if game.focused {
-                if !mouse.relative_mouse_mode() {
-                    mouse.set_relative_mouse_mode(true);
-                }
-                if let Some(player) = game.server.player {
-                    let s = 2000.0 + 0.01;
-                    let (rx, ry) = (xrel as f64 / s, yrel as f64 / s);
-                    let rotation = game.server.entities.get_component_mut(player, game.server.rotation).unwrap();
-                    rotation.yaw -= rx;
-                    rotation.pitch -= ry;
-                    if rotation.pitch < (PI/2.0) + 0.01 {
-                        rotation.pitch = (PI/2.0) + 0.01;
-                    }
-                    if rotation.pitch > (PI/2.0)*3.0 - 0.01 {
-                        rotation.pitch = (PI/2.0)*3.0 - 0.01;
-                    }
-                }
-            } else {
-                if mouse.relative_mouse_mode() {
-                    mouse.set_relative_mouse_mode(false);
-                }
-                ui_container.hover_at(game, x as f64, y as f64, width as f64, height as f64);
-            }
-        }
-        Event::MouseButtonUp{mouse_btn: MouseButton::Left, x, y, ..} => {
-            let (width, height) = window.size();
-
-            if !game.focused {
-                if mouse.relative_mouse_mode() {
-                    mouse.set_relative_mouse_mode(false);
-                }
-                ui_container.click_at(game, x as f64, y as f64, width as f64, height as f64);
-            }
-        }
-        Event::MouseButtonDown{mouse_btn: MouseButton::Right, ..} => {
-            if game.focused {
-                game.server.on_right_click(&mut game.renderer);
-            }
-        }
-        Event::TextInput{text, ..} => {
-            if !game.focused {
-                for c in text.chars() {
-                    ui_container.key_type(game, c);
-                }
-            }
-        }
         _ => (),
     }
 }
