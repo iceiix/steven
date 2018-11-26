@@ -291,7 +291,7 @@ impl Renderer {
         gl::clear(gl::ClearFlags::Color | gl::ClearFlags::Depth);
 
         // Model rendering
-        self.model.draw(&self.frustum, &self.perspective_matrix, &self.camera_matrix, 0.8, 1.0);
+        self.model.draw(&self.frustum, &self.perspective_matrix, &self.camera_matrix);
 
         gl::enable(gl::BLEND);
         gl::depth_mask(false);

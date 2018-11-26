@@ -200,15 +200,13 @@ impl Manager {
         }
     }
 
-    pub fn draw(&mut self, frustum: &Frustum<f32>, perspective_matrix: &Matrix4<f32>, camera_matrix: &Matrix4<f32>, light_level: f32, sky_offset: f32) {
+    pub fn draw(&mut self, frustum: &Frustum<f32>, perspective_matrix: &Matrix4<f32>, camera_matrix: &Matrix4<f32>) {
         gl::enable(gl::BLEND);
         for collection in &self.collections {
             collection.shader.program.use_program();
             collection.shader.perspective_matrix.map(|v| v.set_matrix4(perspective_matrix));
             collection.shader.camera_matrix.map(|v| v.set_matrix4(camera_matrix));
             collection.shader.texture.map(|v| v.set_int(0));
-            collection.shader.sky_offset.map(|v| v.set_float(sky_offset));
-            collection.shader.light_level.map(|v| v.set_float(light_level));
             gl::blend_func(collection.blend_s, collection.blend_d);
 
             for model in collection.models.values() {
