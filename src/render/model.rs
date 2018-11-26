@@ -42,22 +42,18 @@ impl Manager {
         m.add_collection(
             &greg.get("model_vertex"),
             &greg.get("model_frag"),
-            gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA
         );
         m.add_collection(
             &greg.get("sun_vertex"),
             &greg.get("sun_frag"),
-            gl::SRC_ALPHA, gl::ONE_FACTOR
         );
         m
     }
 
-    pub fn add_collection(&mut self, vert: &str, frag: &str, blend_s: gl::Factor, blend_d: gl::Factor) -> CollectionKey {
+    pub fn add_collection(&mut self, vert: &str, frag: &str) -> CollectionKey {
         let collection = Collection {
             shader: ModelShader::new_manual(vert, frag),
             models: HashMap::with_hasher(BuildHasherDefault::default()),
-            blend_s,
-            blend_d,
             next_id: 0,
         };
         self.collections.push(collection);
@@ -206,7 +202,6 @@ impl Manager {
             collection.shader.perspective_matrix.map(|v| v.set_matrix4(perspective_matrix));
             collection.shader.camera_matrix.map(|v| v.set_matrix4(camera_matrix));
             collection.shader.texture.map(|v| v.set_int(0));
-            gl::blend_func(collection.blend_s, collection.blend_d);
 
             for model in collection.models.values() {
                 model.array.bind();
@@ -224,8 +219,6 @@ struct Collection {
     shader: ModelShader,
 
     models: HashMap<ModelKey, Model, BuildHasherDefault<FNVHash>>,
-    blend_s: gl::Factor,
-    blend_d: gl::Factor,
 
     next_id: usize,
 }
