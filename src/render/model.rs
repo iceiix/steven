@@ -201,7 +201,6 @@ impl Manager {
     }
 
     pub fn draw(&mut self, _frustum: &Frustum<f32>, perspective_matrix: &Matrix4<f32>, camera_matrix: &Matrix4<f32>) {
-        gl::enable(gl::BLEND);
         for collection in &self.collections {
             collection.shader.program.use_program();
             collection.shader.perspective_matrix.map(|v| v.set_matrix4(perspective_matrix));
@@ -218,7 +217,6 @@ println!("about to draw model {:?} {:?}", model.count, self.index_type);
                 gl::draw_elements(gl::TRIANGLES, model.count, self.index_type, 0);
             }
         }
-        gl::disable(gl::BLEND);
     }
 }
 
