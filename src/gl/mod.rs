@@ -374,7 +374,6 @@ impl Texture {
             gl::GetIntegerv(gl::MAX_SAMPLES, &mut result[0]);
             let use_samples =
                 if samples > result[0] {
-                    println!("glTexImage2DMultisample: requested {} samples but GL_MAX_SAMPLES is {}", samples, result[0]);
                     result[0]
                 } else {
                     samples
