@@ -214,11 +214,10 @@ impl Renderer {
         gl::active_texture(0);
         self.gl_texture.bind(gl::TEXTURE_2D_ARRAY);
 
-        let time_offset = 0.9;
         gl::clear_color(
-             (122.0 / 255.0) * time_offset,
-             (165.0 / 255.0) * time_offset,
-             (247.0 / 255.0) * time_offset,
+             122.0 / 255.0,
+             165.0 / 255.0,
+             247.0 / 255.0,
              1.0
         );
         gl::clear(gl::ClearFlags::Color | gl::ClearFlags::Depth);
