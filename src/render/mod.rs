@@ -278,8 +278,6 @@ impl Renderer {
         // Model rendering
         self.model.draw(&self.frustum, &self.perspective_matrix, &self.camera_matrix);
 
-        gl::enable(gl::BLEND);
-        gl::depth_mask(false);
         trans.trans.bind();
         gl::clear_color(0.0, 0.0, 0.0, 1.0);
         gl::clear(gl::ClearFlags::Color);
@@ -289,10 +287,8 @@ impl Renderer {
         gl::check_framebuffer_status();
         gl::unbind_framebuffer();
         gl::clear(gl::ClearFlags::Color);
-        gl::disable(gl::BLEND);
         trans.draw(&self.trans_shader);
 
-        gl::depth_mask(true);
         gl::check_gl_error();
 
         self.frame_id = self.frame_id.wrapping_add(1);
