@@ -62,7 +62,6 @@ fn main() {
                             .build()
                             .expect("Could not create sdl window.");
     let gl_attr = sdl_video.gl_attr();
-    gl_attr.set_stencil_size(0);
     gl_attr.set_depth_size(24);
     gl_attr.set_context_major_version(3);
     gl_attr.set_context_minor_version(2);
