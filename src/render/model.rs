@@ -3,7 +3,7 @@ use super::glsl;
 use super::shaders;
 use crate::gl;
 use cgmath::{Matrix4, SquareMatrix};
-use collision::{self, Frustum};
+use collision::{Frustum};
 use std::collections::HashMap;
 use std::hash::BuildHasherDefault;
 use std::sync::{Arc, RwLock};
