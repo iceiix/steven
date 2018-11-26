@@ -174,9 +174,6 @@ impl Renderer {
         let ui = ui::UIState::new(&greg, textures.clone(), res.clone());
 
         gl::enable(gl::DEPTH_TEST);
-        gl::enable(gl::CULL_FACE_FLAG);
-        gl::cull_face(gl::BACK);
-        gl::front_face(gl::CLOCK_WISE);
 
         // Shaders
         let chunk_shader = ChunkShader::new(&greg);
