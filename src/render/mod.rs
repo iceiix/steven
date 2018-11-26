@@ -227,14 +227,11 @@ impl Renderer {
         self.model.draw(&self.frustum, &self.perspective_matrix, &self.camera_matrix);
 
         trans.trans.bind();
-        gl::clear_color(0.0, 0.0, 0.0, 1.0);
-        gl::clear(gl::ClearFlags::Color);
         gl::clear_buffer(gl::COLOR, 0, &[0.0, 0.0, 0.0, 1.0]);
         gl::clear_buffer(gl::COLOR, 1, &[0.0, 0.0, 0.0, 0.0]);
 
         gl::check_framebuffer_status();
         gl::unbind_framebuffer();
-        gl::clear(gl::ClearFlags::Color);
         trans.draw(&self.trans_shader);
 
         gl::check_gl_error();
