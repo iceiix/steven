@@ -29,7 +29,6 @@ use image::{GenericImage, GenericImageView};
 use byteorder::{WriteBytesExt, NativeEndian};
 use serde_json;
 use cgmath::prelude::*;
-use crate::world;
 use collision;
 use log::{error};
 
@@ -206,7 +205,7 @@ impl Renderer {
         self.frustum = collision::Frustum::from_matrix4(self.perspective_matrix * self.camera_matrix).unwrap();
     }
 
-    pub fn tick(&mut self, _world: &mut world::World) {
+    pub fn tick(&mut self) {
         self.update_textures();
 
         let trans = self.trans.as_mut().unwrap();

@@ -45,15 +45,7 @@ use crate::server::sun;
 pub struct Game {
     renderer: render::Renderer,
     should_close: bool,
-
-    server: server::Server,
-
     sdl: Sdl,
-}
-
-impl Game {
-    pub fn connect_to(&mut self, _address: &str) {
-    }
 }
 
 fn main() {
@@ -88,7 +80,6 @@ fn main() {
     let renderer = render::Renderer::new(resource_manager.clone());
 
     let mut game = Game {
-        server: server::Server::dummy_server(resource_manager.clone()),
         renderer,
         should_close: false,
         sdl,
@@ -108,7 +99,7 @@ fn main() {
         game.renderer.camera.pos.y = 65.62010000000001;
         game.renderer.camera.pos.z = 90.9279311085242;
  
-        game.renderer.tick(&mut game.server.world);
+        game.renderer.tick();
 
         window.gl_swap_window();
 
