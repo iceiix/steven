@@ -452,8 +452,6 @@ impl super::Screen for ServerList {
 
         elements.logo.tick(renderer);
 
-        let mut need_refresh = false;
-
         for s in &mut elements.servers {
             // Animate the entries
             {
@@ -503,7 +501,6 @@ impl super::Screen for ServerList {
                                 players.text = txt;
                                 println!("inserting address={:?}, version={:?}", res.address, res.protocol_version);
                                 self.server_protocol_versions.insert(res.address, res.protocol_version);
-                                need_refresh = true;
                             }
                             let mut txt = TextComponent::new(&res.protocol_name);
                             txt.modifier.color = Some(format::Color::Yellow);
@@ -533,10 +530,6 @@ impl super::Screen for ServerList {
                     _ => {}
                 }
             }
-        }
-
-        if need_refresh {
-            self.reload_server_list(renderer, ui_container);
         }
         None
     }
