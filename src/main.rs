@@ -74,6 +74,8 @@ pub struct Game {
 
     connect_reply: Option<mpsc::Receiver<Result<server::Server, protocol::Error>>>,
     dpi_factor: f64,
+    last_mouse_x: f64,
+    last_mouse_y: f64,
 }
 
 impl Game {
@@ -215,6 +217,8 @@ fn main() {
         chunk_builder: chunk_builder::ChunkBuilder::new(resource_manager, textures),
         connect_reply: None,
         dpi_factor,
+        last_mouse_x: 0.0,
+        last_mouse_y: 0.0,
     };
     game.renderer.camera.pos = cgmath::Point3::new(0.5, 13.2, 0.5);
 
@@ -320,33 +324,48 @@ fn handle_window_event(window: &mut glutin::GlWindow,
             _ => ()
         },
 
+        glutin::Event::DeviceEvent{event, ..} => match event {
+            glutin::DeviceEvent::MouseMotion{delta:(x, y)} => {
+                use std::f64::consts::PI;
+                let xrel = game.last_mouse_x - x;
+                let yrel = game.last_mouse_y - y;
+
+                game.last_mouse_x = x;
+                game.last_mouse_y = y;
+
+                //TODO let (width, height) = window.size();
+                if game.focused {
+                    /* TODO
+                    if !mouse.relative_mouse_mode() {
+                        mouse.set_relative_mouse_mode(true);
+                    }
+                    */
+                    if let Some(player) = game.server.player {
+                        let s = 2000.0 + 0.01;
+                        let (rx, ry) = (xrel as f64 / s, yrel as f64 / s);
+                        let rotation = game.server.entities.get_component_mut(player, game.server.rotation).unwrap();
+                        rotation.yaw -= rx;
+                        rotation.pitch -= ry;
+                        if rotation.pitch < (PI/2.0) + 0.01 {
+                            rotation.pitch = (PI/2.0) + 0.01;
+                        }
+                        if rotation.pitch > (PI/2.0)*3.0 - 0.01 {
+                            rotation.pitch = (PI/2.0)*3.0 - 0.01;
+                        }
+                    }
+                } else {
+                    /* TODO
+                    if mouse.relative_mouse_mode() {
+                        mouse.set_relative_mouse_mode(false);
+                    }
+                    */
+                    //TODO ui_container.hover_at(game, x as f64, y as f64, width as f64, height as f64);
+                }
+            },
+            _ => ()
+        },
+
         /* TODO
-        Event::MouseMotion{x, y, xrel, yrel, ..} => {
-            let (width, height) = window.size();
-            if game.focused {
-                if !mouse.relative_mouse_mode() {
-                    mouse.set_relative_mouse_mode(true);
-                }
-                if let Some(player) = game.server.player {
-                    let s = 2000.0 + 0.01;
-                    let (rx, ry) = (xrel as f64 / s, yrel as f64 / s);
-                    let rotation = game.server.entities.get_component_mut(player, game.server.rotation).unwrap();
-                    rotation.yaw -= rx;
-                    rotation.pitch -= ry;
-                    if rotation.pitch < (PI/2.0) + 0.01 {
-                        rotation.pitch = (PI/2.0) + 0.01;
-                    }
-                    if rotation.pitch > (PI/2.0)*3.0 - 0.01 {
-                        rotation.pitch = (PI/2.0)*3.0 - 0.01;
-                    }
-                }
-            } else {
-                if mouse.relative_mouse_mode() {
-                    mouse.set_relative_mouse_mode(false);
-                }
-                ui_container.hover_at(game, x as f64, y as f64, width as f64, height as f64);
-            }
-        }
         Event::MouseWheel{x, y, ..} => {
             game.screen_sys.on_scroll(x as f64, y as f64);
         }
