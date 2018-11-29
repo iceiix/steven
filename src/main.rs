@@ -49,6 +49,8 @@ use std::sync::mpsc;
 use crate::protocol::mojang;
 use sdl2::Sdl;
 use sdl2::keyboard;
+use glutin;
+use glutin::GlContext;
 
 const CL_BRAND: console::CVar<String> = console::CVar {
     ty: PhantomData,
@@ -165,6 +167,18 @@ fn main() {
 
     let (res, mut resui) = resources::Manager::new();
     let resource_manager = Arc::new(RwLock::new(res));
+
+    let mut events_loop = glutin::EventsLoop::new();
+    let window = glutin::WindowBuilder::new()
+        .with_title("Steven")
+        .with_dimensions(glutin::dpi::LogicalSize::new(854.0, 480.0));
+    let context = glutin::ContextBuilder::new()
+        .with_vsync(true);
+    let gl_window = glutin::GlWindow::new(window, context, &events_loop).unwrap();
+
+    unsafe {
+        gl_window.make_current().unwrap();
+    }
 
     let sdl = sdl2::init().unwrap();
     let sdl_video = sdl.video().unwrap();
