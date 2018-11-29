@@ -47,8 +47,6 @@ use std::marker::PhantomData;
 use std::thread;
 use std::sync::mpsc;
 use crate::protocol::mojang;
-use sdl2::Sdl;
-use sdl2::keyboard;
 use glutin;
 use glutin::GlContext;
 
@@ -75,8 +73,6 @@ pub struct Game {
     chunk_builder: chunk_builder::ChunkBuilder,
 
     connect_reply: Option<mpsc::Receiver<Result<server::Server, protocol::Error>>>,
-
-    sdl: Sdl,
 }
 
 impl Game {
@@ -169,38 +165,30 @@ fn main() {
     let resource_manager = Arc::new(RwLock::new(res));
 
     let mut events_loop = glutin::EventsLoop::new();
-    let window = glutin::WindowBuilder::new()
+    let window_builder = glutin::WindowBuilder::new()
         .with_title("Steven")
         .with_dimensions(glutin::dpi::LogicalSize::new(854.0, 480.0));
     let context = glutin::ContextBuilder::new()
         .with_vsync(true);
-    let gl_window = glutin::GlWindow::new(window, context, &events_loop).unwrap();
+    let mut window = glutin::GlWindow::new(window_builder, context, &events_loop)
+        .expect("Could not create glutin window.");
 
     unsafe {
-        gl_window.make_current().unwrap();
+        window.make_current().expect("Could not set current context.");
     }
 
-    let sdl = sdl2::init().unwrap();
-    let sdl_video = sdl.video().unwrap();
-    let mut window = sdl2::video::WindowBuilder::new(&sdl_video, "Steven", 854, 480)
-                            .opengl()
-                            .resizable()
-                            .build()
-                            .expect("Could not create sdl window.");
-    sdl2::hint::set_with_priority("SDL_MOUSE_RELATIVE_MODE_WARP", "1", &sdl2::hint::Hint::Override);
+    /* TODO
     let gl_attr = sdl_video.gl_attr();
     gl_attr.set_stencil_size(0);
     gl_attr.set_depth_size(24);
     gl_attr.set_context_major_version(3);
     gl_attr.set_context_minor_version(2);
     gl_attr.set_context_profile(sdl2::video::GLProfile::Core);
+    */
 
-    let gl_context = window.gl_create_context().unwrap();
-    window.gl_make_current(&gl_context).expect("Could not set current context.");
+    gl::init(&window);
 
-    gl::init(&sdl_video);
-
-    sdl_video.gl_set_swap_interval(if vsync { 1 } else { 0 });
+    //TODO sdl_video.gl_set_swap_interval(if vsync { 1 } else { 0 });
 
 
     let renderer = render::Renderer::new(resource_manager.clone());
@@ -224,18 +212,17 @@ fn main() {
         should_close: false,
         chunk_builder: chunk_builder::ChunkBuilder::new(resource_manager, textures),
         connect_reply: None,
-        sdl,
     };
     game.renderer.camera.pos = cgmath::Point3::new(0.5, 13.2, 0.5);
 
-    let mut events = game.sdl.event_pump().unwrap();
     while !game.should_close {
 
         let now = Instant::now();
         let diff = now.duration_since(last_frame);
         last_frame = now;
         let delta = (diff.subsec_nanos() as f64) / frame_time;
-        let (width, height) = window.size();
+        let dpi = window.get_current_monitor().get_hidpi_factor(); // TODO: get from Resized
+        let (width, height) = window.get_inner_size().unwrap().to_physical(dpi).into();
 
         let version = {
             let mut res = game.resource_manager.write().unwrap();
@@ -246,7 +233,7 @@ fn main() {
         let vsync_changed = *game.vars.get(settings::R_VSYNC);
         if vsync != vsync_changed {
             vsync = vsync_changed;
-            sdl_video.gl_set_swap_interval(if vsync { 1 } else { 0 });
+            //TODO sdl_video.gl_set_swap_interval(if vsync { 1 } else { 0 });
         }
         let fps_cap = *game.vars.get(settings::R_MAX_FPS);
 
@@ -273,28 +260,29 @@ fn main() {
                 thread::sleep(sleep_interval - frame_time);
             }
         }
-        window.gl_swap_window();
+        window.swap_buffers().expect("Failed to swap GL buffers");
 
-        for event in events.poll_iter() {
+        events_loop.poll_events(|event| {
             handle_window_event(&mut window, &mut game, &mut ui_container, event);
-        }
+        });
     }
 }
 
-fn handle_window_event(window: &mut sdl2::video::Window,
+fn handle_window_event(window: &mut glutin::GlWindow,
                        game: &mut Game,
                        ui_container: &mut ui::Container,
-                       event: sdl2::event::Event) {
-    use sdl2::event::Event;
-    use sdl2::keyboard::Keycode;
-    use sdl2::mouse::MouseButton;
-    use std::f64::consts::PI;
-
-    let mouse = window.subsystem().sdl().mouse();
-
+                       event: glutin::Event) {
     match event {
-        Event::Quit{..} => game.should_close = true,
+        glutin::Event::WindowEvent{event, ..} => match event {
+            glutin::WindowEvent::CloseRequested => game.should_close = true,
+            glutin::WindowEvent::Resized(logical_size) => {
+                let dpi_factor = window.get_hidpi_factor();
+                window.resize(logical_size.to_physical(dpi_factor));
+            },
+            _ => ()
+        },
 
+        /* TODO
         Event::MouseMotion{x, y, xrel, yrel, ..} => {
             let (width, height) = window.size();
             if game.focused {
@@ -396,6 +384,7 @@ fn handle_window_event(window: &mut sdl2::video::Window,
                 }
             }
         }
+        */
         _ => (),
     }
 }

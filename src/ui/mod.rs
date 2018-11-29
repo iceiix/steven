@@ -1323,11 +1323,13 @@ impl UIElement for TextBox {
             },
             (Keycode::V, true) => {
                 if ctrl_pressed {
+                    /* TODO
                     let clipboard = game.sdl.video().unwrap().clipboard();
                     if clipboard.has_clipboard_text() {
                         let text = clipboard.clipboard_text().unwrap();
                         self.input.push_str(&text);
                     }
+                    */
                 }
             },
             _ => {},
