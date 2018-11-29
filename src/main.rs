@@ -73,6 +73,7 @@ pub struct Game {
     chunk_builder: chunk_builder::ChunkBuilder,
 
     connect_reply: Option<mpsc::Receiver<Result<server::Server, protocol::Error>>>,
+    dpi_factor: f64,
 }
 
 impl Game {
@@ -201,6 +202,7 @@ fn main() {
     screen_sys.add_screen(Box::new(screen::Login::new(vars.clone())));
 
     let textures = renderer.get_textures();
+    let dpi_factor = window.get_current_monitor().get_hidpi_factor();
     let mut game = Game {
         server: server::Server::dummy_server(resource_manager.clone()),
         focused: false,
@@ -212,6 +214,7 @@ fn main() {
         should_close: false,
         chunk_builder: chunk_builder::ChunkBuilder::new(resource_manager, textures),
         connect_reply: None,
+        dpi_factor,
     };
     game.renderer.camera.pos = cgmath::Point3::new(0.5, 13.2, 0.5);
 
@@ -221,8 +224,7 @@ fn main() {
         let diff = now.duration_since(last_frame);
         last_frame = now;
         let delta = (diff.subsec_nanos() as f64) / frame_time;
-        let dpi = window.get_current_monitor().get_hidpi_factor(); // TODO: get from Resized
-        let (width, height) = window.get_inner_size().unwrap().to_physical(dpi).into();
+        let (width, height) = window.get_inner_size().unwrap().to_physical(game.dpi_factor).into();
 
         let version = {
             let mut res = game.resource_manager.write().unwrap();
@@ -276,8 +278,8 @@ fn handle_window_event(window: &mut glutin::GlWindow,
         glutin::Event::WindowEvent{event, ..} => match event {
             glutin::WindowEvent::CloseRequested => game.should_close = true,
             glutin::WindowEvent::Resized(logical_size) => {
-                let dpi_factor = window.get_hidpi_factor();
-                window.resize(logical_size.to_physical(dpi_factor));
+                game.dpi_factor = window.get_hidpi_factor();
+                window.resize(logical_size.to_physical(game.dpi_factor));
             },
             _ => ()
         },
