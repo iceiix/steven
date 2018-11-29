@@ -224,7 +224,8 @@ fn main() {
         let diff = now.duration_since(last_frame);
         last_frame = now;
         let delta = (diff.subsec_nanos() as f64) / frame_time;
-        let (width, height) = window.get_inner_size().unwrap().to_physical(game.dpi_factor).into();
+        let (width, height) = window.get_inner_size().unwrap().into();
+        let (physical_width, physical_height) = window.get_inner_size().unwrap().to_physical(game.dpi_factor).into();
 
         let version = {
             let mut res = game.resource_manager.write().unwrap();
@@ -242,7 +243,7 @@ fn main() {
         game.tick(delta);
         game.server.tick(&mut game.renderer, delta);
 
-        game.renderer.update_camera(width, height);
+        game.renderer.update_camera(physical_width, physical_height);
         game.server.world.compute_render_list(&mut game.renderer);
         game.chunk_builder.tick(&mut game.server.world, &mut game.renderer, version);
 
