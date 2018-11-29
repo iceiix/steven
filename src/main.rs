@@ -282,6 +282,41 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                 game.dpi_factor = window.get_hidpi_factor();
                 window.resize(logical_size.to_physical(game.dpi_factor));
             },
+
+            glutin::WindowEvent::MouseInput{device_id, state, button, modifiers} => {
+                println!("MouseInput {:?} {:?} {:?} {:?}", device_id, state, button, modifiers);
+                match state {
+                    glutin::ElementState::Released => {
+                        // TODO: get x, y
+                        /* TODO
+                        Event::MouseButtonUp{mouse_btn: MouseButton::Left, x, y, ..} => {
+                            let (width, height) = window.size();
+
+                            if game.server.is_connected() && !game.focused && !game.screen_sys.is_current_closable() {
+                                game.focused = true;
+                                if !mouse.relative_mouse_mode() {
+                                    mouse.set_relative_mouse_mode(true);
+                                }
+                                return;
+                            }
+                            if !game.focused {
+                                if mouse.relative_mouse_mode() {
+                                    mouse.set_relative_mouse_mode(false);
+                                }
+                                ui_container.click_at(game, x as f64, y as f64, width as f64, height as f64);
+                            }
+                        }
+                        */
+                    },
+                    glutin::ElementState::Pressed => {
+                        if button == glutin::MouseButton::Right {
+                            if game.focused {
+                                game.server.on_right_click(&mut game.renderer);
+                            }
+                        }
+                    },
+                }
+            },
             _ => ()
         },
 
@@ -310,28 +345,6 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                     mouse.set_relative_mouse_mode(false);
                 }
                 ui_container.hover_at(game, x as f64, y as f64, width as f64, height as f64);
-            }
-        }
-        Event::MouseButtonUp{mouse_btn: MouseButton::Left, x, y, ..} => {
-            let (width, height) = window.size();
-
-            if game.server.is_connected() && !game.focused && !game.screen_sys.is_current_closable() {
-                game.focused = true;
-                if !mouse.relative_mouse_mode() {
-                    mouse.set_relative_mouse_mode(true);
-                }
-                return;
-            }
-            if !game.focused {
-                if mouse.relative_mouse_mode() {
-                    mouse.set_relative_mouse_mode(false);
-                }
-                ui_container.click_at(game, x as f64, y as f64, width as f64, height as f64);
-            }
-        }
-        Event::MouseButtonDown{mouse_btn: MouseButton::Right, ..} => {
-            if game.focused {
-                game.server.on_right_click(&mut game.renderer);
             }
         }
         Event::MouseWheel{x, y, ..} => {
