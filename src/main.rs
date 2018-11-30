@@ -349,50 +349,55 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                             game.screen_sys.pop_screen();
                         }
                     }
-                    (_, _) => ()
-                }
-        /* TODO
-        Event::KeyDown{keycode: Some(Keycode::Backquote), ..} => {
-            game.console.lock().unwrap().toggle();
-        }
-        Event::KeyDown{keycode: Some(Keycode::F11), ..} => { // TODO: configurable binding in settings::Stevenkey
-            let state = match window.fullscreen_state() {
-                sdl2::video::FullscreenType::Off => sdl2::video::FullscreenType::Desktop,
-                sdl2::video::FullscreenType::True => sdl2::video::FullscreenType::Off,
-                sdl2::video::FullscreenType::Desktop => sdl2::video::FullscreenType::Off,
-            };
+                    (glutin::ElementState::Pressed, Some(glutin::VirtualKeyCode::Grave)) => {
+                        game.console.lock().unwrap().toggle();
+                    },
+                    (glutin::ElementState::Pressed, Some(glutin::VirtualKeyCode::F11)) => {
+                        /* TODO
+                        let state = match window.fullscreen_state() {
+                            sdl2::video::FullscreenType::Off => sdl2::video::FullscreenType::Desktop,
+                            sdl2::video::FullscreenType::True => sdl2::video::FullscreenType::Off,
+                            sdl2::video::FullscreenType::Desktop => sdl2::video::FullscreenType::Off,
+                        };
 
-            window.set_fullscreen(state).expect(&format!("failed to set fullscreen to {:?}", state));
-        }
-        Event::KeyDown{keycode: Some(key), keymod, ..} => {
-            if game.focused {
-                if let Some(steven_key) = settings::Stevenkey::get_by_keycode(key, &game.vars) {
-                    game.server.key_press(true, steven_key);
+                        window.set_fullscreen(state).expect(&format!("failed to set fullscreen to {:?}", state));
+                        */
+                    },
+                    (glutin::ElementState::Pressed, Some(key)) => {
+                        /* TODO
+                        if game.focused {
+                            if let Some(steven_key) = settings::Stevenkey::get_by_keycode(key, &game.vars) {
+                                game.server.key_press(true, steven_key);
+                            }
+                        } else {
+                            let ctrl_pressed = keymod.intersects(keyboard::LCTRLMOD | keyboard::RCTRLMOD);
+                            ui_container.key_press(game, key, true, ctrl_pressed);
+                        }
+                        */
+                    },
+                    (glutin::ElementState::Released, Some(key)) => {
+                        /* TODO
+                        if game.focused {
+                            if let Some(steven_key) = settings::Stevenkey::get_by_keycode(key, &game.vars) {
+                                game.server.key_press(false, steven_key);
+                            }
+                        } else {
+                            let ctrl_pressed = keymod.intersects(keyboard::LCTRLMOD | keyboard::RCTRLMOD);
+                            ui_container.key_press(game, key, false, ctrl_pressed);
+                        }
+                        */
+                    },
+                    (_, None) => ()
                 }
-            } else {
-                let ctrl_pressed = keymod.intersects(keyboard::LCTRLMOD | keyboard::RCTRLMOD);
-                ui_container.key_press(game, key, true, ctrl_pressed);
-            }
-        }
-        Event::KeyUp{keycode: Some(key), keymod, ..} => {
-            if game.focused {
-                if let Some(steven_key) = settings::Stevenkey::get_by_keycode(key, &game.vars) {
-                    game.server.key_press(false, steven_key);
+                /* TODO
+                Event::TextInput{text, ..} => {
+                    if !game.focused {
+                        for c in text.chars() {
+                            ui_container.key_type(game, c);
+                        }
+                    }
                 }
-            } else {
-                let ctrl_pressed = keymod.intersects(keyboard::LCTRLMOD | keyboard::RCTRLMOD);
-                ui_container.key_press(game, key, false, ctrl_pressed);
-            }
-        }
-        Event::TextInput{text, ..} => {
-            if !game.focused {
-                for c in text.chars() {
-                    ui_container.key_type(game, c);
-                }
-            }
-        }
-        */
-
+                */
             },
             _ => ()
         },
