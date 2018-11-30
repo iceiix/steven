@@ -19,6 +19,7 @@ use std::cell::{RefCell, RefMut};
 use crate::render;
 use crate::format;
 use glutin::VirtualKeyCode;
+use clipboard::{ClipboardProvider, ClipboardContext};
 
 const SCALED_WIDTH: f64 = 854.0;
 const SCALED_HEIGHT: f64 = 480.0;
@@ -1323,13 +1324,11 @@ impl UIElement for TextBox {
             },
             (VirtualKeyCode::V, true) => {
                 if ctrl_pressed {
-                    /* TODO
-                    let clipboard = game.sdl.video().unwrap().clipboard();
-                    if clipboard.has_clipboard_text() {
-                        let text = clipboard.clipboard_text().unwrap();
-                        self.input.push_str(&text);
+                    let mut clipboard: ClipboardContext = ClipboardProvider::new().unwrap();
+                    match clipboard.get_contents() {
+                        Ok(text) => self.input.push_str(&text),
+                        Err(_) => ()
                     }
-                    */
                 }
             },
             _ => {},
