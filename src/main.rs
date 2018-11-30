@@ -308,13 +308,6 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                 }
             },
 
-            glutin::DeviceEvent::Text{codepoint} => {
-                println!("text {}", codepoint);
-                if !game.focused {
-                    ui_container.key_type(game, codepoint);
-                }
-            },
-
             _ => ()
         },
 
@@ -323,6 +316,12 @@ fn handle_window_event(window: &mut glutin::GlWindow,
             glutin::WindowEvent::Resized(logical_size) => {
                 game.dpi_factor = window.get_hidpi_factor();
                 window.resize(logical_size.to_physical(game.dpi_factor));
+            },
+
+            glutin::WindowEvent::ReceivedCharacter(codepoint) => {
+                if !game.focused {
+                    ui_container.key_type(game, codepoint);
+                }
             },
 
             glutin::WindowEvent::MouseInput{device_id: _, state, button, modifiers: _} => {
