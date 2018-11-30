@@ -364,28 +364,24 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                         game.is_fullscreen = !game.is_fullscreen;
                     },
                     (glutin::ElementState::Pressed, Some(key)) => {
-                        /* TODO
                         if game.focused {
                             if let Some(steven_key) = settings::Stevenkey::get_by_keycode(key, &game.vars) {
                                 game.server.key_press(true, steven_key);
                             }
                         } else {
-                            let ctrl_pressed = keymod.intersects(keyboard::LCTRLMOD | keyboard::RCTRLMOD);
+                            let ctrl_pressed = input.modifiers.ctrl;
                             ui_container.key_press(game, key, true, ctrl_pressed);
                         }
-                        */
                     },
                     (glutin::ElementState::Released, Some(key)) => {
-                        /* TODO
                         if game.focused {
                             if let Some(steven_key) = settings::Stevenkey::get_by_keycode(key, &game.vars) {
                                 game.server.key_press(false, steven_key);
                             }
                         } else {
-                            let ctrl_pressed = keymod.intersects(keyboard::LCTRLMOD | keyboard::RCTRLMOD);
+                            let ctrl_pressed = input.modifiers.ctrl;
                             ui_container.key_press(game, key, false, ctrl_pressed);
                         }
-                        */
                     },
                     (_, None) => ()
                 }

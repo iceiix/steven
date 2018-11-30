@@ -74,7 +74,7 @@ pub fn register_vars(vars: &mut console::Vars) {
     vars.register(CL_KEYBIND_JUMP);
 }
 
-#[derive(Hash, PartialEq, Eq)]
+#[derive(Hash, PartialEq, Eq, Debug)]
 pub enum Stevenkey {
     Forward,
     Backward,
