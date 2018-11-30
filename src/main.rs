@@ -294,19 +294,11 @@ fn handle_window_event(window: &mut glutin::GlWindow,
 
                         if game.server.is_connected() && !game.focused && !game.screen_sys.is_current_closable() {
                             game.focused = true;
-                            /* TODO
-                            if !mouse.relative_mouse_mode() {
-                                mouse.set_relative_mouse_mode(true);
-                            }
-                            */
+                            window.grab_cursor(true).unwrap();
                             return;
                         }
                         if !game.focused {
-                            /* TODO
-                            if mouse.relative_mouse_mode() {
-                                mouse.set_relative_mouse_mode(false);
-                            }
-                            */
+                            window.grab_cursor(false).unwrap();
                             ui_container.click_at(game, game.last_mouse_x, game.last_mouse_y, width, height);
                         }
                     },
@@ -336,11 +328,7 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                 use std::f64::consts::PI;
 
                 if game.focused {
-                    /* TODO
-                    if !mouse.relative_mouse_mode() {
-                        mouse.set_relative_mouse_mode(true);
-                    }
-                    */
+                    window.grab_cursor(true).unwrap();
                     if let Some(player) = game.server.player {
                         let s = 2000.0 + 0.01;
                         let (rx, ry) = (xrel as f64 / s, yrel as f64 / s);
@@ -355,11 +343,7 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                         }
                     }
                 } else {
-                    /* TODO
-                    if mouse.relative_mouse_mode() {
-                        mouse.set_relative_mouse_mode(false);
-                    }
-                    */
+                    window.grab_cursor(false).unwrap();
                 }
             },
             _ => ()
