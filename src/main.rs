@@ -173,6 +173,7 @@ fn main() {
         .with_title("Steven")
         .with_dimensions(glutin::dpi::LogicalSize::new(854.0, 480.0));
     let context = glutin::ContextBuilder::new()
+        .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGl, (3, 2)))
         .with_vsync(true);
     let mut window = glutin::GlWindow::new(window_builder, context, &events_loop)
         .expect("Could not create glutin window.");
@@ -185,8 +186,6 @@ fn main() {
     let gl_attr = sdl_video.gl_attr();
     gl_attr.set_stencil_size(0);
     gl_attr.set_depth_size(24);
-    gl_attr.set_context_major_version(3);
-    gl_attr.set_context_minor_version(2);
     gl_attr.set_context_profile(sdl2::video::GLProfile::Core);
     */
 
