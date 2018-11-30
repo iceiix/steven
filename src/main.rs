@@ -275,9 +275,10 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                        game: &mut Game,
                        ui_container: &mut ui::Container,
                        event: glutin::Event) {
+    use glutin::*;
     match event {
-        glutin::Event::DeviceEvent{event, ..} => match event {
-            glutin::DeviceEvent::MouseMotion{delta:(xrel, yrel)} => {
+        Event::DeviceEvent{event, ..} => match event {
+            DeviceEvent::MouseMotion{delta:(xrel, yrel)} => {
                 use std::f64::consts::PI;
 
                 if game.focused {
@@ -305,22 +306,22 @@ fn handle_window_event(window: &mut glutin::GlWindow,
             _ => ()
         },
 
-        glutin::Event::WindowEvent{event, ..} => match event {
-            glutin::WindowEvent::CloseRequested => game.should_close = true,
-            glutin::WindowEvent::Resized(logical_size) => {
+        Event::WindowEvent{event, ..} => match event {
+            WindowEvent::CloseRequested => game.should_close = true,
+            WindowEvent::Resized(logical_size) => {
                 game.dpi_factor = window.get_hidpi_factor();
                 window.resize(logical_size.to_physical(game.dpi_factor));
             },
 
-            glutin::WindowEvent::ReceivedCharacter(codepoint) => {
+            WindowEvent::ReceivedCharacter(codepoint) => {
                 if !game.focused {
                     ui_container.key_type(game, codepoint);
                 }
             },
 
-            glutin::WindowEvent::MouseInput{device_id: _, state, button, modifiers: _} => {
+            WindowEvent::MouseInput{device_id: _, state, button, modifiers: _} => {
                 match (state, button) {
-                    (glutin::ElementState::Released, glutin::MouseButton::Left) => {
+                    (ElementState::Released, MouseButton::Left) => {
                         let (width, height) = window.get_inner_size().unwrap().into();
 
                         if game.server.is_connected() && !game.focused && !game.screen_sys.is_current_closable() {
@@ -335,7 +336,7 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                             ui_container.click_at(game, game.last_mouse_x, game.last_mouse_y, width, height);
                         }
                     },
-                    (glutin::ElementState::Pressed, glutin::MouseButton::Right) => {
+                    (ElementState::Pressed, MouseButton::Right) => {
                         if game.focused {
                             game.server.on_right_click(&mut game.renderer);
                         }
@@ -343,7 +344,7 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                     (_, _) => ()
                 }
             },
-            glutin::WindowEvent::CursorMoved{device_id: _, position, modifiers: _} => {
+            WindowEvent::CursorMoved{device_id: _, position, modifiers: _} => {
                 let (x, y) = position.into();
                 game.last_mouse_x = x;
                 game.last_mouse_y = y;
@@ -353,21 +354,21 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                     ui_container.hover_at(game, x, y, width, height);
                 }
             },
-            glutin::WindowEvent::MouseWheel{device_id: _, delta, phase: _, modifiers: _} => {
+            WindowEvent::MouseWheel{device_id: _, delta, phase: _, modifiers: _} => {
                 // TODO: line vs pixel delta? does pixel scrolling (e.g. touchpad) need scaling?
                 match delta {
-                    glutin::MouseScrollDelta::LineDelta(x, y) => {
+                    MouseScrollDelta::LineDelta(x, y) => {
                         game.screen_sys.on_scroll(x.into(), y.into());
                     },
-                    glutin::MouseScrollDelta::PixelDelta(position) => {
+                    MouseScrollDelta::PixelDelta(position) => {
                         let (x, y) = position.into();
                         game.screen_sys.on_scroll(x, y);
                     },
                 }
             },
-            glutin::WindowEvent::KeyboardInput{device_id: _, input} => {
+            WindowEvent::KeyboardInput{device_id: _, input} => {
                 match (input.state, input.virtual_keycode) {
-                    (glutin::ElementState::Released, Some(glutin::VirtualKeyCode::Escape)) => {
+                    (ElementState::Released, Some(VirtualKeyCode::Escape)) => {
                         if game.focused {
                             window.grab_cursor(false).unwrap();
                             window.hide_cursor(false);
@@ -380,10 +381,10 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                             game.screen_sys.pop_screen();
                         }
                     }
-                    (glutin::ElementState::Pressed, Some(glutin::VirtualKeyCode::Grave)) => {
+                    (ElementState::Pressed, Some(VirtualKeyCode::Grave)) => {
                         game.console.lock().unwrap().toggle();
                     },
-                    (glutin::ElementState::Pressed, Some(glutin::VirtualKeyCode::F11)) => {
+                    (ElementState::Pressed, Some(VirtualKeyCode::F11)) => {
                         if game.is_fullscreen {
                             window.set_fullscreen(Some(window.get_current_monitor()));
                         } else {
@@ -392,7 +393,7 @@ fn handle_window_event(window: &mut glutin::GlWindow,
 
                         game.is_fullscreen = !game.is_fullscreen;
                     },
-                    (glutin::ElementState::Pressed, Some(key)) => {
+                    (ElementState::Pressed, Some(key)) => {
                         if game.focused {
                             if let Some(steven_key) = settings::Stevenkey::get_by_keycode(key, &game.vars) {
                                 game.server.key_press(true, steven_key);
@@ -402,7 +403,7 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                             ui_container.key_press(game, key, true, ctrl_pressed);
                         }
                     },
-                    (glutin::ElementState::Released, Some(key)) => {
+                    (ElementState::Released, Some(key)) => {
                         if game.focused {
                             if let Some(steven_key) = settings::Stevenkey::get_by_keycode(key, &game.vars) {
                                 game.server.key_press(false, steven_key);
