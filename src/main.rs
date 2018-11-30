@@ -285,8 +285,8 @@ fn handle_window_event(window: &mut glutin::GlWindow,
 
             glutin::WindowEvent::MouseInput{device_id, state, button, modifiers} => {
                 println!("MouseInput {:?} {:?} {:?} {:?}", device_id, state, button, modifiers);
-                match state {
-                    glutin::ElementState::Released => {
+                match (state, button) {
+                    (glutin::ElementState::Released, _) => {
                         // TODO: get x, y
                         /* TODO
                         Event::MouseButtonUp{mouse_btn: MouseButton::Left, x, y, ..} => {
@@ -308,13 +308,12 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                         }
                         */
                     },
-                    glutin::ElementState::Pressed => {
-                        if button == glutin::MouseButton::Right {
-                            if game.focused {
-                                game.server.on_right_click(&mut game.renderer);
-                            }
+                    (glutin::ElementState::Pressed,glutin::MouseButton::Right) => {
+                        if game.focused {
+                            game.server.on_right_click(&mut game.renderer);
                         }
                     },
+                    (_, _) => ()
                 }
             },
             glutin::WindowEvent::CursorMoved{device_id: _, position, modifiers: _} => {
