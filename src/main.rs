@@ -173,7 +173,7 @@ fn main() {
         .with_title("Steven")
         .with_dimensions(glutin::dpi::LogicalSize::new(854.0, 480.0));
     let context = glutin::ContextBuilder::new()
-        .with_gl(glutin::GlRequest::Specific(glutin::Api::OpenGl, (3, 2)))
+        .with_gl(glutin::GlRequest::GlThenGles{opengl_version: (3, 2), opengles_version: (2, 0)})
         .with_vsync(true);
     let mut window = glutin::GlWindow::new(window_builder, context, &events_loop)
         .expect("Could not create glutin window.");
