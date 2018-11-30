@@ -287,7 +287,7 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                 window.resize(logical_size.to_physical(game.dpi_factor));
             },
 
-            glutin::WindowEvent::MouseInput{device_id, state, button, modifiers} => {
+            glutin::WindowEvent::MouseInput{device_id: _, state, button, modifiers: _} => {
                 match (state, button) {
                     (glutin::ElementState::Released, glutin::MouseButton::Left) => {
                         let (width, height) = window.get_inner_size().unwrap().into();
@@ -322,6 +322,18 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                     ui_container.hover_at(game, x, y, width, height);
                 }
             },
+            glutin::WindowEvent::MouseWheel{device_id: _, delta, phase: _, modifiers: _} => {
+                // TODO: line vs pixel delta? does pixel scrolling (e.g. touchpad) need scaling?
+                match delta {
+                    glutin::MouseScrollDelta::LineDelta(x, y) => {
+                        game.screen_sys.on_scroll(x.into(), y.into());
+                    },
+                    glutin::MouseScrollDelta::PixelDelta(position) => {
+                        let (x, y) = position.into();
+                        game.screen_sys.on_scroll(x, y);
+                    },
+                }
+            },
             _ => ()
         },
 
@@ -354,9 +366,6 @@ fn handle_window_event(window: &mut glutin::GlWindow,
         },
 
         /* TODO
-        Event::MouseWheel{x, y, ..} => {
-            game.screen_sys.on_scroll(x as f64, y as f64);
-        }
         Event::KeyUp{keycode: Some(Keycode::Escape), ..} => {
             if game.focused {
                 mouse.set_relative_mouse_mode(false);
