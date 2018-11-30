@@ -333,7 +333,7 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                 game.last_mouse_x = x;
                 game.last_mouse_y = y;
 
-                //TODO let (width, height) = window.size();
+                let (width, height) = window.get_inner_size().unwrap().into();
                 if game.focused {
                     /* TODO
                     if !mouse.relative_mouse_mode() {
@@ -359,7 +359,7 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                         mouse.set_relative_mouse_mode(false);
                     }
                     */
-                    //TODO ui_container.hover_at(game, x as f64, y as f64, width as f64, height as f64);
+                    ui_container.hover_at(game, x as f64, y as f64, width, height);
                 }
             },
             _ => ()
