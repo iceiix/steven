@@ -334,49 +334,24 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                     },
                 }
             },
-            _ => ()
-        },
-
-        glutin::Event::DeviceEvent{event, ..} => match event {
-            glutin::DeviceEvent::MouseMotion{delta:(xrel, yrel)} => {
-                use std::f64::consts::PI;
-
-                if game.focused {
-                    window.grab_cursor(true).unwrap();
-                    window.hide_cursor(true);
-                    if let Some(player) = game.server.player {
-                        let s = 2000.0 + 0.01;
-                        let (rx, ry) = (xrel as f64 / s, yrel as f64 / s);
-                        let rotation = game.server.entities.get_component_mut(player, game.server.rotation).unwrap();
-                        rotation.yaw -= rx;
-                        rotation.pitch -= ry;
-                        if rotation.pitch < (PI/2.0) + 0.01 {
-                            rotation.pitch = (PI/2.0) + 0.01;
-                        }
-                        if rotation.pitch > (PI/2.0)*3.0 - 0.01 {
-                            rotation.pitch = (PI/2.0)*3.0 - 0.01;
+            glutin::WindowEvent::KeyboardInput{device_id: _, input} => {
+                match (input.state, input.virtual_keycode) {
+                    (glutin::ElementState::Released, Some(glutin::VirtualKeyCode::Escape)) => {
+                        if game.focused {
+                            window.grab_cursor(false).unwrap();
+                            window.hide_cursor(false);
+                            game.focused = false;
+                            game.screen_sys.replace_screen(Box::new(screen::SettingsMenu::new(game.vars.clone(), true)));
+                        } else if game.screen_sys.is_current_closable() {
+                            window.grab_cursor(true).unwrap();
+                            window.hide_cursor(true);
+                            game.focused = true;
+                            game.screen_sys.pop_screen();
                         }
                     }
-                } else {
-                    window.grab_cursor(false).unwrap();
-                    window.hide_cursor(false);
+                    (_, _) => ()
                 }
-            },
-            _ => ()
-        },
-
         /* TODO
-        Event::KeyUp{keycode: Some(Keycode::Escape), ..} => {
-            if game.focused {
-                mouse.set_relative_mouse_mode(false);
-                game.focused = false;
-                game.screen_sys.replace_screen(Box::new(screen::SettingsMenu::new(game.vars.clone(), true)));
-            } else if game.screen_sys.is_current_closable() {
-                mouse.set_relative_mouse_mode(true);
-                game.focused = true;
-                game.screen_sys.pop_screen();
-            }
-        }
         Event::KeyDown{keycode: Some(Keycode::Backquote), ..} => {
             game.console.lock().unwrap().toggle();
         }
@@ -417,6 +392,39 @@ fn handle_window_event(window: &mut glutin::GlWindow,
             }
         }
         */
+
+            },
+            _ => ()
+        },
+
+        glutin::Event::DeviceEvent{event, ..} => match event {
+            glutin::DeviceEvent::MouseMotion{delta:(xrel, yrel)} => {
+                use std::f64::consts::PI;
+
+                if game.focused {
+                    window.grab_cursor(true).unwrap();
+                    window.hide_cursor(true);
+                    if let Some(player) = game.server.player {
+                        let s = 2000.0 + 0.01;
+                        let (rx, ry) = (xrel as f64 / s, yrel as f64 / s);
+                        let rotation = game.server.entities.get_component_mut(player, game.server.rotation).unwrap();
+                        rotation.yaw -= rx;
+                        rotation.pitch -= ry;
+                        if rotation.pitch < (PI/2.0) + 0.01 {
+                            rotation.pitch = (PI/2.0) + 0.01;
+                        }
+                        if rotation.pitch > (PI/2.0)*3.0 - 0.01 {
+                            rotation.pitch = (PI/2.0)*3.0 - 0.01;
+                        }
+                    }
+                } else {
+                    window.grab_cursor(false).unwrap();
+                    window.hide_cursor(false);
+                }
+            },
+            _ => ()
+        },
+
         _ => (),
     }
 }
