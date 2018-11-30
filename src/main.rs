@@ -282,6 +282,34 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                        ui_container: &mut ui::Container,
                        event: glutin::Event) {
     match event {
+        glutin::Event::DeviceEvent{event, ..} => match event {
+            glutin::DeviceEvent::MouseMotion{delta:(xrel, yrel)} => {
+                use std::f64::consts::PI;
+
+                if game.focused {
+                    window.grab_cursor(true).unwrap();
+                    window.hide_cursor(true);
+                    if let Some(player) = game.server.player {
+                        let s = 2000.0 + 0.01;
+                        let (rx, ry) = (xrel as f64 / s, yrel as f64 / s);
+                        let rotation = game.server.entities.get_component_mut(player, game.server.rotation).unwrap();
+                        rotation.yaw -= rx;
+                        rotation.pitch -= ry;
+                        if rotation.pitch < (PI/2.0) + 0.01 {
+                            rotation.pitch = (PI/2.0) + 0.01;
+                        }
+                        if rotation.pitch > (PI/2.0)*3.0 - 0.01 {
+                            rotation.pitch = (PI/2.0)*3.0 - 0.01;
+                        }
+                    }
+                } else {
+                    window.grab_cursor(false).unwrap();
+                    window.hide_cursor(false);
+                }
+            },
+            _ => ()
+        },
+
         glutin::Event::WindowEvent{event, ..} => match event {
             glutin::WindowEvent::CloseRequested => game.should_close = true,
             glutin::WindowEvent::Resized(logical_size) => {
@@ -394,34 +422,6 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                     }
                 }
                 */
-            },
-            _ => ()
-        },
-
-        glutin::Event::DeviceEvent{event, ..} => match event {
-            glutin::DeviceEvent::MouseMotion{delta:(xrel, yrel)} => {
-                use std::f64::consts::PI;
-
-                if game.focused {
-                    window.grab_cursor(true).unwrap();
-                    window.hide_cursor(true);
-                    if let Some(player) = game.server.player {
-                        let s = 2000.0 + 0.01;
-                        let (rx, ry) = (xrel as f64 / s, yrel as f64 / s);
-                        let rotation = game.server.entities.get_component_mut(player, game.server.rotation).unwrap();
-                        rotation.yaw -= rx;
-                        rotation.pitch -= ry;
-                        if rotation.pitch < (PI/2.0) + 0.01 {
-                            rotation.pitch = (PI/2.0) + 0.01;
-                        }
-                        if rotation.pitch > (PI/2.0)*3.0 - 0.01 {
-                            rotation.pitch = (PI/2.0)*3.0 - 0.01;
-                        }
-                    }
-                } else {
-                    window.grab_cursor(false).unwrap();
-                    window.hide_cursor(false);
-                }
             },
             _ => ()
         },
