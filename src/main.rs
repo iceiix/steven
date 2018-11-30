@@ -76,6 +76,8 @@ pub struct Game {
     dpi_factor: f64,
     last_mouse_x: f64,
     last_mouse_y: f64,
+    last_mouse_xrel: f64,
+    last_mouse_yrel: f64,
     is_fullscreen: bool,
 }
 
@@ -212,6 +214,8 @@ fn main() {
         dpi_factor,
         last_mouse_x: 0.0,
         last_mouse_y: 0.0,
+        last_mouse_xrel: 0.0,
+        last_mouse_yrel: 0.0,
         is_fullscreen: false,
     };
     game.renderer.camera.pos = cgmath::Point3::new(0.5, 13.2, 0.5);
@@ -278,7 +282,13 @@ fn handle_window_event(window: &mut glutin::GlWindow,
     use glutin::*;
     match event {
         Event::DeviceEvent{event, ..} => match event {
-            DeviceEvent::MouseMotion{delta:(xrel, yrel)} => {
+            DeviceEvent::MouseMotion{delta:(xrel1, yrel1)} => {
+                let xrel = xrel1 - game.last_mouse_xrel;
+                let yrel = yrel1 - game.last_mouse_yrel;
+
+                game.last_mouse_xrel = xrel1;
+                game.last_mouse_yrel = yrel1;
+
                 use std::f64::consts::PI;
 
                 if game.focused {
