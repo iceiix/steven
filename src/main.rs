@@ -307,6 +307,14 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                     window.hide_cursor(false);
                 }
             },
+
+            glutin::DeviceEvent::Text{codepoint} => {
+                println!("text {}", codepoint);
+                if !game.focused {
+                    ui_container.key_type(game, codepoint);
+                }
+            },
+
             _ => ()
         },
 
@@ -413,15 +421,6 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                     },
                     (_, None) => ()
                 }
-                /* TODO
-                Event::TextInput{text, ..} => {
-                    if !game.focused {
-                        for c in text.chars() {
-                            ui_container.key_type(game, c);
-                        }
-                    }
-                }
-                */
             },
             _ => ()
         },
