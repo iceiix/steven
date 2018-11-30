@@ -259,7 +259,7 @@ fn main() {
             .unwrap()
             .tick(&mut ui_container, &game.renderer, delta, width as f64);
         ui_container.tick(&mut game.renderer, delta, width as f64, height as f64);
-        game.renderer.tick(&mut game.server.world, delta, width, height);
+        game.renderer.tick(&mut game.server.world, delta, width, height, physical_width, physical_height);
 
 
         if fps_cap > 0 && !vsync {
