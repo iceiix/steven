@@ -282,12 +282,22 @@ fn handle_window_event(window: &mut glutin::GlWindow,
     use glutin::*;
     match event {
         Event::DeviceEvent{event, ..} => match event {
-            DeviceEvent::MouseMotion{delta:(xrel1, yrel1)} => {
-                let xrel = xrel1 - game.last_mouse_xrel;
-                let yrel = yrel1 - game.last_mouse_yrel;
+            DeviceEvent::MouseMotion{delta:(xrel, yrel)} => {
+                let (rx, ry) =
+                    if xrel > 1000.0 || yrel > 1000.0 {
+                        // Heuristic for if we were passed an absolute value instead of relative
+                        // Workaround https://github.com/tomaka/glutin/issues/1084 MouseMotion event returns absolute instead of relative values, when running Linux in a VM
+                        // Note SDL2 had a hint to handle this scenario:
+                        // sdl2::hint::set_with_priority("SDL_MOUSE_RELATIVE_MODE_WARP", "1", &sdl2::hint::Hint::Override);
+                        let s = 8000.0 + 0.01;
+                        ((xrel - game.last_mouse_xrel) / s, (yrel - game.last_mouse_yrel) / s)
+                    } else {
+                        let s = 2000.0 + 0.01;
+                        (xrel / s, yrel / s)
+                    };
 
-                game.last_mouse_xrel = xrel1;
-                game.last_mouse_yrel = yrel1;
+                game.last_mouse_xrel = xrel;
+                game.last_mouse_yrel = yrel;
 
                 use std::f64::consts::PI;
 
@@ -295,8 +305,6 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                     window.grab_cursor(true).unwrap();
                     window.hide_cursor(true);
                     if let Some(player) = game.server.player {
-                        let s = 2000.0 + 0.01;
-                        let (rx, ry) = (xrel as f64 / s, yrel as f64 / s);
                         let rotation = game.server.entities.get_component_mut(player, game.server.rotation).unwrap();
                         rotation.yaw -= rx;
                         rotation.pitch -= ry;
