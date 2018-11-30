@@ -147,7 +147,7 @@ impl Game {
 
 fn main() {
     let con = Arc::new(Mutex::new(console::Console::new()));
-    let (vars, mut vsync) = {
+    let (vars, vsync) = {
         let mut vars = console::Vars::new();
         vars.register(CL_BRAND);
         auth::register_vars(&mut vars);
@@ -177,7 +177,7 @@ fn main() {
         .with_depth_buffer(24)
         .with_gl(glutin::GlRequest::GlThenGles{opengl_version: (3, 2), opengles_version: (2, 0)})
         .with_gl_profile(glutin::GlProfile::Core)
-        .with_vsync(true);
+        .with_vsync(vsync);
     let mut window = glutin::GlWindow::new(window_builder, context, &events_loop)
         .expect("Could not create glutin window.");
 
@@ -186,9 +186,6 @@ fn main() {
     }
 
     gl::init(&window);
-
-    //TODO sdl_video.gl_set_swap_interval(if vsync { 1 } else { 0 });
-
 
     let renderer = render::Renderer::new(resource_manager.clone());
     let mut ui_container = ui::Container::new();
@@ -236,8 +233,10 @@ fn main() {
 
         let vsync_changed = *game.vars.get(settings::R_VSYNC);
         if vsync != vsync_changed {
-            vsync = vsync_changed;
-            //TODO sdl_video.gl_set_swap_interval(if vsync { 1 } else { 0 });
+            println!("Changing vsync currently requires restarting");
+            break;
+            // TODO: after https://github.com/tomaka/glutin/issues/693 Allow changing vsync on a Window
+            //vsync = vsync_changed;
         }
         let fps_cap = *game.vars.get(settings::R_MAX_FPS);
 
