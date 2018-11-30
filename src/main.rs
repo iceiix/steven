@@ -173,7 +173,10 @@ fn main() {
         .with_title("Steven")
         .with_dimensions(glutin::dpi::LogicalSize::new(854.0, 480.0));
     let context = glutin::ContextBuilder::new()
+        .with_stencil_buffer(0)
+        .with_depth_buffer(24)
         .with_gl(glutin::GlRequest::GlThenGles{opengl_version: (3, 2), opengles_version: (2, 0)})
+        .with_gl_profile(glutin::GlProfile::Core)
         .with_vsync(true);
     let mut window = glutin::GlWindow::new(window_builder, context, &events_loop)
         .expect("Could not create glutin window.");
@@ -181,13 +184,6 @@ fn main() {
     unsafe {
         window.make_current().expect("Could not set current context.");
     }
-
-    /* TODO
-    let gl_attr = sdl_video.gl_attr();
-    gl_attr.set_stencil_size(0);
-    gl_attr.set_depth_size(24);
-    gl_attr.set_context_profile(sdl2::video::GLProfile::Core);
-    */
 
     gl::init(&window);
 
