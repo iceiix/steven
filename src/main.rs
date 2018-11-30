@@ -74,8 +74,6 @@ pub struct Game {
 
     connect_reply: Option<mpsc::Receiver<Result<server::Server, protocol::Error>>>,
     dpi_factor: f64,
-    last_mouse_x: f64,
-    last_mouse_y: f64,
 }
 
 impl Game {
@@ -217,8 +215,6 @@ fn main() {
         chunk_builder: chunk_builder::ChunkBuilder::new(resource_manager, textures),
         connect_reply: None,
         dpi_factor,
-        last_mouse_x: 0.0,
-        last_mouse_y: 0.0,
     };
     game.renderer.camera.pos = cgmath::Point3::new(0.5, 13.2, 0.5);
 
@@ -321,19 +317,21 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                     },
                 }
             },
+            glutin::WindowEvent::CursorMoved{device_id: _, position, modifiers: _} => {
+                let (x, y) = position.into();
+
+                if !game.focused {
+                    let (width, height) = window.get_inner_size().unwrap().into();
+                    ui_container.hover_at(game, x, y, width, height);
+                }
+            },
             _ => ()
         },
 
         glutin::Event::DeviceEvent{event, ..} => match event {
-            glutin::DeviceEvent::MouseMotion{delta:(x, y)} => {
+            glutin::DeviceEvent::MouseMotion{delta:(xrel, yrel)} => {
                 use std::f64::consts::PI;
-                let xrel = game.last_mouse_x - x;
-                let yrel = game.last_mouse_y - y;
 
-                game.last_mouse_x = x;
-                game.last_mouse_y = y;
-
-                let (width, height) = window.get_inner_size().unwrap().into();
                 if game.focused {
                     /* TODO
                     if !mouse.relative_mouse_mode() {
@@ -359,7 +357,6 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                         mouse.set_relative_mouse_mode(false);
                     }
                     */
-                    ui_container.hover_at(game, x as f64, y as f64, width, height);
                 }
             },
             _ => ()
