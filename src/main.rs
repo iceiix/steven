@@ -74,6 +74,8 @@ pub struct Game {
 
     connect_reply: Option<mpsc::Receiver<Result<server::Server, protocol::Error>>>,
     dpi_factor: f64,
+    last_mouse_x: f64,
+    last_mouse_y: f64,
 }
 
 impl Game {
@@ -215,6 +217,8 @@ fn main() {
         chunk_builder: chunk_builder::ChunkBuilder::new(resource_manager, textures),
         connect_reply: None,
         dpi_factor,
+        last_mouse_x: 0.0,
+        last_mouse_y: 0.0,
     };
     game.renderer.camera.pos = cgmath::Point3::new(0.5, 13.2, 0.5);
 
@@ -284,31 +288,29 @@ fn handle_window_event(window: &mut glutin::GlWindow,
             },
 
             glutin::WindowEvent::MouseInput{device_id, state, button, modifiers} => {
-                println!("MouseInput {:?} {:?} {:?} {:?}", device_id, state, button, modifiers);
                 match (state, button) {
-                    (glutin::ElementState::Released, _) => {
-                        // TODO: get x, y
-                        /* TODO
-                        Event::MouseButtonUp{mouse_btn: MouseButton::Left, x, y, ..} => {
-                            let (width, height) = window.size();
+                    (glutin::ElementState::Released, glutin::MouseButton::Left) => {
+                        let (width, height) = window.get_inner_size().unwrap().into();
 
-                            if game.server.is_connected() && !game.focused && !game.screen_sys.is_current_closable() {
-                                game.focused = true;
-                                if !mouse.relative_mouse_mode() {
-                                    mouse.set_relative_mouse_mode(true);
-                                }
-                                return;
+                        if game.server.is_connected() && !game.focused && !game.screen_sys.is_current_closable() {
+                            game.focused = true;
+                            /* TODO
+                            if !mouse.relative_mouse_mode() {
+                                mouse.set_relative_mouse_mode(true);
                             }
-                            if !game.focused {
-                                if mouse.relative_mouse_mode() {
-                                    mouse.set_relative_mouse_mode(false);
-                                }
-                                ui_container.click_at(game, x as f64, y as f64, width as f64, height as f64);
-                            }
+                            */
+                            return;
                         }
-                        */
+                        if !game.focused {
+                            /* TODO
+                            if mouse.relative_mouse_mode() {
+                                mouse.set_relative_mouse_mode(false);
+                            }
+                            */
+                            ui_container.click_at(game, game.last_mouse_x, game.last_mouse_y, width, height);
+                        }
                     },
-                    (glutin::ElementState::Pressed,glutin::MouseButton::Right) => {
+                    (glutin::ElementState::Pressed, glutin::MouseButton::Right) => {
                         if game.focused {
                             game.server.on_right_click(&mut game.renderer);
                         }
@@ -318,6 +320,8 @@ fn handle_window_event(window: &mut glutin::GlWindow,
             },
             glutin::WindowEvent::CursorMoved{device_id: _, position, modifiers: _} => {
                 let (x, y) = position.into();
+                game.last_mouse_x = x;
+                game.last_mouse_y = y;
 
                 if !game.focused {
                     let (width, height) = window.get_inner_size().unwrap().into();
