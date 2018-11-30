@@ -295,10 +295,12 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                         if game.server.is_connected() && !game.focused && !game.screen_sys.is_current_closable() {
                             game.focused = true;
                             window.grab_cursor(true).unwrap();
+                            window.hide_cursor(true);
                             return;
                         }
                         if !game.focused {
                             window.grab_cursor(false).unwrap();
+                            window.hide_cursor(false);
                             ui_container.click_at(game, game.last_mouse_x, game.last_mouse_y, width, height);
                         }
                     },
@@ -329,6 +331,7 @@ fn handle_window_event(window: &mut glutin::GlWindow,
 
                 if game.focused {
                     window.grab_cursor(true).unwrap();
+                    window.hide_cursor(true);
                     if let Some(player) = game.server.player {
                         let s = 2000.0 + 0.01;
                         let (rx, ry) = (xrel as f64 / s, yrel as f64 / s);
@@ -344,6 +347,7 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                     }
                 } else {
                     window.grab_cursor(false).unwrap();
+                    window.hide_cursor(false);
                 }
             },
             _ => ()
