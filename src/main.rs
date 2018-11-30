@@ -76,6 +76,7 @@ pub struct Game {
     dpi_factor: f64,
     last_mouse_x: f64,
     last_mouse_y: f64,
+    is_fullscreen: bool,
 }
 
 impl Game {
@@ -219,6 +220,7 @@ fn main() {
         dpi_factor,
         last_mouse_x: 0.0,
         last_mouse_y: 0.0,
+        is_fullscreen: false,
     };
     game.renderer.camera.pos = cgmath::Point3::new(0.5, 13.2, 0.5);
 
@@ -353,15 +355,13 @@ fn handle_window_event(window: &mut glutin::GlWindow,
                         game.console.lock().unwrap().toggle();
                     },
                     (glutin::ElementState::Pressed, Some(glutin::VirtualKeyCode::F11)) => {
-                        /* TODO
-                        let state = match window.fullscreen_state() {
-                            sdl2::video::FullscreenType::Off => sdl2::video::FullscreenType::Desktop,
-                            sdl2::video::FullscreenType::True => sdl2::video::FullscreenType::Off,
-                            sdl2::video::FullscreenType::Desktop => sdl2::video::FullscreenType::Off,
-                        };
+                        if game.is_fullscreen {
+                            window.set_fullscreen(Some(window.get_current_monitor()));
+                        } else {
+                            window.set_fullscreen(None);
+                        }
 
-                        window.set_fullscreen(state).expect(&format!("failed to set fullscreen to {:?}", state));
-                        */
+                        game.is_fullscreen = !game.is_fullscreen;
                     },
                     (glutin::ElementState::Pressed, Some(key)) => {
                         /* TODO
