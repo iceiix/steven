@@ -438,12 +438,6 @@ state_packets!(
                 field velocity_y: f32 =,
                 field velocity_z: f32 =,
             }
-            /// ChunkUnload tells the client to unload the chunk at the specified
-            /// position.
-            packet ChunkUnload {
-                field x: i32 =,
-                field z: i32 =,
-            }
             /// SetCompression updates the compression threshold.
             packet SetCompression {
                 field threshold: VarInt =,

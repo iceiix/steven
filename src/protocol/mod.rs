@@ -146,11 +146,11 @@ pub const EntityRemoveEffect: i32 = 0x1e;
 pub const SetExperience: i32 = 0x1f;
 pub const EntityProperties: i32 = 0x20;
 pub const ChunkData: i32 = 0x21;
-pub const ChunkUnload: i32 = 0x22;
-pub const MultiBlockChange: i32 = 0x23;
-pub const BlockChange: i32 = 0x24;
-pub const BlockAction: i32 = 0x25;
-pub const BlockBreakAnimation: i32 = 0x26;
+pub const MultiBlockChange: i32 = 0x22;
+pub const BlockChange: i32 = 0x23;
+pub const BlockAction: i32 = 0x245;
+pub const BlockBreakAnimation: i32 = 0x25;
+//TODO: MapChunkBulk 0x26
 pub const Explosion: i32 = 0x27;
 pub const Effect: i32 = 0x28;
 pub const SoundEffect: i32 = 0x29;
