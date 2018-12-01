@@ -31,13 +31,11 @@ pub mod internal_ids {
     pub const ArmSwing: i32 = 0x1a;
     pub const SpectateTeleport: i32 = 0x1b;
     pub const PlayerBlockPlacement: i32 = 0x1c;
-    pub const PlayerBlockPlacementInt: i32 = -1;
     pub const UseItem: i32 = 0x1d;
     pub const SpawnObject: i32 = 0x00;
     pub const SpawnExperienceOrb: i32 = 0x01;
     pub const SpawnGlobalEntity: i32 = 0x02;
     pub const SpawnMob: i32 = 0x03;
-    pub const SpawnMobInt: i32 = -1;
     pub const SpawnPainting: i32 = 0x04;
     pub const SpawnPlayer: i32 = 0x05;
     pub const Animation: i32 = 0x06;
@@ -104,11 +102,9 @@ pub mod internal_ids {
     pub const SpawnPosition: i32 = 0x43;
     pub const TimeUpdate: i32 = 0x44;
     pub const Title: i32 = 0x45;
-    pub const TitleShifted: i32 = -1;
     pub const SoundEffect: i32 = 0x46;
     pub const PlayerListHeaderFooter: i32 = 0x47;
     pub const CollectItem: i32 = 0x48;
-    pub const CollectItemUncounted: i32 = -1;
     pub const EntityTeleport: i32 = 0x49;
     pub const EntityProperties: i32 = 0x4a;
     pub const EntityEffect: i32 = 0x4b;
