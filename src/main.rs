@@ -15,7 +15,7 @@
 #![recursion_limit="300"]
 
 use std::time::{Instant, Duration};
-use log::info;
+use log::{info, warn};
 extern crate steven_shared as shared;
 
 #[macro_use]
@@ -93,7 +93,14 @@ impl Game {
         };
         let server_versions_info: serde_json::Value = serde_json::from_reader(file).unwrap();
         println!("server_versions_info = {}", server_versions_info);
-        let protocol_version = server_versions_info.get(address).unwrap().as_i64().unwrap() as i32;
+        let protocol_version = {
+            if let Some(v) = server_versions_info.get(address) {
+                v.as_i64().unwrap() as i32
+            } else {
+                warn!("Server protocol version not known for {} (no ping response?), defaulting to {}", address, protocol::SUPPORTED_PROTOCOL);
+                protocol::SUPPORTED_PROTOCOL
+            }
+        };
         println!("version for address={} is {}", address, protocol_version);
 
         self.protocol_version = protocol_version;
