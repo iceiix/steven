@@ -166,6 +166,12 @@ state_packets!(
                 field unknown: bool =,
                 field unknown2: bool =,
             }
+            /// CraftRecipeRequest is sent when player clicks a recipe in the crafting book.
+            packet CraftRecipeRequest {
+                field window_id: u8 =,
+                field recipe: VarInt =,
+                field make_all: bool =,
+            }
             /// ClientAbilities is used to modify the players current abilities.
             /// Currently flying is the only one
             packet ClientAbilities {
@@ -193,10 +199,22 @@ state_packets!(
                 field forward: f32 =,
                 field flags: u8 =,
             }
+            /// CraftingBookData is sent when the player interacts with the crafting book.
+            packet CraftingBookData {
+                field action: VarInt =,
+                field recipe_id: i32 = when(|p: &CraftingBookData| p.action.0 == 0),
+                field crafting_book_open: bool = when(|p: &CraftingBookData| p.action.0 == 1),
+                field crafting_filter: bool = when(|p: &CraftingBookData| p.action.0 == 1),
+            }
             /// ResourcePackStatus informs the server of the client's current progress
             /// in activating the requested resource pack
             packet ResourcePackStatus {
                 field result: VarInt =,
+            }
+            // TODO: Document
+            packet AdvancementTab {
+                field action: VarInt =,
+                field tab_id: String = when(|p: &AdvancementTab| p.action.0 == 0),
             }
             /// HeldItemChange is sent when the player changes the currently active
             /// hotbar slot.
@@ -598,6 +616,10 @@ state_packets!(
             packet SignEditorOpen {
                 field location: Position =,
             }
+            /// CraftRecipeResponse is a response to CraftRecipeRequest, notifies the UI.
+            packet CraftRecipeResponse {
+                field location: Position =,
+            }
             /// PlayerAbilities is used to modify the players current abilities. Flying,
             /// creative, god mode etc.
             packet PlayerAbilities {
@@ -636,6 +658,14 @@ state_packets!(
                 field entity_id: VarInt =,
                 field location: Position =,
             }
+            packet UnlockRecipes {
+                field action: VarInt =,
+                field crafting_book_open: bool =,
+                field filtering_craftable: bool =,
+                field array_size_1: VarInt =,
+                //field recipe_ids
+                // TODO: https://wiki.vg/index.php?title=Protocol&oldid=14204#Unlock_Recipes
+            }
             /// EntityDestroy destroys the entities with the ids in the provided slice.
             packet EntityDestroy {
                 field entity_ids: LenPrefixed<VarInt, VarInt> =,
@@ -663,6 +693,11 @@ state_packets!(
             packet EntityHeadLook {
                 field entity_id: VarInt =,
                 field head_yaw: i8 =,
+            }
+            /// SelectAdvancementTab indicates the client should switch the advancement tab.
+            packet SelectAdvancementTab {
+                field has_id: bool =,
+                field tab_id: String = when(|p: &SelectAdvancementTab| p.has_id),
             }
             /// WorldBorder configures the world's border.
             packet WorldBorder {
@@ -817,6 +852,11 @@ state_packets!(
                 field yaw: i8 =,
                 field pitch: i8 =,
                 field on_ground: bool =,
+            }
+            packet Advancements {
+                field reset_clear: bool =,
+                field mapping_size: VarInt =,
+                //TODO: https://wiki.vg/index.php?title=Protocol&oldid=14204#Advancements
             }
             /// EntityProperties updates the properties for an entity.
             packet EntityProperties {
