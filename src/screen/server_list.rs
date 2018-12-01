@@ -151,12 +151,9 @@ impl ServerList {
                     };
                     false
                 });
-                // TODO: move getting protocol version out of refresh
-                let protocol_version: i32 = *self.server_protocol_versions.get(&address).unwrap_or(&protocol::SUPPORTED_PROTOCOL);
-                println!("self.server_protocol_versions.get = {:?}", self.server_protocol_versions);
                 backr.add_click_func(move |_, game| {
                     game.screen_sys.replace_screen(Box::new(super::connecting::Connecting::new(&address)));
-                    game.connect_to(&address, protocol_version);
+                    game.connect_to(&address);
                     true
                 });
             }
@@ -499,8 +496,12 @@ impl super::Screen for ServerList {
                                     format!("Out of date {}/{}", res.online, res.max)
                                 };
                                 players.text = txt;
-                                println!("inserting address={:?}, version={:?}", res.address, res.protocol_version);
+
+                                // TODO: store in memory instead of disk? but where?
                                 self.server_protocol_versions.insert(res.address, res.protocol_version);
+                                let mut out = fs::File::create("server_versions.json").unwrap();
+                                println!("writing self.server_protocol_versions = {:?}", self.server_protocol_versions);
+                                serde_json::to_writer_pretty(&mut out, &self.server_protocol_versions).unwrap();
                             }
                             let mut txt = TextComponent::new(&res.protocol_name);
                             txt.modifier.color = Some(format::Color::Yellow);

@@ -84,7 +84,18 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn connect_to(&mut self, address: &str, protocol_version: i32) {
+    pub fn connect_to(&mut self, address: &str) {
+        // Read saved server protocol version from ping response TODO: get from memory?
+        use std::fs;
+        let file = match fs::File::open("server_versions.json") {
+            Ok(val) => val,
+            Err(_) => return,
+        };
+        let server_versions_info: serde_json::Value = serde_json::from_reader(file).unwrap();
+        println!("server_versions_info = {}", server_versions_info);
+        let protocol_version = server_versions_info.get(address).unwrap().as_i64().unwrap() as i32;
+        println!("version for address={} is {}", address, protocol_version);
+
         self.protocol_version = protocol_version;
         let (tx, rx) = mpsc::channel();
         self.connect_reply = Some(rx);
