@@ -69,7 +69,7 @@ impl Serializable for Metadata {
             if index == 0xFF {
                 break;
             }
-            let ty = u8::read_from(buf)?;
+            let ty = protocol::VarInt::read_from(buf)?.0;
             match ty {
                 0 => m.put_raw(index, i8::read_from(buf)?),
                 1 => m.put_raw(index, protocol::VarInt::read_from(buf)?.0),
