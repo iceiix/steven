@@ -275,7 +275,7 @@ impl ServerList {
                             None
                         };
                         drop(send.send(PingInfo {
-                            address: address,
+                            address,
                             motd: desc,
                             ping: res.1,
                             exists: true,
@@ -291,7 +291,7 @@ impl ServerList {
                         let mut msg = TextComponent::new(&e);
                         msg.modifier.color = Some(format::Color::Red);
                         let _ = send.send(PingInfo {
-                            address: address,
+                            address,
                             motd: Component::Text(msg),
                             ping: Duration::new(99999, 0),
                             exists: false,
