@@ -467,7 +467,6 @@ impl super::Screen for ServerList {
             if !s.done_ping {
                 match s.recv.try_recv() {
                     Ok(res) => {
-                        println!("ping ok!\n");
                         s.done_ping = true;
                         s.motd.borrow_mut().set_text(res.motd);
                         // Selects the icon for the given ping range
@@ -482,7 +481,6 @@ impl super::Screen for ServerList {
                             _ => 56.0 / 256.0,
                         };
                         s.ping.borrow_mut().texture_coords.1 = y;
-                        println!("got res={:?}", res.exists);
                         if res.exists {
                             {
                                 let mut players = s.players.borrow_mut();
@@ -500,7 +498,6 @@ impl super::Screen for ServerList {
                                 // TODO: store in memory instead of disk? but where?
                                 self.server_protocol_versions.insert(res.address, res.protocol_version);
                                 let mut out = fs::File::create("server_versions.json").unwrap();
-                                println!("writing self.server_protocol_versions = {:?}", self.server_protocol_versions);
                                 serde_json::to_writer_pretty(&mut out, &self.server_protocol_versions).unwrap();
                             }
                             let mut txt = TextComponent::new(&res.protocol_name);
