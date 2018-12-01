@@ -7,7 +7,6 @@ branches:
         - updates
 platform:
   - x64
-  - x86
 build_script:
 - cmd: >-
     echo on
