@@ -217,10 +217,6 @@ state_packets!(
                 field cursor_y: u8 =,
                 field cursor_z: u8 =,
             }
-            /// UseItem is sent when the client tries to use an item.
-            packet UseItem {
-                field hand: VarInt =,
-            }
         }
         clientbound Clientbound {
             /// SpawnObject is used to spawn an object or vehicle into the world when it
