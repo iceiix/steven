@@ -21,6 +21,7 @@ use crate::protocol::Serializable;
 use crate::format;
 use crate::item;
 use crate::shared::Position;
+use crate::nbt;
 
 pub struct MetadataKey<T: MetaValue> {
     index: i32,
@@ -98,6 +99,7 @@ impl Serializable for Metadata {
                     }
                 }
                 12 => m.put_raw(index, protocol::VarInt::read_from(buf)?.0 as u16),
+                13 => m.put_raw(index, nbt::Tag::read_from(buf)?),
                 _ => return Err(protocol::Error::Err("unknown metadata type".to_owned())),
             }
         }
@@ -164,6 +166,11 @@ impl Serializable for Metadata {
                     u8::write_to(&11, buf)?;
                     protocol::VarInt(*val as i32).write_to(buf)?;
                 }
+                Value::NBTTag(ref val) => {
+                    u8::write_to(&13, buf)?;
+                    // TODO: write NBT tags metadata
+                    //nbt::Tag(*val).write_to(buf)?;
+                }
             }
         }
         u8::write_to(&0xFF, buf)?;
@@ -202,6 +209,7 @@ pub enum Value {
     Direction(protocol::VarInt), // TODO: Proper type
     OptionalUUID(Option<protocol::UUID>),
     Block(u16), // TODO: Proper type
+    NBTTag(nbt::Tag),
 }
 
 pub trait MetaValue {
@@ -362,6 +370,18 @@ impl MetaValue for u16 {
     }
     fn wrap(self) -> Value {
         Value::Block(self)
+    }
+}
+
+impl MetaValue for nbt::Tag {
+    fn unwrap(value: &Value) -> &Self {
+        match *value {
+            Value::NBTTag(ref val) => val,
+            _ => panic!("incorrect key"),
+        }
+    }
+    fn wrap(self) -> Value {
+        Value::NBTTag(self)
     }
 }
 
