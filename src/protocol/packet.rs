@@ -662,9 +662,8 @@ state_packets!(
                 field action: VarInt =,
                 field crafting_book_open: bool =,
                 field filtering_craftable: bool =,
-                field array_size_1: VarInt =,
-                //field recipe_ids
-                // TODO: https://wiki.vg/index.php?title=Protocol&oldid=14204#Unlock_Recipes
+                field recipe_ids: LenPrefixed<VarInt, VarInt> =,
+                field recipe_ids2: LenPrefixed<VarInt, VarInt> = when(|p: &UnlockRecipes| p.action.0 == 0),
             }
             /// EntityDestroy destroys the entities with the ids in the provided slice.
             packet EntityDestroy {
