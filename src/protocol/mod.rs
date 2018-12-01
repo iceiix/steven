@@ -793,7 +793,7 @@ impl Serializable for Position {
 
 /// Direction is used to define whether packets are going to the
 /// server or the client.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum Direction {
     Serverbound,
     Clientbound,
@@ -801,7 +801,7 @@ pub enum Direction {
 
 /// The protocol has multiple 'sub-protocols' or states which control which
 /// packet an id points to.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum State {
     Handshaking,
     Play,
@@ -963,7 +963,9 @@ impl Conn {
             Direction::Serverbound => Direction::Clientbound,
         };
 
+        println!("parsing packet id {:x} direction {:?} in state {:?}", id, dir, self.state);
         let packet = packet::packet_by_id(self.state, dir, id, &mut buf)?;
+        println!("parsed packet = {:?}", packet);
 
         match packet {
             Some(val) => {
