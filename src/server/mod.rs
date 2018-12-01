@@ -376,7 +376,6 @@ impl Server {
                             Respawn => on_respawn,
                             KeepAliveClientbound => on_keep_alive,
                             ChunkData => on_chunk_data,
-                            ChunkUnload => on_chunk_unload,
                             BlockChange => on_block_change,
                             MultiBlockChange => on_multi_block_change,
                             TeleportPlayer => on_teleport,
@@ -851,10 +850,6 @@ impl Server {
             chunk_data.bitmask.0 as u16,
             chunk_data.data.data
         ).unwrap();
-    }
-
-    fn on_chunk_unload(&mut self, chunk_unload: packet::play::clientbound::ChunkUnload) {
-        self.world.unload_chunk(chunk_unload.x, chunk_unload.z, &mut self.entities);
     }
 
     fn on_block_change(&mut self, block_change: packet::play::clientbound::BlockChange) {
