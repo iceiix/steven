@@ -305,14 +305,6 @@ pub fn write_string<W: io::Write>(buf: &mut W, s: &str) -> Result<(), protocol::
 pub fn read_string<R: io::Read>(buf: &mut R) -> Result<String, protocol::Error> {
     let len: i16 = buf.read_i16::<BigEndian>()?;
     let mut ret = String::new();
-    println!("read_string len = {:?}", len);
-    if len > 3000 {
-        let mut vec = vec![];
-        let result = buf.take(len as u64).read_to_end(&mut vec);
-        println!("vec = {:?}", vec);
-        println!("result = {:?}", result);
-    }
-
     buf.take(len as u64).read_to_string(&mut ret)?;
     Result::Ok(ret)
 }
