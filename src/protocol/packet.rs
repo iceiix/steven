@@ -857,7 +857,7 @@ state_packets!(
                 field reset_clear: bool =,
                 field mapping: LenPrefixed<VarInt, packet::Advancement> =,
                 field identifiers: LenPrefixed<VarInt, String> =,
-                //TODO field progress: LenPrefixed<VarInt, packet::AdvancementProgress> =,
+                field progress: LenPrefixed<VarInt, LenPrefixed<VarInt, Option<i64>>> =,
             }
             /// EntityProperties updates the properties for an entity.
             packet EntityProperties {
@@ -1166,16 +1166,6 @@ impl Serializable for AdvancementDisplay {
         self.y_coord.write_to(buf)
     }
 
-}
-
-#[derive(Debug, Default)]
-pub struct AdvancementProgress {
-    pub criteria: LenPrefixed<VarInt, CriterionProgress>,
-}
-
-#[derive(Debug, Default)]
-pub struct CriterionProgress {
-    pub date_of_achieving: Option<i64>,
 }
 
 #[derive(Debug, Default)]
