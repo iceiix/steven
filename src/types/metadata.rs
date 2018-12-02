@@ -70,7 +70,6 @@ impl Serializable for Metadata {
                 break;
             }
             let ty = protocol::VarInt::read_from(buf)?.0;
-            println!("metadata read_from index={:?}, ty={:?}", index, ty);
             match ty {
                 0 => m.put_raw(index, i8::read_from(buf)?),
                 1 => m.put_raw(index, protocol::VarInt::read_from(buf)?.0),
@@ -111,8 +110,8 @@ impl Serializable for Metadata {
                 }
                 _ => return Err(protocol::Error::Err("unknown metadata type".to_owned())),
             }
-            println!("metadata read_from ok {:?}", m);
         }
+        //println!("metadata read_from ok {:?}", m);
         Ok(m)
     }
 
