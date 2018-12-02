@@ -964,6 +964,7 @@ impl Conn {
         };
 
         println!("parsing packet id {:x} direction {:?} in state {:?}", id, dir, self.state);
+
         let packet = packet::packet_by_id(self.state, dir, id, &mut buf)?;
         println!("parsed packet = {:?}", packet);
 
@@ -1089,6 +1090,7 @@ pub struct StatusPlayer {
 
 impl Read for Conn {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        let ret =
         match self.cipher.as_mut() {
             Option::None => self.stream.read(buf),
             Option::Some(cipher) => {
@@ -1097,7 +1099,9 @@ impl Read for Conn {
 
                 Ok(ret)
             }
-        }
+        };
+        println!("read {:?} = {:?}", ret, buf);
+        ret
     }
 }
 
