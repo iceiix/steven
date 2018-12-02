@@ -182,7 +182,7 @@ impl Tag {
         }
     }
 
-    fn read_type<R: io::Read>(id: u8, buf: &mut R) -> Result<Tag, protocol::Error> {
+    pub fn read_type<R: io::Read>(id: u8, buf: &mut R) -> Result<Tag, protocol::Error> {
         match id {
             0 => unreachable!(),
             1 => Ok(Tag::Byte(buf.read_i8()?)),
@@ -211,10 +211,10 @@ impl Tag {
                 let mut c = Tag::new_compound();
                 loop {
                     let ty = buf.read_u8()?;
+                    let name: String = read_string(buf)?;
                     if ty == 0 {
                         break;
                     }
-                    let name: String = read_string(buf)?;
                     c.put(&name[..], Tag::read_type(ty, buf)?);
                 }
                 Ok(c)
@@ -304,7 +304,12 @@ pub fn write_string<W: io::Write>(buf: &mut W, s: &str) -> Result<(), protocol::
 
 pub fn read_string<R: io::Read>(buf: &mut R) -> Result<String, protocol::Error> {
     let len: i16 = buf.read_i16::<BigEndian>()?;
+    println!("about to read_string len={}", len);
     let mut ret = String::new();
-    buf.take(len as u64).read_to_string(&mut ret)?;
+    let mut vec = vec![];
+    buf.take(len as u64).read_to_end(&mut vec)?;
+    println!("read_string is {:?}", vec);
     Result::Ok(ret)
+    //buf.take(len as u64).read_to_string(&mut ret)?;
+    //Result::Ok(ret)
 }
