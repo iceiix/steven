@@ -963,7 +963,7 @@ impl Conn {
             Direction::Serverbound => Direction::Clientbound,
         };
 
-        println!("parsing packet id {:x} direction {:?} in state {:?}", id, dir, self.state);
+        //println!("parsing packet id {:x} direction {:?} in state {:?}", id, dir, self.state);
         // TODO: remove hack, handle these correctly
         if id == 0x4d // Advancements
             {
@@ -972,7 +972,7 @@ impl Conn {
             }
 
         let packet = packet::packet_by_id(self.state, dir, id, &mut buf)?;
-        println!("parsed packet = {:?}", packet);
+        //println!("parsed packet = {:?}", packet);
 
         match packet {
             Some(val) => {
@@ -1106,7 +1106,7 @@ impl Read for Conn {
                 Ok(ret)
             }
         };
-        println!("read {:?} = {:?}", ret, buf);
+        //println!("read {:?} = {:?}", ret, buf);
         ret
     }
 }
