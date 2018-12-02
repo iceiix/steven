@@ -618,7 +618,8 @@ state_packets!(
             }
             /// CraftRecipeResponse is a response to CraftRecipeRequest, notifies the UI.
             packet CraftRecipeResponse {
-                field location: Position =,
+                field window_id: u8 =,
+                field recipe: VarInt =,
             }
             /// PlayerAbilities is used to modify the players current abilities. Flying,
             /// creative, god mode etc.
