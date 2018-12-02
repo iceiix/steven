@@ -857,7 +857,7 @@ state_packets!(
                 field reset_clear: bool =,
                 field mapping: LenPrefixed<VarInt, packet::Advancement> =,
                 field identifiers: LenPrefixed<VarInt, String> =,
-                field progress: LenPrefixed<VarInt, packet::AdvancementProgress> =,
+                //TODO field progress: LenPrefixed<VarInt, packet::AdvancementProgress> =,
             }
             /// EntityProperties updates the properties for an entity.
             packet EntityProperties {
@@ -1088,9 +1088,30 @@ impl Default for MapIcon {
 pub struct Advancement {
     pub id: String,
     pub parent_id: Option<String>,
-    pub display_data: Option<AdvancementDisplay>,
+    //pub display_data: Option<AdvancementDisplay>,
     pub criteria: LenPrefixed<VarInt, String>,
     pub requirements: LenPrefixed<VarInt, LenPrefixed<VarInt, String>>,
+}
+
+impl Serializable for Advancement {
+    fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, Error> {
+        Ok(Advancement {
+            id: Serializable::read_from(buf)?,
+            parent_id: Serializable::read_from(buf)?,
+            //TODO display_data: Serializable::read_from(buf)?,
+            criteria: Serializable::read_from(buf)?,
+            requirements: Serializable::read_from(buf)?,
+        })
+    }
+
+    fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), Error> {
+        self.id.write_to(buf)?;
+        self.parent_id.write_to(buf)?;
+        //TODO self.display_data.write_to(buf)
+        self.criteria.write_to(buf)?;
+        self.requirements.write_to(buf)
+    }
+
 }
 
 #[derive(Debug, Default)]
