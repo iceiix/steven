@@ -855,8 +855,9 @@ state_packets!(
             }
             packet Advancements {
                 field reset_clear: bool =,
-                field mapping_size: VarInt =,
-                //TODO: https://wiki.vg/index.php?title=Protocol&oldid=14204#Advancements
+                field mapping: LenPrefixed<VarInt, packet::Advancement> =,
+                field identifiers: LenPrefixed<VarInt, String> =,
+                field progress: LenPrefixed<VarInt, packet::AdvancementProgress> =,
             }
             /// EntityProperties updates the properties for an entity.
             packet EntityProperties {
@@ -1081,6 +1082,37 @@ impl Default for MapIcon {
             z: 0,
         }
     }
+}
+
+#[derive(Debug, Default)]
+pub struct Advancement {
+    pub id: String,
+    pub parent_id: Option<String>,
+    pub display_data: Option<AdvancementDisplay>,
+    pub criteria: LenPrefixed<VarInt, String>,
+    pub requirements: LenPrefixed<VarInt, LenPrefixed<VarInt, String>>,
+}
+
+#[derive(Debug, Default)]
+pub struct AdvancementDisplay {
+    pub title: String,
+    pub description: String,
+    pub icon: crate::item::Stack,
+    pub frame_type: VarInt,
+    pub flags: i32,
+    pub background_texture: String, // TODO: only when flags & 1
+    pub x_coord: f32,
+    pub y_coord: f64,
+}
+
+#[derive(Debug, Default)]
+pub struct AdvancementProgress {
+    pub criteria: LenPrefixed<VarInt, CriterionProgress>,
+}
+
+#[derive(Debug, Default)]
+pub struct CriterionProgress {
+    pub date_of_achieving: Option<i64>,
 }
 
 #[derive(Debug, Default)]
