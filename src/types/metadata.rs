@@ -101,8 +101,13 @@ impl Serializable for Metadata {
                 }
                 12 => m.put_raw(index, protocol::VarInt::read_from(buf)?.0 as u16),
                 13 => {
-                    let nbt_type = u8::read_from(buf)?;
-                    m.put_raw(index, nbt::Tag::read_type(nbt_type, buf)?);
+                    let ty = u8::read_from(buf)?;
+                    if ty != 0 {
+                        let name = nbt::read_string(buf)?;
+                        let tag = nbt::Tag::read_from(buf)?;
+
+                        m.put_raw(index, nbt::NamedTag(name, tag));
+                    }
                 }
                 _ => return Err(protocol::Error::Err("unknown metadata type".to_owned())),
             }
@@ -214,7 +219,7 @@ pub enum Value {
     Direction(protocol::VarInt), // TODO: Proper type
     OptionalUUID(Option<protocol::UUID>),
     Block(u16), // TODO: Proper type
-    NBTTag(nbt::Tag),
+    NBTTag(nbt::NamedTag),
 }
 
 pub trait MetaValue {
@@ -378,7 +383,7 @@ impl MetaValue for u16 {
     }
 }
 
-impl MetaValue for nbt::Tag {
+impl MetaValue for nbt::NamedTag {
     fn unwrap(value: &Value) -> &Self {
         match *value {
             Value::NBTTag(ref val) => val,
