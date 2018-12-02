@@ -1088,7 +1088,7 @@ impl Default for MapIcon {
 pub struct Advancement {
     pub id: String,
     pub parent_id: Option<String>,
-    //pub display_data: Option<AdvancementDisplay>,
+    pub display_data: Option<AdvancementDisplay>,
     pub criteria: LenPrefixed<VarInt, String>,
     pub requirements: LenPrefixed<VarInt, LenPrefixed<VarInt, String>>,
 }
@@ -1098,7 +1098,7 @@ impl Serializable for Advancement {
         Ok(Advancement {
             id: Serializable::read_from(buf)?,
             parent_id: Serializable::read_from(buf)?,
-            //TODO display_data: Serializable::read_from(buf)?,
+            display_data: Serializable::read_from(buf)?,
             criteria: Serializable::read_from(buf)?,
             requirements: Serializable::read_from(buf)?,
         })
@@ -1107,7 +1107,7 @@ impl Serializable for Advancement {
     fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), Error> {
         self.id.write_to(buf)?;
         self.parent_id.write_to(buf)?;
-        //TODO self.display_data.write_to(buf)
+        self.display_data.write_to(buf)?;
         self.criteria.write_to(buf)?;
         self.requirements.write_to(buf)
     }
@@ -1118,12 +1118,54 @@ impl Serializable for Advancement {
 pub struct AdvancementDisplay {
     pub title: String,
     pub description: String,
-    pub icon: crate::item::Stack,
+    pub icon: Option<crate::item::Stack>,
     pub frame_type: VarInt,
     pub flags: i32,
-    pub background_texture: String, // TODO: only when flags & 1
+    pub background_texture: Option<String>,
     pub x_coord: f32,
-    pub y_coord: f64,
+    pub y_coord: f32,
+}
+
+impl Serializable for AdvancementDisplay {
+    fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, Error> {
+        let title: String = Serializable::read_from(buf)?;
+        let description: String = Serializable::read_from(buf)?;
+        let icon: Option<crate::item::Stack> = Serializable::read_from(buf)?;
+        let frame_type: VarInt = Serializable::read_from(buf)?;
+        let flags: i32 = Serializable::read_from(buf)?;
+        let background_texture: Option<String> = if flags & 1 != 0 {
+            Serializable::read_from(buf)?
+        } else {
+            None
+        };
+        let x_coord: f32 = Serializable::read_from(buf)?;
+        let y_coord: f32 = Serializable::read_from(buf)?;
+
+        Ok(AdvancementDisplay {
+            title,
+            description,
+            icon,
+            frame_type,
+            flags,
+            background_texture,
+            x_coord,
+            y_coord,
+        })
+    }
+
+    fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), Error> {
+        self.title.write_to(buf)?;
+        self.description.write_to(buf)?;
+        self.icon.write_to(buf)?;
+        self.frame_type.write_to(buf)?;
+        self.flags.write_to(buf)?;
+        if self.flags & 1 != 0 {
+            self.background_texture.write_to(buf)?;
+        }
+        self.x_coord.write_to(buf)?;
+        self.y_coord.write_to(buf)
+    }
+
 }
 
 #[derive(Debug, Default)]
