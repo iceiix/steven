@@ -965,8 +965,7 @@ impl Conn {
 
         println!("parsing packet id {:x} direction {:?} in state {:?}", id, dir, self.state);
         // TODO: remove hack, handle these correctly
-        if id == 0x3c // EntityMetadata
-            || id == 0x4d // Advancements
+        if id == 0x4d // Advancements
             {
                 println!("skipping unhandled packet {}", id);
                 return Result::Ok(packet::Packet::EnchantItem{0: packet::play::serverbound::EnchantItem{id: 0, enchantment: 0}});
