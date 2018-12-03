@@ -111,7 +111,6 @@ impl Serializable for Metadata {
                 _ => return Err(protocol::Error::Err("unknown metadata type".to_owned())),
             }
         }
-        //println!("metadata read_from ok {:?}", m);
         Ok(m)
     }
 

@@ -369,7 +369,6 @@ impl Server {
         // Packets modify entities so need to handled here
         if let Some(rx) = self.read_queue.take() {
             while let Ok(pck) = rx.try_recv() {
-                //println!("entity_tick pck = {:?}", pck);
                 match pck {
                     Ok(pck) => handle_packet!{
                         self pck {
@@ -534,7 +533,6 @@ impl Server {
     }
 
     pub fn write_packet<T: protocol::PacketType>(&mut self, p: T) where T: std::fmt::Debug {
-        //println!("write packet {:?}", p);
         let _ = self.conn.as_mut().unwrap().write_packet(p); // TODO handle errors
     }
 
