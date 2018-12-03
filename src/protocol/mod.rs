@@ -94,7 +94,9 @@ macro_rules! state_packets {
 
                     impl PacketType for $name {
 
-                        fn packet_id(&self) -> i32 { internal_ids::$name }
+                        fn packet_id(&self) -> i32 {
+                            packet::from_internal_packet_id(State::$stateName, Direction::$dirName, internal_ids::$name)
+                        }
 
                         fn write<W: io::Write>(self, buf: &mut W) -> Result<(), Error> {
                             $(
@@ -121,7 +123,7 @@ macro_rules! state_packets {
                         match dir {
                             $(
                                 Direction::$dirName => {
-                                    let internal_id = packet::translate_packet_id(state, dir, id);
+                                    let internal_id = packet::to_internal_packet_id(state, dir, id);
                                     match internal_id {
                                     $(
                                         self::$state::$dir::internal_ids::$name => {
@@ -158,7 +160,7 @@ macro_rules! protocol_packet_ids {
            )*
        })+
     })+) => {
-        pub fn translate_packet_id(state: State, dir: Direction, id: i32) -> i32 {
+        pub fn to_internal_packet_id(state: State, dir: Direction, id: i32) -> i32 {
             match state {
                 $(
                     State::$stateName => {
@@ -178,6 +180,28 @@ macro_rules! protocol_packet_ids {
                 )*
             }
         }
+
+        pub fn from_internal_packet_id(state: State, dir: Direction, id: i32) -> i32 {
+            match state {
+                $(
+                    State::$stateName => {
+                        match dir {
+                            $(
+                                Direction::$dirName => {
+                                    match id {
+                                    $(
+                                        crate::protocol::packet::$state::$dir::internal_ids::$name => $id,
+                                    )*
+                                        _ => panic!("bad packet id $id in $dir $state"),
+                                    }
+                                }
+                            )*
+                        }
+                    }
+                )*
+            }
+        }
+
     }
 }
 
