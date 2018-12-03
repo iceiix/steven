@@ -19,7 +19,7 @@ protocol_packet_ids!(
             0x08 => CloseWindow
             0x09 => PluginMessageServerbound
             0x0a => UseEntity
-            0x0b => KeepAliveServerbound
+            0x0b => KeepAliveServerbound_i64
             0x0c => Player
             0x0d => PlayerPosition
             0x0e => PlayerPositionLook
@@ -74,7 +74,7 @@ protocol_packet_ids!(
             0x1c => Explosion
             0x1d => ChunkUnload
             0x1e => ChangeGameState
-            0x1f => KeepAliveClientbound
+            0x1f => KeepAliveClientbound_i64
             0x20 => ChunkData
             0x21 => Effect
             0x22 => Particle

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #![allow(dead_code)]
+#![allow(non_camel_case_types)]
 
 use aes::Aes128;
 use cfb8::Cfb8;
@@ -195,6 +196,7 @@ macro_rules! protocol_packet_ids {
 
 pub mod packet;
 pub mod v1_12_2;
+pub mod v1_11_2;
 pub trait Serializable: Sized {
 fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, Error>;
 fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), Error>;
