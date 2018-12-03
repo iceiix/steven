@@ -25,7 +25,7 @@ hex = "0.3.2"
 base64 = "0.9.3"
 log = { version = "0.4.6", features = ["std"] }
 cgmath = "0.16.1"
-lazy_static = "1.1.0"
+lazy_static = "1.2.0"
 collision = "0.18.0"
 aes = "0.3.2"
 cfb8 = "0.3.1"
