@@ -95,8 +95,8 @@ macro_rules! state_packets {
 
                     impl PacketType for $name {
 
-                        fn packet_id(&self) -> i32 {
-                            packet::v1_12_2::translate_internal_packet_id(State::$stateName, Direction::$dirName, internal_ids::$name, false)
+                        fn packet_id(&self, version: i32) -> i32 {
+                            packet::versions::translate_internal_packet_id_for_version(version, State::$stateName, Direction::$dirName, internal_ids::$name, false)
                         }
 
                         fn write<W: io::Write>(self, buf: &mut W) -> Result<(), Error> {
@@ -117,14 +117,14 @@ macro_rules! state_packets {
 
         /// Returns the packet for the given state, direction and id after parsing the fields
         /// from the buffer.
-        pub fn packet_by_id<R: io::Read>(state: State, dir: Direction, id: i32, mut buf: &mut R) -> Result<Option<Packet>, Error> {
+        pub fn packet_by_id<R: io::Read>(version: i32, state: State, dir: Direction, id: i32, mut buf: &mut R) -> Result<Option<Packet>, Error> {
             match state {
                 $(
                     State::$stateName => {
                         match dir {
                             $(
                                 Direction::$dirName => {
-                                    let internal_id = packet::v1_12_2::translate_internal_packet_id(state, dir, id, true);
+                                    let internal_id = packet::versions::translate_internal_packet_id_for_version(version, state, dir, id, true);
                                     match internal_id {
                                     $(
                                         self::$state::$dir::internal_ids::$name => {
@@ -195,8 +195,7 @@ macro_rules! protocol_packet_ids {
 }
 
 pub mod packet;
-pub mod v1_12_2;
-pub mod v1_11_2;
+pub mod versions;
 pub trait Serializable: Sized {
 fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, Error>;
 fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), Error>;
@@ -795,6 +794,7 @@ pub host: String,
 pub port: u16,
 direction: Direction,
 pub state: State,
+pub protocol_version: i32,
 
 cipher: Option<Aes128Cfb>,
 
@@ -804,7 +804,7 @@ compression_write: Option<ZlibEncoder<io::Cursor<Vec<u8>>>>,
 }
 
 impl Conn {
-pub fn new(target: &str) -> Result<Conn, Error> {
+pub fn new(target: &str, protocol_version: i32) -> Result<Conn, Error> {
     // TODO SRV record support
     let mut parts = target.split(':').collect::<Vec<&str>>();
     let address = if parts.len() == 1 {
@@ -820,6 +820,7 @@ pub fn new(target: &str) -> Result<Conn, Error> {
         port: parts[1].parse().unwrap(),
         direction: Direction::Serverbound,
         state: State::Handshaking,
+        protocol_version,
         cipher: Option::None,
         compression_threshold: -1,
         compression_read: Option::None,
@@ -829,7 +830,7 @@ pub fn new(target: &str) -> Result<Conn, Error> {
 
 pub fn write_packet<T: PacketType>(&mut self, packet: T) -> Result<(), Error> {
     let mut buf = Vec::new();
-    VarInt(packet.packet_id()).write_to(&mut buf)?;
+    VarInt(packet.packet_id(self.protocol_version)).write_to(&mut buf)?;
     packet.write(&mut buf)?;
 
     let mut extra = if self.compression_threshold >= 0 {
@@ -889,7 +890,7 @@ pub fn read_packet(&mut self) -> Result<packet::Packet, Error> {
         Direction::Serverbound => Direction::Clientbound,
     };
 
-    let packet = packet::packet_by_id(self.state, dir, id, &mut buf)?;
+    let packet = packet::packet_by_id(self.protocol_version, self.state, dir, id, &mut buf)?;
 
     match packet {
         Some(val) => {
@@ -1057,6 +1058,7 @@ fn clone(&self) -> Self {
         port: self.port,
         direction: self.direction,
         state: self.state,
+        protocol_version: self.protocol_version,
         cipher: Option::None,
         compression_threshold: self.compression_threshold,
         compression_read: Option::None,
@@ -1066,7 +1068,7 @@ fn clone(&self) -> Self {
 }
 
 pub trait PacketType {
-fn packet_id(&self) -> i32;
+fn packet_id(&self, protocol_version: i32) -> i32;
 
 fn write<W: io::Write>(self, buf: &mut W) -> Result<(), Error>;
 }

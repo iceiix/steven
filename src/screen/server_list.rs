@@ -263,7 +263,7 @@ impl ServerList {
 
             // Don't block the main thread whilst pinging the server
             thread::spawn(move || {
-                match protocol::Conn::new(&address).and_then(|conn| conn.do_status()) {
+                match protocol::Conn::new(&address, protocol::SUPPORTED_PROTOCOLS[0]).and_then(|conn| conn.do_status()) {
                     Ok(res) => {
                         let mut desc = res.0.description;
                         format::convert_legacy(&mut desc);
