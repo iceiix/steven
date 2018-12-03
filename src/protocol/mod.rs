@@ -121,7 +121,8 @@ macro_rules! state_packets {
                         match dir {
                             $(
                                 Direction::$dirName => {
-                                    match id {
+                                    let internal_id = packet::translate_packet_id(state, dir, id);
+                                    match internal_id {
                                     $(
                                         self::$state::$dir::internal_ids::$name => {
                                             use self::$state::$dir::$name;
@@ -147,6 +148,165 @@ macro_rules! state_packets {
 }
 
 pub mod packet;
+
+pub fn translate_packet_id(state: State, dir: Direction, id: i32) -> i32 {
+    match state {
+        State::Handshaking => match dir {
+            Direction::Serverbound => match id {
+                0x00 => crate::protocol::packet::handshake::serverbound::internal_ids::Handshake,
+                _ => panic!("bad packet id in Handshake Serverbound"),
+            }
+            Direction::Clientbound => panic!("unexpected Clientbound in Handshake"),
+        }
+        State::Play => match dir {
+            Direction::Serverbound => match id {
+                0x00 => crate::protocol::packet::play::serverbound::internal_ids::TeleportConfirm,
+                0x01 => crate::protocol::packet::play::serverbound::internal_ids::TabComplete,
+                0x02 => crate::protocol::packet::play::serverbound::internal_ids::ChatMessage,
+                0x03 => crate::protocol::packet::play::serverbound::internal_ids::ClientStatus,
+                0x04 => crate::protocol::packet::play::serverbound::internal_ids::ClientSettings,
+                0x05 => crate::protocol::packet::play::serverbound::internal_ids::ConfirmTransactionServerbound,
+                0x06 => crate::protocol::packet::play::serverbound::internal_ids::EnchantItem,
+                0x07 => crate::protocol::packet::play::serverbound::internal_ids::ClickWindow,
+                0x08 => crate::protocol::packet::play::serverbound::internal_ids::CloseWindow,
+                0x09 => crate::protocol::packet::play::serverbound::internal_ids::PluginMessageServerbound,
+                0x0a => crate::protocol::packet::play::serverbound::internal_ids::UseEntity,
+                0x0b => crate::protocol::packet::play::serverbound::internal_ids::KeepAliveServerbound,
+                0x0c => crate::protocol::packet::play::serverbound::internal_ids::Player,
+                0x0d => crate::protocol::packet::play::serverbound::internal_ids::PlayerPosition,
+                0x0e => crate::protocol::packet::play::serverbound::internal_ids::PlayerPositionLook,
+                0x0f => crate::protocol::packet::play::serverbound::internal_ids::PlayerLook,
+                0x10 => crate::protocol::packet::play::serverbound::internal_ids::VehicleMove,
+                0x11 => crate::protocol::packet::play::serverbound::internal_ids::SteerBoat,
+                0x12 => crate::protocol::packet::play::serverbound::internal_ids::CraftRecipeRequest,
+                0x13 => crate::protocol::packet::play::serverbound::internal_ids::ClientAbilities,
+                0x14 => crate::protocol::packet::play::serverbound::internal_ids::PlayerDigging,
+                0x15 => crate::protocol::packet::play::serverbound::internal_ids::PlayerAction,
+                0x16 => crate::protocol::packet::play::serverbound::internal_ids::SteerVehicle,
+                0x17 => crate::protocol::packet::play::serverbound::internal_ids::CraftingBookData,
+                0x18 => crate::protocol::packet::play::serverbound::internal_ids::ResourcePackStatus,
+                0x19 => crate::protocol::packet::play::serverbound::internal_ids::AdvancementTab,
+                0x1a => crate::protocol::packet::play::serverbound::internal_ids::HeldItemChange,
+                0x1b => crate::protocol::packet::play::serverbound::internal_ids::CreativeInventoryAction,
+                0x1c => crate::protocol::packet::play::serverbound::internal_ids::SetSign,
+                0x1d => crate::protocol::packet::play::serverbound::internal_ids::ArmSwing,
+                0x1e => crate::protocol::packet::play::serverbound::internal_ids::SpectateTeleport,
+                0x1f => crate::protocol::packet::play::serverbound::internal_ids::PlayerBlockPlacement,
+                0x20 => crate::protocol::packet::play::serverbound::internal_ids::UseItem,
+                _ => panic!("bad packet id in Play Serverbound"),
+            }
+            Direction::Clientbound => match id {
+                0x00 => crate::protocol::packet::play::clientbound::internal_ids::SpawnObject,
+                0x01 => crate::protocol::packet::play::clientbound::internal_ids::SpawnExperienceOrb,
+                0x02 => crate::protocol::packet::play::clientbound::internal_ids::SpawnGlobalEntity,
+                0x03 => crate::protocol::packet::play::clientbound::internal_ids::SpawnMob,
+                0x04 => crate::protocol::packet::play::clientbound::internal_ids::SpawnPainting,
+                0x05 => crate::protocol::packet::play::clientbound::internal_ids::SpawnPlayer,
+                0x06 => crate::protocol::packet::play::clientbound::internal_ids::Animation,
+                0x07 => crate::protocol::packet::play::clientbound::internal_ids::Statistics,
+                0x08 => crate::protocol::packet::play::clientbound::internal_ids::BlockBreakAnimation,
+                0x09 => crate::protocol::packet::play::clientbound::internal_ids::UpdateBlockEntity,
+                0x0a => crate::protocol::packet::play::clientbound::internal_ids::BlockAction,
+                0x0b => crate::protocol::packet::play::clientbound::internal_ids::BlockChange,
+                0x0c => crate::protocol::packet::play::clientbound::internal_ids::BossBar,
+                0x0d => crate::protocol::packet::play::clientbound::internal_ids::ServerDifficulty,
+                0x0e => crate::protocol::packet::play::clientbound::internal_ids::TabCompleteReply,
+                0x0f => crate::protocol::packet::play::clientbound::internal_ids::ServerMessage,
+                0x10 => crate::protocol::packet::play::clientbound::internal_ids::MultiBlockChange,
+                0x11 => crate::protocol::packet::play::clientbound::internal_ids::ConfirmTransaction,
+                0x12 => crate::protocol::packet::play::clientbound::internal_ids::WindowClose,
+                0x13 => crate::protocol::packet::play::clientbound::internal_ids::WindowOpen,
+                0x14 => crate::protocol::packet::play::clientbound::internal_ids::WindowItems,
+                0x15 => crate::protocol::packet::play::clientbound::internal_ids::WindowProperty,
+                0x16 => crate::protocol::packet::play::clientbound::internal_ids::WindowSetSlot,
+                0x17 => crate::protocol::packet::play::clientbound::internal_ids::SetCooldown,
+                0x18 => crate::protocol::packet::play::clientbound::internal_ids::PluginMessageClientbound,
+                0x19 => crate::protocol::packet::play::clientbound::internal_ids::NamedSoundEffect,
+                0x1a => crate::protocol::packet::play::clientbound::internal_ids::Disconnect,
+                0x1b => crate::protocol::packet::play::clientbound::internal_ids::EntityAction,
+                0x1c => crate::protocol::packet::play::clientbound::internal_ids::Explosion,
+                0x1d => crate::protocol::packet::play::clientbound::internal_ids::ChunkUnload,
+                0x1e => crate::protocol::packet::play::clientbound::internal_ids::ChangeGameState,
+                0x1f => crate::protocol::packet::play::clientbound::internal_ids::KeepAliveClientbound,
+                0x20 => crate::protocol::packet::play::clientbound::internal_ids::ChunkData,
+                0x21 => crate::protocol::packet::play::clientbound::internal_ids::Effect,
+                0x22 => crate::protocol::packet::play::clientbound::internal_ids::Particle,
+                0x23 => crate::protocol::packet::play::clientbound::internal_ids::JoinGame,
+                0x24 => crate::protocol::packet::play::clientbound::internal_ids::Maps,
+                0x25 => crate::protocol::packet::play::clientbound::internal_ids::Entity,
+                0x26 => crate::protocol::packet::play::clientbound::internal_ids::EntityMove,
+                0x27 => crate::protocol::packet::play::clientbound::internal_ids::EntityLookAndMove,
+                0x28 => crate::protocol::packet::play::clientbound::internal_ids::EntityLook,
+                0x29 => crate::protocol::packet::play::clientbound::internal_ids::VehicleTeleport,
+                0x2a => crate::protocol::packet::play::clientbound::internal_ids::SignEditorOpen,
+                0x2b => crate::protocol::packet::play::clientbound::internal_ids::CraftRecipeResponse,
+                0x2c => crate::protocol::packet::play::clientbound::internal_ids::PlayerAbilities,
+                0x2d => crate::protocol::packet::play::clientbound::internal_ids::CombatEvent,
+                0x2e => crate::protocol::packet::play::clientbound::internal_ids::PlayerInfo,
+                0x2f => crate::protocol::packet::play::clientbound::internal_ids::TeleportPlayer,
+                0x30 => crate::protocol::packet::play::clientbound::internal_ids::EntityUsedBed,
+                0x31 => crate::protocol::packet::play::clientbound::internal_ids::UnlockRecipes,
+                0x32 => crate::protocol::packet::play::clientbound::internal_ids::EntityDestroy,
+                0x33 => crate::protocol::packet::play::clientbound::internal_ids::EntityRemoveEffect,
+                0x34 => crate::protocol::packet::play::clientbound::internal_ids::ResourcePackSend,
+                0x35 => crate::protocol::packet::play::clientbound::internal_ids::Respawn,
+                0x36 => crate::protocol::packet::play::clientbound::internal_ids::EntityHeadLook,
+                0x37 => crate::protocol::packet::play::clientbound::internal_ids::SelectAdvancementTab,
+                0x38 => crate::protocol::packet::play::clientbound::internal_ids::WorldBorder,
+                0x39 => crate::protocol::packet::play::clientbound::internal_ids::Camera,
+                0x3a => crate::protocol::packet::play::clientbound::internal_ids::SetCurrentHotbarSlot,
+                0x3b => crate::protocol::packet::play::clientbound::internal_ids::ScoreboardDisplay,
+                0x3c => crate::protocol::packet::play::clientbound::internal_ids::EntityMetadata,
+                0x3d => crate::protocol::packet::play::clientbound::internal_ids::EntityAttach,
+                0x3e => crate::protocol::packet::play::clientbound::internal_ids::EntityVelocity,
+                0x3f => crate::protocol::packet::play::clientbound::internal_ids::EntityEquipment,
+                0x40 => crate::protocol::packet::play::clientbound::internal_ids::SetExperience,
+                0x41 => crate::protocol::packet::play::clientbound::internal_ids::UpdateHealth,
+                0x42 => crate::protocol::packet::play::clientbound::internal_ids::ScoreboardObjective,
+                0x43 => crate::protocol::packet::play::clientbound::internal_ids::SetPassengers,
+                0x44 => crate::protocol::packet::play::clientbound::internal_ids::Teams,
+                0x45 => crate::protocol::packet::play::clientbound::internal_ids::UpdateScore,
+                0x46 => crate::protocol::packet::play::clientbound::internal_ids::SpawnPosition,
+                0x47 => crate::protocol::packet::play::clientbound::internal_ids::TimeUpdate,
+                0x48 => crate::protocol::packet::play::clientbound::internal_ids::Title,
+                0x49 => crate::protocol::packet::play::clientbound::internal_ids::SoundEffect,
+                0x4a => crate::protocol::packet::play::clientbound::internal_ids::PlayerListHeaderFooter,
+                0x4b => crate::protocol::packet::play::clientbound::internal_ids::CollectItem,
+                0x4c => crate::protocol::packet::play::clientbound::internal_ids::EntityTeleport,
+                0x4d => crate::protocol::packet::play::clientbound::internal_ids::Advancements,
+                0x4e => crate::protocol::packet::play::clientbound::internal_ids::EntityProperties,
+                0x4f => crate::protocol::packet::play::clientbound::internal_ids::EntityEffect,
+                _ => panic!("bad packet id in Play Clientbound"),
+            }
+        }
+        State::Login => match dir {
+            Direction::Serverbound => match id {
+                0x00 => crate::protocol::packet::login::serverbound::internal_ids::LoginStart,
+                0x01 => crate::protocol::packet::login::serverbound::internal_ids::EncryptionResponse,
+                _ => panic!("bad packet id in Login Serverbound"),
+            }
+            Direction::Clientbound => match id {
+                0x00 => crate::protocol::packet::login::clientbound::internal_ids::LoginDisconnect,
+                0x01 => crate::protocol::packet::login::clientbound::internal_ids::EncryptionRequest,
+                0x02 => crate::protocol::packet::login::clientbound::internal_ids::LoginSuccess,
+                0x03 => crate::protocol::packet::login::clientbound::internal_ids::SetInitialCompression,
+                _ => panic!("bad packet id in Login Clientbound"),
+            }
+        }
+        State::Status => match dir {
+            Direction::Serverbound => match id {
+                0x00 => crate::protocol::packet::status::serverbound::internal_ids::StatusRequest,
+                0x01 => crate::protocol::packet::status::serverbound::internal_ids::StatusPing,
+                _ => panic!("bad packet id in Status Serverbound"),
+            }
+            Direction::Clientbound => match id {
+                0x00 => crate::protocol::packet::status::clientbound::internal_ids::StatusResponse,
+                0x01 => crate::protocol::packet::status::clientbound::internal_ids::StatusPong,
+                _ => panic!("bad packet id in Status Clientbound"),
+            }
+        }
+    }
+}
 
 pub trait Serializable: Sized {
     fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, Error>;
