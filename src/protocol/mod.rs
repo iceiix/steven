@@ -925,7 +925,7 @@ impl Conn {
         let host = self.host.clone();
         let port = self.port;
         self.write_packet(Handshake {
-            protocol_version: VarInt(SUPPORTED_PROTOCOLS[0]),
+            protocol_version: VarInt(self.protocol_version),
             host,
             port,
             next: VarInt(1),
