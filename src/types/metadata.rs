@@ -175,7 +175,7 @@ impl Serializable for Metadata {
                     u8::write_to(&11, buf)?;
                     protocol::VarInt(*val as i32).write_to(buf)?;
                 }
-                Value::NBTTag(ref val) => {
+                Value::NBTTag(ref _val) => {
                     u8::write_to(&13, buf)?;
                     // TODO: write NBT tags metadata
                     //nbt::Tag(*val).write_to(buf)?;
