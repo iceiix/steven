@@ -484,7 +484,7 @@ impl super::Screen for ServerList {
                         if res.exists {
                             {
                                 let mut players = s.players.borrow_mut();
-                                let txt = if res.protocol_version == protocol::SUPPORTED_PROTOCOL {
+                                let txt = if protocol::SUPPORTED_PROTOCOLS.contains(&res.protocol_version) {
                                     players.colour.1 = 255;
                                     players.colour.2 = 255;
                                     format!("{}/{}", res.online, res.max)

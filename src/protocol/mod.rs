@@ -36,7 +36,7 @@ use flate2::Compression;
 use std::time::{Instant, Duration};
 use crate::shared::Position;
 
-pub const SUPPORTED_PROTOCOL: i32 = 340;
+pub const SUPPORTED_PROTOCOLS: [i32; 2] = [340, 316];
 
 
 /// Helper macro for defining packets
@@ -922,7 +922,7 @@ pub fn do_status(mut self) -> Result<(Status, Duration), Error> {
     let host = self.host.clone();
     let port = self.port;
     self.write_packet(Handshake {
-        protocol_version: VarInt(SUPPORTED_PROTOCOL),
+        protocol_version: VarInt(SUPPORTED_PROTOCOLS[0]),
         host,
         port,
         next: VarInt(1),
