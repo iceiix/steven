@@ -39,15 +39,28 @@ impl Default for Stack {
 
 impl Serializable for Option<Stack> {
     fn read_from<R: io::Read>(buf: &mut R) -> Result<Option<Stack>, protocol::Error> {
+        println!("Option<Stack> Serializable read_from");
         let id = buf.read_i16::<BigEndian>()?;
+        println!("Option<Stack> Serializable read_from id={}", id);
         if id == -1 {
             return Ok(None);
         }
+        println!("Option<Stack> Serializable read_from id={}", id);
+
+        let count = buf.read_u8()? as isize;
+        println!("count={}", count);
+
+        let damage = buf.read_i16::<BigEndian>()? as isize;
+        println!("damage={}", damage);
+
+        let tag = Serializable::read_from(buf)?;
+        println!("tag={:?}", tag);
+
         Ok(Some(Stack {
             id: id as isize,
-            count: buf.read_u8()? as isize,
-            damage: buf.read_i16::<BigEndian>()? as isize,
-            tag: Serializable::read_from(buf)?,
+            count: count,
+            damage: damage,
+            tag: tag,
         }))
     }
     fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), protocol::Error> {
