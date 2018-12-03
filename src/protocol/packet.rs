@@ -857,7 +857,7 @@ state_packets!(
                 field reset_clear: bool =,
                 field mapping: LenPrefixed<VarInt, packet::Advancement> =,
                 field identifiers: LenPrefixed<VarInt, String> =,
-                field progress: LenPrefixed<VarInt, LenPrefixed<VarInt, Option<i64>>> =,
+                field progress: LenPrefixed<VarInt, packet::AdvancementProgress> =,
             }
             /// EntityProperties updates the properties for an entity.
             packet EntityProperties {
@@ -1212,6 +1212,56 @@ impl Serializable for AdvancementDisplay {
     }
 
 }
+
+#[derive(Debug, Default)]
+pub struct AdvancementProgress {
+    pub id: String,
+    pub criteria: LenPrefixed<VarInt, CriterionProgress>,
+}
+
+impl Serializable for AdvancementProgress {
+    fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, Error> {
+        Ok(AdvancementProgress {
+            id: Serializable::read_from(buf)?,
+            criteria: Serializable::read_from(buf)?,
+        })
+    }
+
+    fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), Error> {
+        self.id.write_to(buf)?;
+        self.criteria.write_to(buf)
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct CriterionProgress {
+    pub id: String,
+    pub date_of_achieving: Option<i64>,
+}
+
+impl Serializable for CriterionProgress {
+    fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, Error> {
+        let id = Serializable::read_from(buf)?;
+        let achieved: u8 = Serializable::read_from(buf)?;
+        let date_of_achieving: Option<i64> = if achieved != 0 {
+            Serializable::read_from(buf)?
+        } else {
+            None
+        };
+
+        Ok(CriterionProgress {
+            id,
+            date_of_achieving,
+        })
+    }
+ 
+    fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), Error> {
+        self.id.write_to(buf)?;
+        self.date_of_achieving.write_to(buf)
+    }
+}
+
+
 
 #[derive(Debug, Default)]
 pub struct EntityProperty {
