@@ -11,7 +11,7 @@ edition = "2018"
 opt-level = 1
 
 [dependencies]
-sha-1 = "0.8.0"
+sha-1 = "0.8.1"
 glutin = "0.19.0"
 byteorder = "1.2.7"
 reqwest = "0.9.4"
