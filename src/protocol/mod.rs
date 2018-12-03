@@ -95,7 +95,7 @@ macro_rules! state_packets {
                     impl PacketType for $name {
 
                         fn packet_id(&self) -> i32 {
-                            packet::v1_12_2::translate_internal_packet_id(State::$stateName, Direction::$dirName, internal_ids::$name, false)
+                            packet::v1_11_2::translate_internal_packet_id(State::$stateName, Direction::$dirName, internal_ids::$name, false)
                         }
 
                         fn write<W: io::Write>(self, buf: &mut W) -> Result<(), Error> {
@@ -123,7 +123,7 @@ macro_rules! state_packets {
                         match dir {
                             $(
                                 Direction::$dirName => {
-                                    let internal_id = packet::v1_12_2::translate_internal_packet_id(state, dir, id, true);
+                                    let internal_id = packet::v1_11_2::translate_internal_packet_id(state, dir, id, true);
                                     match internal_id {
                                     $(
                                         self::$state::$dir::internal_ids::$name => {
@@ -195,6 +195,7 @@ macro_rules! protocol_packet_ids {
 
 pub mod packet;
 pub mod v1_12_2;
+pub mod v1_11_2;
 pub trait Serializable: Sized {
 fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, Error>;
 fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), Error>;
