@@ -540,7 +540,7 @@ state_packets!(
                 field offset_z: f32 =,
                 field speed: f32 =,
                 field count: i32 =,
-                field data1: VarInt = when(|p: &Particle| p.particle_id == 36 || p.particle_id == 37 || p.particle_id == 38),
+                field data1: VarInt = when(|p: &Particle| p.particle_id == 36 || p.particle_id == 37 || p.particle_id == 38 || p.particle_id == 46),
                 field data2: VarInt = when(|p: &Particle| p.particle_id == 36),
             }
             /// JoinGame is sent after completing the login process. This
