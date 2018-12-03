@@ -290,17 +290,12 @@ impl Serializable for Vec<u8> {
 
 impl Serializable for Option<nbt::NamedTag>{
     fn read_from<R: io::Read>(buf: &mut R) -> Result<Option<nbt::NamedTag>, Error> {
-        println!("Option<nbt::NamedTag read_from");
         let ty = buf.read_u8()?;
-        println!("ty = {}", ty);
         if ty == 0 {
-            println!("ok none");
             Result::Ok(None)
         } else {
             let name = nbt::read_string(buf)?;
-            println!("name = {}", name);
             let tag = nbt::Tag::read_from(buf)?;
-            println!("tag = {:?}", tag);
             Result::Ok(Some(nbt::NamedTag(name, tag)))
         }
     }
@@ -968,11 +963,10 @@ impl Conn {
             Direction::Serverbound => Direction::Clientbound,
         };
 
-        println!("parsing packet id {:x} direction {:?} in state {:?}", id, dir, self.state);
-        println!("parsing packet buf = {:?}", buf);
+        //println!("parsing packet id {:x} direction {:?} in state {:?}", id, dir, self.state);
 
         let packet = packet::packet_by_id(self.state, dir, id, &mut buf)?;
-        println!("parsed packet = {:?}", packet);
+        //println!("parsed packet = {:?}", packet);
 
         match packet {
             Some(val) => {

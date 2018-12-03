@@ -534,7 +534,7 @@ impl Server {
     }
 
     pub fn write_packet<T: protocol::PacketType>(&mut self, p: T) where T: std::fmt::Debug {
-        println!("write packet {:?}", p);
+        //println!("write packet {:?}", p);
         let _ = self.conn.as_mut().unwrap().write_packet(p); // TODO handle errors
     }
 
