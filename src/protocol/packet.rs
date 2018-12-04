@@ -787,6 +787,16 @@ state_packets!(
                 field z: Option<u8> = when(|p: &Maps| p.columns > 0),
                 field data: Option<LenPrefixedBytes<VarInt>> = when(|p: &Maps| p.columns > 0),
             }
+            packet Maps_NoTracking {
+                field item_damage: VarInt =,
+                field scale: i8 =,
+                field icons: LenPrefixed<VarInt, packet::MapIcon> =,
+                field columns: u8 =,
+                field rows: Option<u8> = when(|p: &Maps_NoTracking| p.columns > 0),
+                field x: Option<u8> = when(|p: &Maps_NoTracking| p.columns > 0),
+                field z: Option<u8> = when(|p: &Maps_NoTracking| p.columns > 0),
+                field data: Option<LenPrefixedBytes<VarInt>> = when(|p: &Maps_NoTracking| p.columns > 0),
+            }
             /// EntityMove moves the entity with the id by the offsets provided.
             packet EntityMove_i16 {
                 field entity_id: VarInt =,
