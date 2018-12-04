@@ -886,6 +886,10 @@ state_packets!(
                 field entity_id: VarInt =,
                 field head_yaw: i8 =,
             }
+            packet EntityStatus {
+                field entity_id: i32 =,
+                field entity_status: i8 =,
+            }
             /// SelectAdvancementTab indicates the client should switch the advancement tab.
             packet SelectAdvancementTab {
                 field has_id: bool =,

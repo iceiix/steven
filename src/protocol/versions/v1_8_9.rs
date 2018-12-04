@@ -61,7 +61,7 @@ protocol_packet_ids!(
             0x17 => EntityLookAndMove_i8
             0x18 => EntityTeleport_i32
             0x19 => EntityHeadLook
-            //0x1a => EntityStatus
+            0x1a => EntityStatus
             0x1b => EntityAttach_leashed
             0x1c => EntityMetadata
             0x1d => EntityEffect
@@ -71,7 +71,7 @@ protocol_packet_ids!(
             0x21 => ChunkData_NoEntities
             0x22 => MultiBlockChange
             0x23 => BlockChange
-            0x245 => BlockAction
+            0x24 => BlockAction
             0x25 => BlockBreakAnimation
             0x26 => ChunkDataBulk
             0x27 => Explosion
