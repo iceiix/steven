@@ -842,6 +842,11 @@ state_packets!(
             packet Entity {
                 field entity_id: VarInt =,
             }
+            /// EntityUpdateNBT updates the entity named binary tag.
+            packet EntityUpdateNBT {
+                field entity_id: VarInt =,
+                field nbt: Option<nbt::NamedTag> =,
+            }
             /// Teleports the player's vehicle
             packet VehicleTeleport {
                 field x: f64 =,

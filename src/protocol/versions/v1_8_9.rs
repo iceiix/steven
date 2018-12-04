@@ -108,7 +108,7 @@ protocol_packet_ids!(
             0x46 => SetCompression
             0x47 => PlayerListHeaderFooter
             0x48 => ResourcePackSend
-            0x49 => BossBar
+            0x49 => EntityUpdateNBT
         }
     }
     login Login {
