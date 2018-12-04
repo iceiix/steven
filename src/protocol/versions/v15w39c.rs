@@ -8,13 +8,13 @@ protocol_packet_ids!(
     }
     play Play {
         serverbound Serverbound {
-            0x00 => TabComplete
+            0x00 => TabComplete_NoAssume
             0x01 => ChatMessage
             0x02 => ClientStatus
-            0x03 => ClientSettings
+            0x03 => ClientSettings_u8
             0x04 => ConfirmTransactionServerbound
             0x05 => EnchantItem
-            0x06 => ClickWindow
+            0x06 => ClickWindow_u8
             0x07 => CloseWindow
             0x08 => PluginMessageServerbound
             0x09 => UseEntity
@@ -24,7 +24,7 @@ protocol_packet_ids!(
             0x0d => PlayerLook
             0x0e => Player
             0x0f => ClientAbilities
-            0x10 => PlayerDigging
+            0x10 => PlayerDigging_u8
             0x11 => PlayerAction
             0x12 => SteerVehicle
             0x13 => ResourcePackStatus
@@ -37,11 +37,11 @@ protocol_packet_ids!(
             0x1a => UseItem
         }
         clientbound Clientbound {
-            0x00 => SpawnObject
-            0x01 => SpawnExperienceOrb
-            0x02 => SpawnGlobalEntity
-            0x03 => SpawnMob_u8
-            0x04 => SpawnPainting
+            0x00 => SpawnObject_i32
+            0x01 => SpawnExperienceOrb_i32
+            0x02 => SpawnGlobalEntity_i32
+            0x03 => SpawnMob_u8_i32
+            0x04 => SpawnPainting_NoUUID
             0x05 => SpawnPlayer
             0x06 => Animation
             0x07 => Statistics
@@ -66,25 +66,24 @@ protocol_packet_ids!(
             0x1a => EntityAction
             0x1b => Explosion
             0x1c => ChunkUnload
-            //TODO 0x1d => SetCompression
+            0x1d => SetCompression
             0x1e => ChangeGameState
             0x1f => KeepAliveClientbound_VarInt
             0x20 => ChunkData_NoEntities
             0x21 => Effect
             0x22 => Particle
-            0x23 => SoundEffect
+            0x23 => NamedSoundEffect_u8_NoCategory
             0x24 => JoinGame_i8
             0x25 => Maps
-            0x26 => EntityMove
-            0x27 => EntityLookAndMove
+            0x26 => EntityMove_i8
+            0x27 => EntityLookAndMove_i8
             0x28 => EntityLook
             0x29 => Entity
-            0x29 => VehicleTeleport
             0x2a => SignEditorOpen
             0x2b => PlayerAbilities
             0x2c => CombatEvent
             0x2d => PlayerInfo
-            0x2e => TeleportPlayer
+            0x2e => TeleportPlayer_NoID
             0x2f => EntityUsedBed
             0x30 => EntityDestroy
             0x31 => EntityRemoveEffect
@@ -96,7 +95,7 @@ protocol_packet_ids!(
             0x37 => SetCurrentHotbarSlot
             0x38 => ScoreboardDisplay
             0x39 => EntityMetadata
-            0x3a => EntityAttach
+            0x3a => EntityAttach_leashed
             0x3b => EntityVelocity
             0x3c => EntityEquipment
             0x3d => SetExperience
@@ -106,11 +105,11 @@ protocol_packet_ids!(
             0x41 => UpdateScore
             0x42 => SpawnPosition
             0x43 => TimeUpdate
-            0x44 => Title_notext
+            0x44 => Title_notext_component
             0x45 => UpdateSign
             0x46 => PlayerListHeaderFooter
             0x47 => CollectItem_nocount
-            0x48 => EntityTeleport
+            0x48 => EntityTeleport_i32
             0x49 => EntityProperties
             0x4a => EntityEffect
         }
