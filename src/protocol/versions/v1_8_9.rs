@@ -68,7 +68,7 @@ protocol_packet_ids!(
             0x1e => EntityRemoveEffect
             0x1f => SetExperience
             0x20 => EntityProperties
-            0x21 => ChunkData_NoEntities
+            0x21 => ChunkData_NoEntities_u16
             0x22 => MultiBlockChange
             0x23 => BlockChange
             0x24 => BlockAction

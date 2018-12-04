@@ -382,6 +382,7 @@ impl Server {
                             KeepAliveClientbound_VarInt => on_keep_alive_varint,
                             ChunkData => on_chunk_data,
                             ChunkData_NoEntities => on_chunk_data_no_entities,
+                            ChunkData_NoEntities_u16 => on_chunk_data_no_entities_u16,
                             ChunkUnload => on_chunk_unload,
                             BlockChange => on_block_change,
                             MultiBlockChange => on_multi_block_change,
@@ -968,6 +969,17 @@ impl Server {
             chunk_data.data.data
         ).unwrap();
     }
+
+    fn on_chunk_data_no_entities_u16(&mut self, chunk_data: packet::play::clientbound::ChunkData_NoEntities_u16) {
+        self.world.load_chunk(
+            chunk_data.chunk_x,
+            chunk_data.chunk_z,
+            chunk_data.new,
+            chunk_data.bitmask,
+            chunk_data.data.data
+        ).unwrap();
+    }
+
 
     fn on_chunk_unload(&mut self, chunk_unload: packet::play::clientbound::ChunkUnload) {
         self.world.unload_chunk(chunk_unload.x, chunk_unload.z, &mut self.entities);
