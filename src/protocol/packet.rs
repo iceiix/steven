@@ -448,6 +448,17 @@ state_packets!(
                 field pitch: i8 =,
                 field metadata: types::Metadata =,
             }
+            packet SpawnPlayer_i32_HeldItem {
+                field entity_id: VarInt =,
+                field uuid: UUID =,
+                field x: i32 =,
+                field y: i32 =,
+                field z: i32 =,
+                field yaw: i8 =,
+                field pitch: i8 =,
+                field current_item: u16 =,
+                field metadata: types::Metadata =,
+            }
             /// Animation is sent by the server to play an animation on a specific entity.
             packet Animation {
                 field entity_id: VarInt =,

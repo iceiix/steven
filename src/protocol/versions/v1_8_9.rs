@@ -47,7 +47,7 @@ protocol_packet_ids!(
             0x09 => SetCurrentHotbarSlot
             0x0a => EntityUsedBed
             0x0b => Animation
-            0x0c => SpawnPlayer_i32
+            0x0c => SpawnPlayer_i32_HeldItem
             0x0d => CollectItem_nocount
             0x0e => SpawnObject_i32
             0x0f => SpawnMob_u8_i32
