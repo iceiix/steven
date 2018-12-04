@@ -383,6 +383,7 @@ impl Server {
                             ChunkData => on_chunk_data,
                             ChunkData_NoEntities => on_chunk_data_no_entities,
                             ChunkData_NoEntities_u16 => on_chunk_data_no_entities_u16,
+                            ChunkDataBulk => on_chunk_data_bulk,
                             ChunkUnload => on_chunk_unload,
                             BlockChange => on_block_change,
                             MultiBlockChange => on_multi_block_change,
@@ -971,7 +972,7 @@ impl Server {
     }
 
     fn on_chunk_data_no_entities_u16(&mut self, chunk_data: packet::play::clientbound::ChunkData_NoEntities_u16) {
-        self.world.load_chunk(
+        self.world.load_chunk18(
             chunk_data.chunk_x,
             chunk_data.chunk_z,
             chunk_data.new,
@@ -980,6 +981,20 @@ impl Server {
         ).unwrap();
     }
 
+    fn on_chunk_data_bulk(&mut self, bulk: packet::play::clientbound::ChunkDataBulk) {
+        for meta in bulk.chunk_meta.data {
+            let new = true;
+            // TODO
+            let data = &bulk.chunk_data;
+            self.world.load_chunk18(
+                meta.x,
+                meta.z,
+                new,
+                meta.bitmask,
+                data.to_vec()
+            ).unwrap();
+        }
+    }
 
     fn on_chunk_unload(&mut self, chunk_unload: packet::play::clientbound::ChunkUnload) {
         self.world.unload_chunk(chunk_unload.x, chunk_unload.z, &mut self.entities);
