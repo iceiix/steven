@@ -399,7 +399,8 @@ impl Server {
                             EntityMove_i16 => on_entity_move_i16,
                             EntityMove_i8 => on_entity_move_i8,
                             EntityLook => on_entity_look,
-                            EntityLookAndMove => on_entity_look_and_move,
+                            EntityLookAndMove_i16 => on_entity_look_and_move_i16,
+                            EntityLookAndMove_i8 => on_entity_look_and_move_i8,
                         }
                     },
                     Err(err) => panic!("Err: {:?}", err),
@@ -687,16 +688,28 @@ impl Server {
         }
     }
 
-    fn on_entity_look_and_move(&mut self, lookmove: packet::play::clientbound::EntityLookAndMove) {
+    fn on_entity_look_and_move_i16(&mut self, lookmove: packet::play::clientbound::EntityLookAndMove_i16) {
+        self.on_entity_look_and_move(lookmove.entity_id.0,
+                                     lookmove.delta_x as f64, lookmove.delta_y as f64, lookmove.delta_z as f64,
+                                     lookmove.yaw as f64, lookmove.pitch as f64)
+    }
+
+    fn on_entity_look_and_move_i8(&mut self, lookmove: packet::play::clientbound::EntityLookAndMove_i8) {
+        self.on_entity_look_and_move(lookmove.entity_id.0,
+                                     lookmove.delta_x as f64, lookmove.delta_y as f64, lookmove.delta_z as f64,
+                                     lookmove.yaw as f64, lookmove.pitch as f64)
+    }
+
+    fn on_entity_look_and_move(&mut self, entity_id: i32, delta_x: f64, delta_y: f64, delta_z: f64, yaw: f64, pitch: f64) {
         use std::f64::consts::PI;
-        if let Some(entity) = self.entity_map.get(&lookmove.entity_id.0) {
+        if let Some(entity) = self.entity_map.get(&entity_id) {
             let position = self.entities.get_component_mut(*entity, self.target_position).unwrap();
             let rotation = self.entities.get_component_mut(*entity, self.target_rotation).unwrap();
-            position.position.x += lookmove.delta_x as f64 / (32.0 * 128.0);
-            position.position.y += lookmove.delta_y as f64 / (32.0 * 128.0);
-            position.position.z += lookmove.delta_z as f64 / (32.0 * 128.0);
-            rotation.yaw = -((lookmove.yaw as f64) / 256.0) * PI * 2.0;
-            rotation.pitch = -((lookmove.pitch as f64) / 256.0) * PI * 2.0;
+            position.position.x += delta_x / (32.0 * 128.0);
+            position.position.y += delta_y / (32.0 * 128.0);
+            position.position.z += delta_z / (32.0 * 128.0);
+            rotation.yaw = -(yaw / 256.0) * PI * 2.0;
+            rotation.pitch = -(pitch / 256.0) * PI * 2.0;
         }
     }
 

@@ -78,7 +78,7 @@ protocol_packet_ids!(
             0x23 => JoinGame_i32
             0x24 => Maps
             0x25 => EntityMove_i16
-            0x26 => EntityLookAndMove
+            0x26 => EntityLookAndMove_i16
             0x27 => EntityLook
             0x28 => Entity
             0x29 => VehicleTeleport

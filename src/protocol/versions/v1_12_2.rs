@@ -82,7 +82,7 @@ protocol_packet_ids!(
             0x24 => Maps
             0x25 => Entity
             0x26 => EntityMove_i16
-            0x27 => EntityLookAndMove
+            0x27 => EntityLookAndMove_i16
             0x28 => EntityLook
             0x29 => VehicleTeleport
             0x2a => SignEditorOpen

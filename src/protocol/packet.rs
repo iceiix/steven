@@ -743,7 +743,7 @@ state_packets!(
                 field on_ground: bool =,
             }
             /// EntityLookAndMove is a combination of EntityMove and EntityLook.
-            packet EntityLookAndMove {
+            packet EntityLookAndMove_i16 {
                 field entity_id: VarInt =,
                 field delta_x: i16 =,
                 field delta_y: i16 =,
