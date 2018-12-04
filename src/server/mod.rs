@@ -396,7 +396,8 @@ impl Server {
                             // Entities
                             EntityDestroy => on_entity_destroy,
                             SpawnPlayer => on_player_spawn,
-                            EntityTeleport => on_entity_teleport,
+                            EntityTeleport_f64 => on_entity_teleport_f64,
+                            EntityTeleport_i32 => on_entity_teleport_i32,
                             EntityMove_i16 => on_entity_move_i16,
                             EntityMove_i8 => on_entity_move_i8,
                             EntityLook => on_entity_look,
@@ -650,16 +651,24 @@ impl Server {
         }
     }
 
-    fn on_entity_teleport(&mut self, entity_telport: packet::play::clientbound::EntityTeleport) {
+    fn on_entity_teleport_f64(&mut self, entity_telport: packet::play::clientbound::EntityTeleport_f64) {
+        self.on_entity_teleport(entity_telport.entity_id.0, entity_telport.x, entity_telport.y, entity_telport.z, entity_telport.yaw as f64, entity_telport.pitch as f64, entity_telport.on_ground)
+    }
+
+    fn on_entity_teleport_i32(&mut self, entity_telport: packet::play::clientbound::EntityTeleport_i32) {
+        self.on_entity_teleport(entity_telport.entity_id.0, entity_telport.x as f64, entity_telport.y as f64, entity_telport.z as f64, entity_telport.yaw as f64, entity_telport.pitch as f64, entity_telport.on_ground)
+    }
+
+    fn on_entity_teleport(&mut self, entity_id: i32, x: f64, y: f64, z: f64, yaw: f64, pitch: f64, _on_ground: bool) {
         use std::f64::consts::PI;
-        if let Some(entity) = self.entity_map.get(&entity_telport.entity_id.0) {
+        if let Some(entity) = self.entity_map.get(&entity_id) {
             let target_position = self.entities.get_component_mut(*entity, self.target_position).unwrap();
             let target_rotation = self.entities.get_component_mut(*entity, self.target_rotation).unwrap();
-            target_position.position.x = entity_telport.x;
-            target_position.position.y = entity_telport.y;
-            target_position.position.z = entity_telport.z;
-            target_rotation.yaw = -((entity_telport.yaw as f64) / 256.0) * PI * 2.0;
-            target_rotation.pitch = -((entity_telport.pitch as f64) / 256.0) * PI * 2.0;
+            target_position.position.x = x;
+            target_position.position.y = y;
+            target_position.position.z = z;
+            target_rotation.yaw = -(yaw / 256.0) * PI * 2.0;
+            target_rotation.pitch = -(pitch / 256.0) * PI * 2.0;
         }
     }
 

@@ -113,7 +113,7 @@ protocol_packet_ids!(
             0x46 => SoundEffect
             0x47 => PlayerListHeaderFooter
             0x48 => CollectItem
-            0x49 => EntityTeleport
+            0x49 => EntityTeleport_f64
             0x4a => EntityProperties
             0x4b => EntityEffect
         }

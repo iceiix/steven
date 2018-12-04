@@ -1063,7 +1063,7 @@ state_packets!(
             }
             /// EntityTeleport teleports the entity to the target location. This is
             /// sent if the entity moves further than EntityMove allows.
-            packet EntityTeleport {
+            packet EntityTeleport_f64 {
                 field entity_id: VarInt =,
                 field x: f64 =,
                 field y: f64 =,
