@@ -141,6 +141,13 @@ state_packets!(
                 field target_z: f32 = when(|p: &UseEntity| p.ty.0 == 2),
                 field hand: VarInt = when(|p: &UseEntity| p.ty.0 == 0 || p.ty.0 == 2),
             }
+            packet UseEntity_Handsfree {
+                field target_id: VarInt =,
+                field ty: VarInt =,
+                field target_x: f32 = when(|p: &UseEntity_Handsfree| p.ty.0 == 2),
+                field target_y: f32 = when(|p: &UseEntity_Handsfree| p.ty.0 == 2),
+                field target_z: f32 = when(|p: &UseEntity_Handsfree| p.ty.0 == 2),
+            }
             /// KeepAliveServerbound is sent by a client as a response to a
             /// KeepAliveClientbound. If the client doesn't reply the server
             /// may disconnect the client.

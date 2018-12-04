@@ -10,7 +10,7 @@ protocol_packet_ids!(
         serverbound Serverbound {
             0x00 => KeepAliveServerbound_VarInt
             0x01 => ChatMessage
-            0x02 => UseEntity
+            0x02 => UseEntity_Handsfree
             0x03 => Player
             0x04 => PlayerPosition
             0x05 => PlayerLook
