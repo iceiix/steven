@@ -728,7 +728,7 @@ state_packets!(
                 field data: Option<LenPrefixedBytes<VarInt>> = when(|p: &Maps| p.columns > 0),
             }
             /// EntityMove moves the entity with the id by the offsets provided.
-            packet EntityMove {
+            packet EntityMove_i16 {
                 field entity_id: VarInt =,
                 field delta_x: i16 =,
                 field delta_y: i16 =,

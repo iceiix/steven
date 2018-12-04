@@ -396,7 +396,8 @@ impl Server {
                             EntityDestroy => on_entity_destroy,
                             SpawnPlayer => on_player_spawn,
                             EntityTeleport => on_entity_teleport,
-                            EntityMove => on_entity_move,
+                            EntityMove_i16 => on_entity_move_i16,
+                            EntityMove_i8 => on_entity_move_i8,
                             EntityLook => on_entity_look,
                             EntityLookAndMove => on_entity_look_and_move,
                         }
@@ -660,12 +661,20 @@ impl Server {
         }
     }
 
-    fn on_entity_move(&mut self, m: packet::play::clientbound::EntityMove) {
-        if let Some(entity) = self.entity_map.get(&m.entity_id.0) {
+    fn on_entity_move_i16(&mut self, m: packet::play::clientbound::EntityMove_i16) {
+        self.on_entity_move(m.entity_id.0, m.delta_x as f64, m.delta_y as f64, m.delta_z as f64)
+    }
+
+    fn on_entity_move_i8(&mut self, m: packet::play::clientbound::EntityMove_i8) {
+        self.on_entity_move(m.entity_id.0, m.delta_x as f64, m.delta_y as f64, m.delta_z as f64)
+    }
+
+    fn on_entity_move(&mut self, entity_id: i32, delta_x: f64, delta_y: f64, delta_z: f64) {
+        if let Some(entity) = self.entity_map.get(&entity_id) {
             let position = self.entities.get_component_mut(*entity, self.target_position).unwrap();
-            position.position.x += m.delta_x as f64 / (32.0 * 128.0);
-            position.position.y += m.delta_y as f64 / (32.0 * 128.0);
-            position.position.z += m.delta_z as f64 / (32.0 * 128.0);
+            position.position.x += delta_x / (32.0 * 128.0);
+            position.position.y += delta_y / (32.0 * 128.0);
+            position.position.z += delta_z / (32.0 * 128.0);
         }
     }
 
