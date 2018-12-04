@@ -301,6 +301,15 @@ state_packets!(
                 field cursor_y: u8 =,
                 field cursor_z: u8 =,
             }
+            packet PlayerBlockPlacement_u8_Item {
+                field location: Position =,
+                field face: u8 =,
+                field hand: Option<item::Stack> =,
+                field cursor_x: u8 =,
+                field cursor_y: u8 =,
+                field cursor_z: u8 =,
+            }
+
             /// UseItem is sent when the client tries to use an item.
             packet UseItem {
                 field hand: VarInt =,

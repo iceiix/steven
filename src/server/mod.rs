@@ -544,7 +544,7 @@ impl Server {
                         cursor_y: at.y as f32,
                         cursor_z: at.z as f32,
                     });
-                } else {
+                } else if self.protocol_version >= 49 {
                     self.write_packet(packet::play::serverbound::PlayerBlockPlacement_u8 {
                         location: pos,
                         face: protocol::VarInt(match face {
@@ -557,6 +557,23 @@ impl Server {
                             _ => unreachable!(),
                         }),
                         hand: protocol::VarInt(0),
+                        cursor_x: (at.x * 16.0) as u8,
+                        cursor_y: (at.y * 16.0) as u8,
+                        cursor_z: (at.z * 16.0) as u8,
+                    });
+                } else {
+                    self.write_packet(packet::play::serverbound::PlayerBlockPlacement_u8_Item {
+                        location: pos,
+                        face: match face {
+                            Direction::Down => 0,
+                            Direction::Up => 1,
+                            Direction::North => 2,
+                            Direction::South => 3,
+                            Direction::West => 4,
+                            Direction::East => 5,
+                            _ => unreachable!(),
+                        },
+                        hand: None,
                         cursor_x: (at.x * 16.0) as u8,
                         cursor_y: (at.y * 16.0) as u8,
                         cursor_z: (at.z * 16.0) as u8,
