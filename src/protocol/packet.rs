@@ -330,6 +330,19 @@ state_packets!(
                 field velocity_y: i16 =,
                 field velocity_z: i16 =,
             }
+            packet SpawnObject_i32_NoUUID {
+                field entity_id: VarInt =,
+                field ty: u8 =,
+                field x: i32 =,
+                field y: i32 =,
+                field z: i32 =,
+                field pitch: i8 =,
+                field yaw: i8 =,
+                field data: i32 =,
+                field velocity_x: i16 = when(|p: &SpawnObject_i32_NoUUID| p.data != 0),
+                field velocity_y: i16 = when(|p: &SpawnObject_i32_NoUUID| p.data != 0),
+                field velocity_z: i16 = when(|p: &SpawnObject_i32_NoUUID| p.data != 0),
+            }
             /// SpawnExperienceOrb spawns a single experience orb into the world when
             /// it is in range of the client. The count controls the amount of experience
             /// gained when collected.
