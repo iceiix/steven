@@ -73,7 +73,7 @@ protocol_packet_ids!(
             0x23 => BlockChange
             0x245 => BlockAction
             0x25 => BlockBreakAnimation
-            //TODO 0x26 => MapChunkBulk
+            0x26 => ChunkDataBulk
             0x27 => Explosion
             0x28 => Effect
             0x29 => NamedSoundEffect_u8_NoCategory

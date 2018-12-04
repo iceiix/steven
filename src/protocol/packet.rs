@@ -664,6 +664,11 @@ state_packets!(
                 field bitmask: VarInt =,
                 field data: LenPrefixedBytes<VarInt> =,
             }
+            packet ChunkDataBulk {
+                field skylight: bool =,
+                field chunk_meta: LenPrefixed<VarInt, packet::ChunkMeta_u16> =,
+                field chunk_data: Vec<u8> =,
+            }
             /// Effect plays a sound effect or particle at the target location with the
             /// volume (of sounds) being relative to the player's position unless
             /// DisableRelative is set to true.
@@ -1263,6 +1268,29 @@ impl Serializable for BlockChangeRecord {
         self.xz.write_to(buf)?;
         self.y.write_to(buf)?;
         self.block_id.write_to(buf)
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct ChunkMeta_u16 {
+    pub x: i32,
+    pub z: i32,
+    pub bitmask: u16,
+}
+
+impl Serializable for ChunkMeta_u16 {
+    fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, Error> {
+        Ok(ChunkMeta_u16 {
+            x: Serializable::read_from(buf)?,
+            z: Serializable::read_from(buf)?,
+            bitmask: Serializable::read_from(buf)?,
+        })
+    }
+
+    fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), Error> {
+        self.x.write_to(buf)?;
+        self.z.write_to(buf)?;
+        self.bitmask.write_to(buf)
     }
 }
 
