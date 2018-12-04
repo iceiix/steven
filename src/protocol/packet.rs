@@ -280,6 +280,9 @@ state_packets!(
             packet ArmSwing {
                 field hand: VarInt =,
             }
+            packet ArmSwing_Handsfree {
+                field empty: () =,
+            }
             /// SpectateTeleport is sent by clients in spectator mode to teleport to a player.
             packet SpectateTeleport {
                 field target: UUID =,

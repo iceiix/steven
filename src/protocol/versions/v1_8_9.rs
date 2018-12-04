@@ -18,7 +18,7 @@ protocol_packet_ids!(
             0x07 => PlayerDigging_u8
             0x08 => PlayerBlockPlacement_u8_Item
             0x09 => HeldItemChange
-            0x0a => ArmSwing
+            0x0a => ArmSwing_Handsfree
             0x0b => PlayerAction
             0x0c => SteerVehicle
             0x0d => CloseWindow
