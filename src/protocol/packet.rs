@@ -423,6 +423,20 @@ state_packets!(
                 field velocity_z: i16 =,
                 field metadata: types::Metadata =,
             }
+            packet SpawnMob_u8_i32_NoUUID {
+                field entity_id: VarInt =,
+                field ty: u8 =,
+                field x: i32 =,
+                field y: i32 =,
+                field z: i32 =,
+                field yaw: i8 =,
+                field pitch: i8 =,
+                field head_pitch: i8 =,
+                field velocity_x: i16 =,
+                field velocity_y: i16 =,
+                field velocity_z: i16 =,
+                field metadata: types::Metadata =,
+            }
             /// SpawnPainting spawns a painting into the world when it is in range of
             /// the client. The title effects the size and the texture of the painting.
             packet SpawnPainting {
