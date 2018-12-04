@@ -428,12 +428,22 @@ state_packets!(
             /// SpawnPlayer is used to spawn a player when they are in range of the client.
             /// This packet alone isn't enough to display the player as the skin and username
             /// information is in the player information packet.
-            packet SpawnPlayer {
+            packet SpawnPlayer_f64 {
                 field entity_id: VarInt =,
                 field uuid: UUID =,
                 field x: f64 =,
                 field y: f64 =,
                 field z: f64 =,
+                field yaw: i8 =,
+                field pitch: i8 =,
+                field metadata: types::Metadata =,
+            }
+            packet SpawnPlayer_i32 {
+                field entity_id: VarInt =,
+                field uuid: UUID =,
+                field x: i32 =,
+                field y: i32 =,
+                field z: i32 =,
                 field yaw: i8 =,
                 field pitch: i8 =,
                 field metadata: types::Metadata =,

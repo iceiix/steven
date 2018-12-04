@@ -42,7 +42,7 @@ protocol_packet_ids!(
             0x02 => SpawnGlobalEntity_i32
             0x03 => SpawnMob_u8_i32
             0x04 => SpawnPainting_NoUUID
-            0x05 => SpawnPlayer
+            0x05 => SpawnPlayer_i32
             0x06 => Animation
             0x07 => Statistics
             0x08 => BlockBreakAnimation
