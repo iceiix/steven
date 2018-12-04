@@ -22,7 +22,7 @@ protocol_packet_ids!(
             0x0b => PlayerAction
             0x0c => SteerVehicle
             0x0d => CloseWindow
-            0x0e => ClickWindow
+            0x0e => ClickWindow_u8
             0x0f => ConfirmTransactionServerbound
             0x10 => CreativeInventoryAction
             0x11 => EnchantItem
