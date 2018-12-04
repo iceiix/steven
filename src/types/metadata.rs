@@ -65,6 +65,33 @@ impl Serializable for Metadata {
     fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, protocol::Error> {
         let mut m = Metadata::new();
         loop {
+            // 1.8-
+            let ty_index = u8::read_from(buf)? as i32;
+            if ty_index == 0x7f {
+                break;
+            }
+            let index = ty_index & 0x1f;
+            let ty = ty_index >> 5;
+
+            match ty {
+                0 => m.put_raw(index, i8::read_from(buf)?),
+                1 => m.put_raw(index, i16::read_from(buf)?),
+                2 => m.put_raw(index, i32::read_from(buf)?),
+                3 => m.put_raw(index, f32::read_from(buf)?),
+                4 => m.put_raw(index, String::read_from(buf)?),
+                5 => m.put_raw(index, Option::<item::Stack>::read_from(buf)?),
+                6 => m.put_raw(index,
+                               [i32::read_from(buf)?,
+                                i32::read_from(buf)?,
+                                i32::read_from(buf)?]),
+                7 => m.put_raw(index,
+                               [f32::read_from(buf)?,
+                                f32::read_from(buf)?,
+                                f32::read_from(buf)?]),
+                _ => return Err(protocol::Error::Err("unknown metadata type".to_owned())),
+            }
+
+            /* TODO: 1.9+
             let index = u8::read_from(buf)? as i32;
             if index == 0xFF {
                 break;
@@ -110,11 +137,73 @@ impl Serializable for Metadata {
                 }
                 _ => return Err(protocol::Error::Err("unknown metadata type".to_owned())),
             }
+            */
         }
         Ok(m)
     }
 
     fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), protocol::Error> {
+        // 1.8-
+        for (k, v) in &self.map {
+            if (*k as u8) > 0x1f {
+                panic!("write metadata index {:x} > 0x1f", *k as u8);
+            }
+
+            let ty_index: u8 = *k as u8;
+            const TYPE_SHIFT: usize = 5;
+
+            match *v
+            {
+                Value::Byte(ref val) => {
+                    u8::write_to(&(ty_index | (0 << TYPE_SHIFT)), buf)?;
+                    val.write_to(buf)?;
+                }
+                Value::Short(ref val) => {
+                    u8::write_to(&(ty_index | (1 << TYPE_SHIFT)), buf)?;
+                    val.write_to(buf)?;
+                }
+
+                Value::Int(ref val) => {
+                    u8::write_to(&(ty_index | (2 << TYPE_SHIFT)), buf)?;
+                    val.write_to(buf)?;
+                }
+                Value::Float(ref val) => {
+                    u8::write_to(&(ty_index | (3 << TYPE_SHIFT)), buf)?;
+                    val.write_to(buf)?;
+                }
+                Value::String(ref val) => {
+                    u8::write_to(&(ty_index | (4 << TYPE_SHIFT)), buf)?;
+                    val.write_to(buf)?;
+                }
+                Value::OptionalItemStack(ref val) => {
+                    u8::write_to(&(ty_index | (5 << TYPE_SHIFT)), buf)?;
+                    val.write_to(buf)?;
+                }
+                Value::Vector(ref val) => {
+                    u8::write_to(&(ty_index | (6 << TYPE_SHIFT)), buf)?;
+                    val[0].write_to(buf)?;
+                    val[1].write_to(buf)?;
+                    val[2].write_to(buf)?;
+                }
+                Value::Rotation(ref val) => {
+                    u8::write_to(&(ty_index | (7 << TYPE_SHIFT)), buf)?;
+                    val[0].write_to(buf)?;
+                    val[1].write_to(buf)?;
+                    val[2].write_to(buf)?;
+                }
+
+                Value::FormatComponent(_) | Value::Bool(_) | Value::Position(_) |
+                Value::OptionalPosition(_) | Value::Direction(_) | Value::OptionalUUID(_) |
+                Value::Block(_) | Value::NBTTag(_) => {
+                    panic!("attempted to write 1.9+ metadata to 1.8");
+                }
+            }
+        }
+        u8::write_to(&0x7f, buf)?;
+        Ok(())
+
+
+        /* TODO: 1.9+
         for (k, v) in &self.map {
             (*k as u8).write_to(buf)?;
             match *v {
@@ -183,6 +272,7 @@ impl Serializable for Metadata {
         }
         u8::write_to(&0xFF, buf)?;
         Ok(())
+    */
     }
 }
 
@@ -205,6 +295,7 @@ impl Default for Metadata {
 #[derive(Debug)]
 pub enum Value {
     Byte(i8),
+    Short(i16),
     Int(i32),
     Float(f32),
     String(String),
@@ -212,6 +303,7 @@ pub enum Value {
     OptionalItemStack(Option<item::Stack>),
     Bool(bool),
     Vector([f32; 3]),
+    Rotation([i32; 3]),
     Position(Position),
     OptionalPosition(Option<Position>),
     Direction(protocol::VarInt), // TODO: Proper type
@@ -234,6 +326,18 @@ impl MetaValue for i8 {
     }
     fn wrap(self) -> Value {
         Value::Byte(self)
+    }
+}
+
+impl MetaValue for i16 {
+    fn unwrap(value: &Value) -> &Self {
+        match *value {
+            Value::Short(ref val) => val,
+            _ => panic!("incorrect key"),
+        }
+    }
+    fn wrap(self) -> Value {
+        Value::Short(self)
     }
 }
 
@@ -306,6 +410,18 @@ impl MetaValue for bool {
     }
     fn wrap(self) -> Value {
         Value::Bool(self)
+    }
+}
+
+impl MetaValue for [i32; 3] {
+    fn unwrap(value: &Value) -> &Self {
+        match *value {
+            Value::Rotation(ref val) => val,
+            _ => panic!("incorrect key"),
+        }
+    }
+    fn wrap(self) -> Value {
+        Value::Rotation(self)
     }
 }
 
