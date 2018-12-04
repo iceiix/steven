@@ -29,7 +29,7 @@ protocol_packet_ids!(
             0x12 => SetSign
             0x13 => ClientAbilities
             0x14 => TabComplete_NoAssume
-            0x15 => ClientSettings_u8
+            0x15 => ClientSettings_u8_Handsfree
             0x16 => ClientStatus
             0x17 => PluginMessageServerbound
             0x18 => ResourcePackStatus

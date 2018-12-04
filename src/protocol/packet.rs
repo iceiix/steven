@@ -92,6 +92,13 @@ state_packets!(
                 field displayed_skin_parts: u8 =,
                 field main_hand: VarInt =,
             }
+            packet ClientSettings_u8_Handsfree {
+                field locale: String =,
+                field view_distance: u8 =,
+                field chat_mode: u8 =,
+                field chat_colors: bool =,
+                field displayed_skin_parts: u8 =,
+            }
             /// ConfirmTransactionServerbound is a reply to ConfirmTransaction.
             packet ConfirmTransactionServerbound {
                 field id: u8 =,
