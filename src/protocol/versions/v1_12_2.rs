@@ -90,7 +90,7 @@ protocol_packet_ids!(
             0x2c => PlayerAbilities
             0x2d => CombatEvent
             0x2e => PlayerInfo
-            0x2f => TeleportPlayer
+            0x2f => TeleportPlayer_WithConfirm
             0x30 => EntityUsedBed
             0x31 => UnlockRecipes
             0x32 => EntityDestroy

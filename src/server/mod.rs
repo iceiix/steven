@@ -385,7 +385,8 @@ impl Server {
                             ChunkUnload => on_chunk_unload,
                             BlockChange => on_block_change,
                             MultiBlockChange => on_multi_block_change,
-                            TeleportPlayer => on_teleport,
+                            TeleportPlayer_WithConfirm => on_teleport_player_withconfirm,
+                            TeleportPlayer_NoConfirm => on_teleport_player_noconfirm,
                             TimeUpdate => on_time_update,
                             ChangeGameState => on_game_state_change,
                             UpdateBlockEntity => on_block_entity_update,
@@ -740,38 +741,48 @@ impl Server {
         self.entity_map.insert(spawn.entity_id.0, entity);
     }
 
-    fn on_teleport(&mut self, teleport: packet::play::clientbound::TeleportPlayer) {
+    fn on_teleport_player_withconfirm(&mut self, teleport: packet::play::clientbound::TeleportPlayer_WithConfirm) {
+        self.on_teleport_player(teleport.x, teleport.y, teleport.z, teleport.yaw as f64, teleport.pitch as f64, teleport.flags, Some(teleport.teleport_id))
+    }
+
+    fn on_teleport_player_noconfirm(&mut self, teleport: packet::play::clientbound::TeleportPlayer_NoConfirm) {
+        self.on_teleport_player(teleport.x, teleport.y, teleport.z, teleport.yaw as f64, teleport.pitch as f64, teleport.flags, None)
+    }
+
+    fn on_teleport_player(&mut self, x: f64, y: f64, z: f64, yaw: f64, pitch: f64, flags: u8, teleport_id: Option<protocol::VarInt>) {
         use std::f64::consts::PI;
         if let Some(player) = self.player {
             let position = self.entities.get_component_mut(player, self.target_position).unwrap();
             let rotation = self.entities.get_component_mut(player, self.rotation).unwrap();
             let velocity = self.entities.get_component_mut(player, self.velocity).unwrap();
 
-            position.position.x = calculate_relative_teleport(TeleportFlag::RelX, teleport.flags, position.position.x, teleport.x);
-            position.position.y = calculate_relative_teleport(TeleportFlag::RelY, teleport.flags, position.position.y, teleport.y);
-            position.position.z = calculate_relative_teleport(TeleportFlag::RelZ, teleport.flags, position.position.z, teleport.z);
-            rotation.yaw = calculate_relative_teleport(TeleportFlag::RelYaw, teleport.flags, rotation.yaw, -teleport.yaw as f64 * (PI / 180.0));
+            position.position.x = calculate_relative_teleport(TeleportFlag::RelX, flags, position.position.x, x);
+            position.position.y = calculate_relative_teleport(TeleportFlag::RelY, flags, position.position.y, y);
+            position.position.z = calculate_relative_teleport(TeleportFlag::RelZ, flags, position.position.z, z);
+            rotation.yaw = calculate_relative_teleport(TeleportFlag::RelYaw, flags, rotation.yaw, -yaw as f64 * (PI / 180.0));
 
             rotation.pitch = -((calculate_relative_teleport(
                 TeleportFlag::RelPitch,
-                teleport.flags,
+                flags,
                 (-rotation.pitch) * (180.0 / PI) + 180.0,
-                teleport.pitch as f64
+                pitch
             ) - 180.0) * (PI / 180.0));
 
-            if (teleport.flags & (TeleportFlag::RelX as u8)) == 0 {
+            if (flags & (TeleportFlag::RelX as u8)) == 0 {
                 velocity.velocity.x = 0.0;
             }
-            if (teleport.flags & (TeleportFlag::RelY as u8)) == 0 {
+            if (flags & (TeleportFlag::RelY as u8)) == 0 {
                 velocity.velocity.y = 0.0;
             }
-            if (teleport.flags & (TeleportFlag::RelZ as u8)) == 0 {
+            if (flags & (TeleportFlag::RelZ as u8)) == 0 {
                 velocity.velocity.z = 0.0;
             }
 
-            self.write_packet(packet::play::serverbound::TeleportConfirm {
-                teleport_id: teleport.teleport_id,
-            });
+            if let Some(teleport_id) = teleport_id {
+                self.write_packet(packet::play::serverbound::TeleportConfirm {
+                    teleport_id,
+                });
+            }
         }
     }
 

@@ -83,7 +83,7 @@ protocol_packet_ids!(
             0x2b => PlayerAbilities
             0x2c => CombatEvent
             0x2d => PlayerInfo
-            0x2e => TeleportPlayer_NoID
+            0x2e => TeleportPlayer_NoConfirm
             0x2f => EntityUsedBed
             0x30 => EntityDestroy
             0x31 => EntityRemoveEffect
