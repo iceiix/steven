@@ -32,7 +32,8 @@ protocol_packet_ids!(
             0x15 => ClientSettings_u8_Handsfree
             0x16 => ClientStatus
             0x17 => PluginMessageServerbound
-            0x18 => ResourcePackStatus
+            0x18 => SpectateTeleport
+            0x19 => ResourcePackStatus
         }
         clientbound Clientbound {
             0x00 => KeepAliveClientbound_VarInt
