@@ -39,7 +39,7 @@ protocol_packet_ids!(
             0x01 => JoinGame_i8
             0x02 => ServerMessage
             0x03 => TimeUpdate
-            0x04 => EntityEquipment
+            0x04 => EntityEquipment_u16
             0x05 => SpawnPosition
             0x06 => UpdateHealth
             0x07 => Respawn

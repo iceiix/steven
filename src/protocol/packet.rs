@@ -949,6 +949,11 @@ state_packets!(
                 field slot: VarInt =,
                 field item: Option<item::Stack> =,
             }
+            packet EntityEquipment_u16 {
+                field entity_id: VarInt =,
+                field slot: u16 =,
+                field item: Option<item::Stack> =,
+            }
             /// SetExperience updates the experience bar on the client.
             packet SetExperience {
                 field experience_bar: f32 =,
