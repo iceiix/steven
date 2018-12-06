@@ -644,11 +644,8 @@ impl World {
     }
 
     pub fn load_chunk18(&mut self, x: i32, z: i32, new: bool, mask: u16, skylight: bool, data: Vec<u8>) -> Result<(), protocol::Error> {
-        println!("load_chunk18 x={} z={} new={} mask={} data={:?}", x, z, new, mask, &data);
-        // TODO: 1.8
         use std::io::{Cursor, Read};
         use byteorder::ReadBytesExt;
-        use crate::protocol::{VarInt, Serializable, LenPrefixed};
 
         let mut data = Cursor::new(data);
 
@@ -680,25 +677,10 @@ impl World {
                 let section = chunk.sections[i as usize].as_mut().unwrap();
                 section.dirty = true;
 
-                let mut bit_size = data.read_u8()?;
-                let mut mappings: HashMap<usize, block::Block, BuildHasherDefault<FNVHash>> = HashMap::with_hasher(BuildHasherDefault::default());
-                if bit_size == 0 {
-                    bit_size = 13;
-                } else {
-                    let count = VarInt::read_from(&mut data)?.0;
-                    for i in 0 .. count {
-                        let id = VarInt::read_from(&mut data)?.0;
-                        let bl = block::Block::by_vanilla_id(id as usize);
-                        mappings.insert(i as usize, bl);
-                    }
-                }
-
-                let bits = LenPrefixed::<VarInt, u64>::read_from(&mut data)?.data;
-                let m = bit::Map::from_raw(bits, bit_size as usize);
-
                 for bi in 0 .. 4096 {
-                    let id = m.get(bi);
-                    section.blocks.set(bi, mappings.get(&id).cloned().unwrap_or(block::Block::by_vanilla_id(id)));
+                    let id = data.read_u16::<byteorder::LittleEndian>()?;
+
+                    section.blocks.set(bi, block::Block::by_vanilla_id(id as usize));
                     // Spawn block entities
                     let b = section.blocks.get(bi);
                     if block_entity::BlockEntityType::get_block_entity(b).is_some() {
@@ -715,7 +697,9 @@ impl World {
                 }
 
                 data.read_exact(&mut section.block_light.data)?;
-                data.read_exact(&mut section.sky_light.data)?;
+                if skylight {
+                    data.read_exact(&mut section.sky_light.data)?;
+                }
             }
 
             if new {
