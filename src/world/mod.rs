@@ -545,12 +545,21 @@ impl World {
         }
     }
 
-    pub fn load_chunk(&mut self, x: i32, z: i32, new: bool, mask: u16, data: Vec<u8>) -> Result<(), protocol::Error> {
+    pub fn load_chunk(&mut self, x: i32, z: i32, new: bool, bitmask: u16, data: Vec<u8>) -> Result<(), protocol::Error> {
+        self.load_chunks(new, &vec![crate::protocol::packet::ChunkMeta { x, z, bitmask }], data)
+    }
+
+    pub fn load_chunks(&mut self, new: bool, chunk_metas: &[crate::protocol::packet::ChunkMeta], data: Vec<u8>) -> Result<(), protocol::Error> {
         use std::io::{Cursor, Read};
         use byteorder::ReadBytesExt;
         use crate::protocol::{VarInt, Serializable, LenPrefixed};
 
         let mut data = Cursor::new(data);
+
+        for chunk_meta in chunk_metas {
+            let x = chunk_meta.x;
+            let z = chunk_meta.z;
+            let mask = chunk_meta.bitmask;
 
         let cpos = CPos(x, z);
         {
@@ -639,6 +648,8 @@ impl World {
                 (x<<4) - 1, (i<<4) - 1, (z<<4) - 1,
                 (x<<4) + 17, (i<<4) + 17, (z<<4) + 17
             );
+        }
+
         }
         Ok(())
     }
