@@ -737,7 +737,7 @@ state_packets!(
             }
             packet ChunkDataBulk {
                 field skylight: bool =,
-                field chunk_meta: LenPrefixed<VarInt, packet::ChunkMeta_u16> =,
+                field chunk_meta: LenPrefixed<VarInt, packet::ChunkMeta> =,
                 field chunk_data: Vec<u8> =,
             }
             /// Effect plays a sound effect or particle at the target location with the
@@ -1367,15 +1367,15 @@ impl Serializable for BlockChangeRecord {
 }
 
 #[derive(Debug, Default)]
-pub struct ChunkMeta_u16 {
+pub struct ChunkMeta {
     pub x: i32,
     pub z: i32,
     pub bitmask: u16,
 }
 
-impl Serializable for ChunkMeta_u16 {
+impl Serializable for ChunkMeta {
     fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, Error> {
-        Ok(ChunkMeta_u16 {
+        Ok(ChunkMeta {
             x: Serializable::read_from(buf)?,
             z: Serializable::read_from(buf)?,
             bitmask: Serializable::read_from(buf)?,

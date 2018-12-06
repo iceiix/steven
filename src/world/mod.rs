@@ -643,7 +643,7 @@ impl World {
         Ok(())
     }
 
-    pub fn load_chunks18(&mut self, new: bool, skylight: bool, chunk_metas: &[crate::protocol::packet::ChunkMeta_u16], data: Vec<u8>) -> Result<(), protocol::Error> {
+    pub fn load_chunks18(&mut self, new: bool, skylight: bool, chunk_metas: &[crate::protocol::packet::ChunkMeta], data: Vec<u8>) -> Result<(), protocol::Error> {
         use std::io::{Cursor, Read};
         use byteorder::ReadBytesExt;
 

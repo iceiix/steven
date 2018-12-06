@@ -994,7 +994,7 @@ impl Server {
     }
 
     fn on_chunk_data_no_entities_u16(&mut self, chunk_data: packet::play::clientbound::ChunkData_NoEntities_u16) {
-        let chunk_meta = vec![crate::protocol::packet::ChunkMeta_u16 {
+        let chunk_meta = vec![crate::protocol::packet::ChunkMeta {
             x: chunk_data.chunk_x,
             z: chunk_data.chunk_z,
             bitmask: chunk_data.bitmask,
