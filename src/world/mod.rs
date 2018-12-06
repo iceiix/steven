@@ -76,6 +76,7 @@ struct LightUpdate {
     pos: Position,
 }
 
+#[derive(Clone, Copy, Eq, PartialEq, Debug)]
 enum ChunkFormat {
     V1_9,
     V1_8,
@@ -550,7 +551,7 @@ impl World {
         }
     }
 
-    pub fn load_chunk(&mut self, x: i32, z: i32, new: bool, bitmask: u16, data: Vec<u8>) -> Result<(), protocol::Error> {
+    pub fn load_chunk19(&mut self, x: i32, z: i32, new: bool, bitmask: u16, data: Vec<u8>) -> Result<(), protocol::Error> {
         let skylight = true;
         self.load_chunks(ChunkFormat::V1_9, new, skylight, &vec![crate::protocol::packet::ChunkMeta { x, z, bitmask }], data)
     }
@@ -560,132 +561,137 @@ impl World {
     }
 
     fn load_chunks(&mut self, format: ChunkFormat, new: bool, skylight: bool, chunk_metas: &[crate::protocol::packet::ChunkMeta], data: Vec<u8>) -> Result<(), protocol::Error> {
-        use std::io::{Cursor, Read};
-        use byteorder::ReadBytesExt;
-        use crate::protocol::{VarInt, Serializable, LenPrefixed};
-
-        let mut data = Cursor::new(data);
+        let mut data = std::io::Cursor::new(data);
 
         for chunk_meta in chunk_metas {
             let x = chunk_meta.x;
             let z = chunk_meta.z;
             let mask = chunk_meta.bitmask;
 
-            let cpos = CPos(x, z);
-            {
-                let chunk = if new {
-                    self.chunks.insert(cpos, Chunk::new(cpos));
-                    self.chunks.get_mut(&cpos).unwrap()
-                } else {
-                    if !self.chunks.contains_key(&cpos) {
-                        return Ok(());
-                    }
-                    self.chunks.get_mut(&cpos).unwrap()
-                };
+            self.load_chunk(format, new, skylight, x, z, mask, &mut data)?;
+        }
+        Ok(())
+    }
 
-                for i in 0 .. 16 {
-                    if chunk.sections[i].is_none() {
-                        let mut fill_sky = chunk.sections.iter()
-                            .skip(i)
-                            .all(|v| v.is_none());
-                        fill_sky &= (mask & !((1 << i) | ((1 << i) - 1))) == 0;
-                        if !fill_sky || mask & (1 << i) != 0 {
-                            chunk.sections[i] = Some(Section::new(i as u8, fill_sky));
-                        }
-                    }
-                    if mask & (1 << i) == 0 {
-                        continue;
-                    }
-                    let section = chunk.sections[i as usize].as_mut().unwrap();
-                    section.dirty = true;
+    fn load_chunk(&mut self, format: ChunkFormat, new: bool, skylight: bool, x: i32, z: i32, mask: u16, mut data: &mut std::io::Cursor<Vec<u8>>) -> Result<(), protocol::Error> {
+        use std::io::Read;
+        use byteorder::ReadBytesExt;
+        use crate::protocol::{VarInt, Serializable, LenPrefixed};
 
-                    match format {
-                        ChunkFormat::V1_9 => {
-                            let mut bit_size = data.read_u8()?;
-                            let mut mappings: HashMap<usize, block::Block, BuildHasherDefault<FNVHash>> = HashMap::with_hasher(BuildHasherDefault::default());
-                            if bit_size == 0 {
-                                bit_size = 13;
-                            } else {
-                                let count = VarInt::read_from(&mut data)?.0;
-                                for i in 0 .. count {
-                                    let id = VarInt::read_from(&mut data)?.0;
-                                    let bl = block::Block::by_vanilla_id(id as usize);
-                                    mappings.insert(i as usize, bl);
-                                }
-                            }
-
-                            let bits = LenPrefixed::<VarInt, u64>::read_from(&mut data)?.data;
-                            let m = bit::Map::from_raw(bits, bit_size as usize);
-
-                            for bi in 0 .. 4096 {
-                                let id = m.get(bi);
-                                section.blocks.set(bi, mappings.get(&id).cloned().unwrap_or(block::Block::by_vanilla_id(id)));
-
-                                // Spawn block entities
-                                let b = section.blocks.get(bi);
-                                if block_entity::BlockEntityType::get_block_entity(b).is_some() {
-                                    let pos = Position::new(
-                                        (bi & 0xF) as i32,
-                                        (bi >> 8) as i32,
-                                        ((bi >> 4) & 0xF) as i32
-                                    ) + (chunk.position.0 << 4, (i << 4) as i32, chunk.position.1 << 4);
-                                    if chunk.block_entities.contains_key(&pos) {
-                                        self.block_entity_actions.push_back(BlockEntityAction::Remove(pos))
-                                    }
-                                    self.block_entity_actions.push_back(BlockEntityAction::Create(pos))
-                                }
-                            }
-                        }
-                        ChunkFormat::V1_8 => {
-                            for bi in 0 .. 4096 {
-                                let id = data.read_u16::<byteorder::LittleEndian>()?;
-                                section.blocks.set(bi, block::Block::by_vanilla_id(id as usize));
-
-                                // Spawn block entities
-                                let b = section.blocks.get(bi);
-                                if block_entity::BlockEntityType::get_block_entity(b).is_some() {
-                                    let pos = Position::new(
-                                        (bi & 0xF) as i32,
-                                        (bi >> 8) as i32,
-                                        ((bi >> 4) & 0xF) as i32
-                                    ) + (chunk.position.0 << 4, (i << 4) as i32, chunk.position.1 << 4);
-                                    if chunk.block_entities.contains_key(&pos) {
-                                        self.block_entity_actions.push_back(BlockEntityAction::Remove(pos))
-                                    }
-                                    self.block_entity_actions.push_back(BlockEntityAction::Create(pos))
-                                }
-                            }
-                        }
-                    }
-
-                    data.read_exact(&mut section.block_light.data)?;
-                    if skylight {
-                        data.read_exact(&mut section.sky_light.data)?;
-                    }
+        let cpos = CPos(x, z);
+        {
+            let chunk = if new {
+                self.chunks.insert(cpos, Chunk::new(cpos));
+                self.chunks.get_mut(&cpos).unwrap()
+            } else {
+                if !self.chunks.contains_key(&cpos) {
+                    return Ok(());
                 }
-
-                if new {
-                    data.read_exact(&mut chunk.biomes)?;
-                }
-
-                chunk.calculate_heightmap();
-            }
+                self.chunks.get_mut(&cpos).unwrap()
+            };
 
             for i in 0 .. 16 {
+                if chunk.sections[i].is_none() {
+                    let mut fill_sky = chunk.sections.iter()
+                        .skip(i)
+                        .all(|v| v.is_none());
+                    fill_sky &= (mask & !((1 << i) | ((1 << i) - 1))) == 0;
+                    if !fill_sky || mask & (1 << i) != 0 {
+                        chunk.sections[i] = Some(Section::new(i as u8, fill_sky));
+                    }
+                }
                 if mask & (1 << i) == 0 {
                     continue;
                 }
-                for pos in [
-                    (-1, 0, 0), (1, 0, 0),
-                    (0, -1, 0), (0, 1, 0),
-                    (0, 0, -1), (0, 0, 1)].into_iter() {
-                    self.flag_section_dirty(x + pos.0, i as i32 + pos.1, z + pos.2);
+                let section = chunk.sections[i as usize].as_mut().unwrap();
+                section.dirty = true;
+
+                match format {
+                    ChunkFormat::V1_9 => {
+                        let mut bit_size = data.read_u8()?;
+                        let mut mappings: HashMap<usize, block::Block, BuildHasherDefault<FNVHash>> = HashMap::with_hasher(BuildHasherDefault::default());
+                        if bit_size == 0 {
+                            bit_size = 13;
+                        } else {
+                            let count = VarInt::read_from(&mut data)?.0;
+                            for i in 0 .. count {
+                                let id = VarInt::read_from(&mut data)?.0;
+                                let bl = block::Block::by_vanilla_id(id as usize);
+                                mappings.insert(i as usize, bl);
+                            }
+                        }
+
+                        let bits = LenPrefixed::<VarInt, u64>::read_from(&mut data)?.data;
+                        let m = bit::Map::from_raw(bits, bit_size as usize);
+
+                        for bi in 0 .. 4096 {
+                            let id = m.get(bi);
+                            section.blocks.set(bi, mappings.get(&id).cloned().unwrap_or(block::Block::by_vanilla_id(id)));
+
+                            // Spawn block entities
+                            let b = section.blocks.get(bi);
+                            if block_entity::BlockEntityType::get_block_entity(b).is_some() {
+                                let pos = Position::new(
+                                    (bi & 0xF) as i32,
+                                    (bi >> 8) as i32,
+                                    ((bi >> 4) & 0xF) as i32
+                                ) + (chunk.position.0 << 4, (i << 4) as i32, chunk.position.1 << 4);
+                                if chunk.block_entities.contains_key(&pos) {
+                                    self.block_entity_actions.push_back(BlockEntityAction::Remove(pos))
+                                }
+                                self.block_entity_actions.push_back(BlockEntityAction::Create(pos))
+                            }
+                        }
+                    }
+                    ChunkFormat::V1_8 => {
+                        for bi in 0 .. 4096 {
+                            let id = data.read_u16::<byteorder::LittleEndian>()?;
+                            section.blocks.set(bi, block::Block::by_vanilla_id(id as usize));
+
+                            // Spawn block entities
+                            let b = section.blocks.get(bi);
+                            if block_entity::BlockEntityType::get_block_entity(b).is_some() {
+                                let pos = Position::new(
+                                    (bi & 0xF) as i32,
+                                    (bi >> 8) as i32,
+                                    ((bi >> 4) & 0xF) as i32
+                                ) + (chunk.position.0 << 4, (i << 4) as i32, chunk.position.1 << 4);
+                                if chunk.block_entities.contains_key(&pos) {
+                                    self.block_entity_actions.push_back(BlockEntityAction::Remove(pos))
+                                }
+                                self.block_entity_actions.push_back(BlockEntityAction::Create(pos))
+                            }
+                        }
+                    }
                 }
-                self.update_range(
-                    (x<<4) - 1, (i<<4) - 1, (z<<4) - 1,
-                    (x<<4) + 17, (i<<4) + 17, (z<<4) + 17
-                );
+
+                data.read_exact(&mut section.block_light.data)?;
+                if skylight {
+                    data.read_exact(&mut section.sky_light.data)?;
+                }
             }
+
+            if new {
+                data.read_exact(&mut chunk.biomes)?;
+            }
+
+            chunk.calculate_heightmap();
+        }
+
+        for i in 0 .. 16 {
+            if mask & (1 << i) == 0 {
+                continue;
+            }
+            for pos in [
+                (-1, 0, 0), (1, 0, 0),
+                (0, -1, 0), (0, 1, 0),
+                (0, 0, -1), (0, 0, 1)].into_iter() {
+                self.flag_section_dirty(x + pos.0, i as i32 + pos.1, z + pos.2);
+            }
+            self.update_range(
+                (x<<4) - 1, (i<<4) - 1, (z<<4) - 1,
+                (x<<4) + 17, (i<<4) + 17, (z<<4) + 17
+            );
         }
         Ok(())
     }
