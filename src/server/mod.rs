@@ -999,6 +999,7 @@ impl Server {
             chunk_data.chunk_z,
             chunk_data.new,
             chunk_data.bitmask,
+            false,
             chunk_data.data.data
         ).unwrap();
     }
@@ -1013,6 +1014,7 @@ impl Server {
                 meta.z,
                 new,
                 meta.bitmask,
+                bulk.skylight,
                 data.to_vec()
             ).unwrap();
         }

@@ -643,7 +643,8 @@ impl World {
         Ok(())
     }
 
-    pub fn load_chunk18(&mut self, x: i32, z: i32, new: bool, mask: u16, data: Vec<u8>) -> Result<(), protocol::Error> {
+    pub fn load_chunk18(&mut self, x: i32, z: i32, new: bool, mask: u16, skylight: bool, data: Vec<u8>) -> Result<(), protocol::Error> {
+        println!("load_chunk18 x={} z={} new={} mask={} data={:?}", x, z, new, mask, &data);
         // TODO: 1.8
         use std::io::{Cursor, Read};
         use byteorder::ReadBytesExt;
