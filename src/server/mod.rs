@@ -994,30 +994,18 @@ impl Server {
     }
 
     fn on_chunk_data_no_entities_u16(&mut self, chunk_data: packet::play::clientbound::ChunkData_NoEntities_u16) {
-        self.world.load_chunk18(
-            chunk_data.chunk_x,
-            chunk_data.chunk_z,
-            chunk_data.new,
-            chunk_data.bitmask,
-            false,
-            chunk_data.data.data
-        ).unwrap();
+        let chunk_meta = vec![crate::protocol::packet::ChunkMeta_u16 {
+            x: chunk_data.chunk_x,
+            z: chunk_data.chunk_z,
+            bitmask: chunk_data.bitmask,
+        }];
+        let skylight = false;
+        self.world.load_chunks18(chunk_data.new, skylight, &chunk_meta, chunk_data.data.data).unwrap();
     }
 
     fn on_chunk_data_bulk(&mut self, bulk: packet::play::clientbound::ChunkDataBulk) {
-        for meta in bulk.chunk_meta.data {
-            let new = true;
-            // TODO
-            let data = &bulk.chunk_data;
-            self.world.load_chunk18(
-                meta.x,
-                meta.z,
-                new,
-                meta.bitmask,
-                bulk.skylight,
-                data.to_vec()
-            ).unwrap();
-        }
+        let new = true;
+        self.world.load_chunks18(new, bulk.skylight, &bulk.chunk_meta.data, bulk.chunk_data.to_vec()).unwrap();
     }
 
     fn on_chunk_unload(&mut self, chunk_unload: packet::play::clientbound::ChunkUnload) {
