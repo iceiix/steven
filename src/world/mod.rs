@@ -648,19 +648,7 @@ impl World {
                             let id = data.read_u16::<byteorder::LittleEndian>()?;
                             section.blocks.set(bi, block::Block::by_vanilla_id(id as usize));
 
-                            // Spawn block entities
-                            let b = section.blocks.get(bi);
-                            if block_entity::BlockEntityType::get_block_entity(b).is_some() {
-                                let pos = Position::new(
-                                    (bi & 0xF) as i32,
-                                    (bi >> 8) as i32,
-                                    ((bi >> 4) & 0xF) as i32
-                                ) + (chunk.position.0 << 4, (i << 4) as i32, chunk.position.1 << 4);
-                                if chunk.block_entities.contains_key(&pos) {
-                                    self.block_entity_actions.push_back(BlockEntityAction::Remove(pos))
-                                }
-                                self.block_entity_actions.push_back(BlockEntityAction::Create(pos))
-                            }
+                            // TODO: Spawn block entities
                         }
                     }
                 }
