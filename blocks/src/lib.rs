@@ -97,7 +97,7 @@ macro_rules! define_blocks {
                 if let Some(block) = VANILLA_ID_MAP.get(id).and_then(|v| *v) {
                     block
                 } else {
-                    println!("by_vanilla_id: no block for id {}", id);
+                    println!("by_vanilla_id: no block for id {} ({}:{})", id, id >> 4, id & 0xF);
                     Block::Missing{}
                 }
             }
