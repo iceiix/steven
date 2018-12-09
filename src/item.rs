@@ -49,7 +49,7 @@ impl Serializable for Option<Stack> {
         // 1.7
         let tag_size = buf.read_i16::<BigEndian>()?;
         let tag: Option<nbt::NamedTag> = if tag_size != -1 {
-            for i in 0..tag_size {
+            for _ in 0..tag_size {
                 let _ = buf.read_u8()?;
             }
             // TODO: un-gzip NBT

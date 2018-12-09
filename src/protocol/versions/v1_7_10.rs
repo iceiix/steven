@@ -68,7 +68,7 @@ protocol_packet_ids!(
             0x1f => SetExperience_i16
             0x20 => EntityProperties_i32
             0x21 => ChunkData_NoEntities_u16_Add
-            0x22 => MultiBlockChange
+            0x22 => MultiBlockChange_i16
             0x23 => BlockChange_u8
             0x24 => BlockAction_u16
             0x25 => BlockBreakAnimation_i32
