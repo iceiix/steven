@@ -1535,7 +1535,7 @@ state_packets!(
             }
             packet EntityProperties_i32 {
                 field entity_id: i32 =,
-                field properties: LenPrefixed<i32, packet::EntityProperty> =,
+                field properties: LenPrefixed<i32, packet::EntityProperty_i16> =,
             }
             /// EntityEffect applies a status effect to an entity for a given duration.
             packet EntityEffect {
@@ -1997,6 +1997,30 @@ impl Serializable for EntityProperty {
         self.modifiers.write_to(buf)
     }
 }
+
+#[derive(Debug, Default)]
+pub struct EntityProperty_i16 {
+    pub key: String,
+    pub value: f64,
+    pub modifiers: LenPrefixed<i16, PropertyModifier>,
+}
+
+impl Serializable for EntityProperty_i16 {
+    fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, Error> {
+        Ok(EntityProperty_i16 {
+            key: Serializable::read_from(buf)?,
+            value: Serializable::read_from(buf)?,
+            modifiers: Serializable::read_from(buf)?,
+        })
+    }
+
+    fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), Error> {
+        self.key.write_to(buf)?;
+        self.value.write_to(buf)?;
+        self.modifiers.write_to(buf)
+    }
+}
+
 
 #[derive(Debug, Default)]
 pub struct PropertyModifier {
