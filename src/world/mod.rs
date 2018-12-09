@@ -571,12 +571,13 @@ impl World {
 
             println!("about to load_chunk x={} z={} mask={:x}", x, z, mask);
             self.load_chunk(format, new, skylight, x, z, mask, &mut data)?;
+            panic!("done");
         }
-        panic!("done");
         Ok(())
     }
 
     fn load_chunk(&mut self, format: ChunkFormat, new: bool, skylight: bool, x: i32, z: i32, mask: u16, mut data: &mut std::io::Cursor<Vec<u8>>) -> Result<(), protocol::Error> {
+        println!("about to read chunk from position={}", data.position());
         use std::io::Read;
         use byteorder::ReadBytesExt;
         use crate::protocol::{VarInt, Serializable, LenPrefixed};
@@ -649,11 +650,12 @@ impl World {
                     }
                     ChunkFormat::V1_8 => {
                         let mut blocks = vec![0; 8192];
-                        let mut data2 = data.clone();
-                        let mut bis = vec![0u16; 4096];
+                        println!("about to read blocks from position={}", data.position());
+                        data.read_exact(&mut blocks)?;
+                        println!("blocks = {:?}", blocks);
                         for bi in 0 .. 4096 {
-                            let id = data.read_u16::<byteorder::LittleEndian>()?;
-                            bis[bi] = id;
+                            //let id = data.read_u16::<byteorder::LittleEndian>()?;
+                            let id: u16 = (blocks[bi * 2] as u16) + (blocks[bi * 2 + 1] as u16) * 256;
 
                             println!("position={}\tread_u16 = {:04x}", data.position(), id);
                             println!("section {}, block #{} = {}:{}", i, bi, id>>4, id&0xF);
@@ -661,27 +663,23 @@ impl World {
 
                             // TODO: Spawn block entities
                         }
-
-                        data2.read_exact(&mut blocks)?;
-                        println!("blocks = {:?}", blocks);
-                        for bi in 0..4096 {
-                            let id2: u16 = (blocks[bi * 2] as u16) + (blocks[bi * 2 + 1] as u16) * 256;
-                            let id = bis[bi];
-                            if id != id2 {
-                                panic!("id={:04x}, id2={:04x}", id, id2);
-                            }
-                        }
                     }
                 }
 
+                println!("about to read block_light from position={}", data.position());
                 data.read_exact(&mut section.block_light.data)?;
+                println!("done read block_light from position={}", data.position());
                 if skylight {
+                    println!("about to read skylight from position={}", data.position());
                     data.read_exact(&mut section.sky_light.data)?;
+                    println!("done read skylight from position={}", data.position());
                 }
             }
 
             if new {
+                println!("about to read biomes from position={}", data.position());
                 data.read_exact(&mut chunk.biomes)?;
+                println!("done read biomes from position={}", data.position());
             }
 
             chunk.calculate_heightmap();
@@ -702,6 +700,7 @@ impl World {
                 (x<<4) + 17, (i<<4) + 17, (z<<4) + 17
             );
         }
+        println!("done chunk from position={}", data.position());
         Ok(())
     }
 
