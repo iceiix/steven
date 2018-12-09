@@ -46,7 +46,7 @@ pub struct Metadata19 {
     map: HashMap<i32, Value>,
 }
 
-trait MetadataBase {
+trait MetadataBase: fmt::Debug {
     fn map(&self) -> &HashMap<i32, Value>;
     fn map_mut(&mut self) -> &mut HashMap<i32, Value>;
 
