@@ -870,7 +870,7 @@ state_packets!(
                 field id: VarInt =,
             }
             packet KeepAliveClientbound_i32 {
-                field id: VarInt =,
+                field id: i32 =,
             }
             /// ChunkData sends or updates a single chunk on the client. If New is set
             /// then biome data should be sent too.
