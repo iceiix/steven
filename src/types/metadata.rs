@@ -38,13 +38,35 @@ impl <T: MetaValue> MetadataKey<T> {
     }
 }
 
-struct Metadata {
+pub struct Metadata18 {
     map: HashMap<i32, Value>,
 }
 
-impl Metadata {
-    pub fn new() -> Metadata {
-        Metadata { map: HashMap::new() }
+pub struct Metadata19 {
+    map: HashMap<i32, Value>,
+}
+
+// TODO: reduce this redundancy
+impl Metadata18 {
+    pub fn new() -> Metadata18 {
+        Metadata18 { map: HashMap::new() }
+    }
+
+    pub fn get<T: MetaValue>(&self, key: &MetadataKey<T>) -> Option<&T> {
+        self.map.get(&key.index).map(T::unwrap)
+    }
+
+    pub fn put<T: MetaValue>(&mut self, key: &MetadataKey<T>, val: T) {
+        self.map.insert(key.index, val.wrap());
+    }
+
+    fn put_raw<T: MetaValue>(&mut self, index: i32, val: T) {
+        self.map.insert(index, val.wrap());
+    }
+}
+impl Metadata19 {
+    pub fn new() -> Metadata19 {
+        Metadata19 { map: HashMap::new() }
     }
 
     pub fn get<T: MetaValue>(&self, key: &MetadataKey<T>) -> Option<&T> {
@@ -60,56 +82,12 @@ impl Metadata {
     }
 }
 
-pub struct Metadata18 {
-    metadata: Metadata,
-}
-
-pub struct Metadata19 {
-    metadata: Metadata,
-}
-
-// TODO: reduce this redundancy
-impl Metadata18 {
-    pub fn new() -> Metadata18 {
-        Metadata18 { metadata: Metadata { map: HashMap::new() } }
-    }
-
-    pub fn get<T: MetaValue>(&self, key: &MetadataKey<T>) -> Option<&T> {
-        self.metadata.map.get(&key.index).map(T::unwrap)
-    }
-
-    pub fn put<T: MetaValue>(&mut self, key: &MetadataKey<T>, val: T) {
-        self.metadata.map.insert(key.index, val.wrap());
-    }
-
-    fn put_raw<T: MetaValue>(&mut self, index: i32, val: T) {
-        self.metadata.map.insert(index, val.wrap());
-    }
-}
-impl Metadata19 {
-    pub fn new() -> Metadata19 {
-        Metadata19 { metadata: Metadata { map: HashMap::new() } }
-    }
-
-    pub fn get<T: MetaValue>(&self, key: &MetadataKey<T>) -> Option<&T> {
-        self.metadata.map.get(&key.index).map(T::unwrap)
-    }
-
-    pub fn put<T: MetaValue>(&mut self, key: &MetadataKey<T>, val: T) {
-        self.metadata.map.insert(key.index, val.wrap());
-    }
-
-    fn put_raw<T: MetaValue>(&mut self, index: i32, val: T) {
-        self.metadata.map.insert(index, val.wrap());
-    }
-}
-
 
 
 impl Serializable for Metadata18 {
 
     fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, protocol::Error> {
-        let mut m = Metadata::new();
+        let mut m = Self::new();
         loop {
             let ty_index = u8::read_from(buf)? as i32;
             if ty_index == 0x7f {
@@ -136,11 +114,11 @@ impl Serializable for Metadata18 {
                 _ => return Err(protocol::Error::Err("unknown metadata type".to_owned())),
             }
         }
-        Ok(Metadata18 {metadata: m})
+        Ok(m)
     }
 
     fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), protocol::Error> {
-        for (k, v) in &self.metadata.map {
+        for (k, v) in &self.map {
             if (*k as u8) > 0x1f {
                 panic!("write metadata index {:x} > 0x1f", *k as u8);
             }
@@ -203,7 +181,7 @@ impl Serializable for Metadata18 {
 impl Serializable for Metadata19 {
 
     fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, protocol::Error> {
-        let mut m = Metadata::new();
+        let mut m = Self::new();
         loop {
             let index = u8::read_from(buf)? as i32;
             if index == 0xFF {
@@ -251,11 +229,11 @@ impl Serializable for Metadata19 {
                 _ => return Err(protocol::Error::Err("unknown metadata type".to_owned())),
             }
         }
-        Ok(Metadata19 { metadata: m })
+        Ok(m)
     }
 
     fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), protocol::Error> {
-        for (k, v) in &self.metadata.map {
+        for (k, v) in &self.map {
             (*k as u8).write_to(buf)?;
             match *v {
                 Value::Byte(ref val) => {
@@ -328,21 +306,11 @@ impl Serializable for Metadata19 {
 }
 
 
-impl fmt::Debug for Metadata {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Metadata[ ")?;
-        for (k, v) in &self.map {
-            write!(f, "{:?}={:?}, ", k, v)?;
-        }
-        write!(f, "]")
-    }
-}
-
 // TODO: reduce duplication
 impl fmt::Debug for Metadata19 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Metadata19[ ")?;
-        for (k, v) in &self.metadata.map {
+        for (k, v) in &self.map {
             write!(f, "{:?}={:?}, ", k, v)?;
         }
         write!(f, "]")
@@ -351,7 +319,7 @@ impl fmt::Debug for Metadata19 {
 impl fmt::Debug for Metadata18 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Metadata18[ ")?;
-        for (k, v) in &self.metadata.map {
+        for (k, v) in &self.map {
             write!(f, "{:?}={:?}, ", k, v)?;
         }
         write!(f, "]")
@@ -359,12 +327,6 @@ impl fmt::Debug for Metadata18 {
 }
 
 
-
-impl Default for Metadata {
-    fn default() -> Metadata {
-        Metadata::new()
-    }
-}
 // TODO: reduce duplication
 impl Default for Metadata19 {
     fn default() -> Metadata19 {
