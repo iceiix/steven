@@ -331,8 +331,6 @@ impl Default for Metadata18 {
     }
 }
 
-
-
 #[derive(Debug)]
 pub enum Value {
     Byte(i8),
