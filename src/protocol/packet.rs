@@ -563,7 +563,9 @@ state_packets!(
             packet SpawnPainting_NoUUID_i32 {
                 field entity_id: VarInt =,
                 field title: String =,
-                field location: Position =,
+                field x: i32 =,
+                field y: i32 =,
+                field z: i32 =,
                 field direction: i32 =,
             }
             /// SpawnPlayer is used to spawn a player when they are in range of the client.
@@ -628,6 +630,13 @@ state_packets!(
             packet BlockBreakAnimation {
                 field entity_id: VarInt =,
                 field location: Position =,
+                field stage: i8 =,
+            }
+            packet BlockBreakAnimation_i32 {
+                field entity_id: VarInt =,
+                field x: i32 =,
+                field y: i32 =,
+                field z: i32 =,
                 field stage: i8 =,
             }
             /// UpdateBlockEntity updates the nbt tag of a block entity in the
@@ -1106,6 +1115,11 @@ state_packets!(
             packet SignEditorOpen {
                 field location: Position =,
             }
+            packet SignEditorOpen_i32 {
+                field x: i32 =,
+                field y: i32 =,
+                field z: i32 =,
+            }
             /// CraftRecipeResponse is a response to CraftRecipeRequest, notifies the UI.
             packet CraftRecipeResponse {
                 field window_id: u8 =,
@@ -1384,6 +1398,11 @@ state_packets!(
             /// only used by the client for the compass.
             packet SpawnPosition {
                 field location: Position =,
+            }
+            packet SpawnPosition_i32 {
+                field x: i32 =,
+                field y: i32 =,
+                field z: i32 =,
             }
             /// TimeUpdate is sent to sync the world's time to the client, the client
             /// will manually tick the time itself so this doesn't need to sent repeatedly

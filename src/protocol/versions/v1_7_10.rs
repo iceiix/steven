@@ -39,7 +39,7 @@ protocol_packet_ids!(
             0x02 => ServerMessage_NoPosition
             0x03 => TimeUpdate
             0x04 => EntityEquipment_u16_i32
-            0x05 => SpawnPosition
+            0x05 => SpawnPosition_i32
             0x06 => UpdateHealth_u16
             0x07 => Respawn
             0x08 => TeleportPlayer_NoConfirm
@@ -71,7 +71,7 @@ protocol_packet_ids!(
             0x22 => MultiBlockChange
             0x23 => BlockChange_u8
             0x24 => BlockAction_u16
-            0x25 => BlockBreakAnimation
+            0x25 => BlockBreakAnimation_i32
             0x26 => ChunkDataBulk_17
             0x27 => Explosion
             0x28 => Effect_u8y
@@ -85,11 +85,10 @@ protocol_packet_ids!(
             0x30 => WindowItems
             0x31 => WindowProperty
             0x32 => ConfirmTransaction
-            0x33 => UpdateSign
             0x33 => UpdateSign_u16
             0x34 => Maps_NoTracking_Data
             0x35 => UpdateBlockEntity_Data
-            0x36 => SignEditorOpen
+            0x36 => SignEditorOpen_i32
             0x37 => Statistics
             0x38 => PlayerInfo_String
             0x39 => PlayerAbilities
