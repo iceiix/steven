@@ -76,12 +76,6 @@ struct LightUpdate {
     pos: Position,
 }
 
-#[derive(Clone, Copy, Eq, PartialEq, Debug)]
-enum ChunkFormat {
-    V1_9,
-    V1_8,
-}
-
 impl World {
     pub fn new() -> World { Default::default() }
 
@@ -551,37 +545,12 @@ impl World {
         }
     }
 
-    pub fn load_chunk19(&mut self, x: i32, z: i32, new: bool, bitmask: u16, data: Vec<u8>) -> Result<(), protocol::Error> {
-        let skylight = true;
-        self.load_chunks(ChunkFormat::V1_9, new, skylight, &vec![crate::protocol::packet::ChunkMeta { x, z, bitmask }], data)
-    }
-    
-    pub fn load_chunks18(&mut self, new: bool, skylight: bool, chunk_metas: &[crate::protocol::packet::ChunkMeta], data: Vec<u8>) -> Result<(), protocol::Error> {
-        println!("load_chunks18 new={} skylight={} chunk_metas: {:?}", new, skylight, chunk_metas);
-        self.load_chunks(ChunkFormat::V1_8, new, skylight, &chunk_metas, data)
-    }
-
-    fn load_chunks(&mut self, format: ChunkFormat, new: bool, skylight: bool, chunk_metas: &[crate::protocol::packet::ChunkMeta], data: Vec<u8>) -> Result<(), protocol::Error> {
-        let mut data = std::io::Cursor::new(data);
-
-        for chunk_meta in chunk_metas {
-            let x = chunk_meta.x;
-            let z = chunk_meta.z;
-            let mask = chunk_meta.bitmask;
-
-            println!("about to load_chunk x={} z={} mask={:x}", x, z, mask);
-            self.load_chunk(format, new, skylight, x, z, mask, &mut data)?;
-            //panic!("done");
-        }
-        Ok(())
-    }
-
-    fn load_chunk(&mut self, format: ChunkFormat, new: bool, skylight: bool, x: i32, z: i32, mask: u16, mut data: &mut std::io::Cursor<Vec<u8>>) -> Result<(), protocol::Error> {
-        println!("about to read chunk from position={}", data.position());
-        use std::io::Read;
-        use std::io::{Seek, SeekFrom};
+    pub fn load_chunk(&mut self, x: i32, z: i32, new: bool, mask: u16, data: Vec<u8>) -> Result<(), protocol::Error> {
+        use std::io::{Cursor, Read};
         use byteorder::ReadBytesExt;
         use crate::protocol::{VarInt, Serializable, LenPrefixed};
+
+        let mut data = Cursor::new(data);
 
         let cpos = CPos(x, z);
         {
@@ -595,18 +564,7 @@ impl World {
                 self.chunks.get_mut(&cpos).unwrap()
             };
 
-            let mut chunk_count = 0;
             for i in 0 .. 16 {
-                if mask & (1 << i) != 0 {
-                    chunk_count += 1;
-                }
-            }
-            let mut offset_blocks = 0;
-            let mut offset_light = 4096 * chunk_count * 2;
-            let mut offset_skylight = 4096 * (chunk_count >> 1) * 5;
-
-            for i in 0 .. 16 {
-                println!("iteration={}", i);
                 if chunk.sections[i].is_none() {
                     let mut fill_sky = chunk.sections.iter()
                         .skip(i)
@@ -622,90 +580,46 @@ impl World {
                 let section = chunk.sections[i as usize].as_mut().unwrap();
                 section.dirty = true;
 
-                match format {
-                    ChunkFormat::V1_9 => {
-                        let mut bit_size = data.read_u8()?;
-                        let mut mappings: HashMap<usize, block::Block, BuildHasherDefault<FNVHash>> = HashMap::with_hasher(BuildHasherDefault::default());
-                        if bit_size == 0 {
-                            bit_size = 13;
-                        } else {
-                            let count = VarInt::read_from(&mut data)?.0;
-                            for i in 0 .. count {
-                                let id = VarInt::read_from(&mut data)?.0;
-                                let bl = block::Block::by_vanilla_id(id as usize);
-                                mappings.insert(i as usize, bl);
-                            }
-                        }
-
-                        let bits = LenPrefixed::<VarInt, u64>::read_from(&mut data)?.data;
-                        let m = bit::Map::from_raw(bits, bit_size as usize);
-
-                        for bi in 0 .. 4096 {
-                            let id = m.get(bi);
-                            section.blocks.set(bi, mappings.get(&id).cloned().unwrap_or(block::Block::by_vanilla_id(id)));
-
-                            // Spawn block entities
-                            let b = section.blocks.get(bi);
-                            if block_entity::BlockEntityType::get_block_entity(b).is_some() {
-                                let pos = Position::new(
-                                    (bi & 0xF) as i32,
-                                    (bi >> 8) as i32,
-                                    ((bi >> 4) & 0xF) as i32
-                                ) + (chunk.position.0 << 4, (i << 4) as i32, chunk.position.1 << 4);
-                                if chunk.block_entities.contains_key(&pos) {
-                                    self.block_entity_actions.push_back(BlockEntityAction::Remove(pos))
-                                }
-                                self.block_entity_actions.push_back(BlockEntityAction::Create(pos))
-                            }
-                        }
-                    }
-                    ChunkFormat::V1_8 => {
-
-                        data.seek(SeekFrom::Start(offset_blocks))?;
-
-                        let mut blocks = vec![0; 8192];
-                        println!("about to read blocks from position={}", data.position());
-                        data.read_exact(&mut blocks)?;
-                        offset_blocks = data.position();
-                        //println!("blocks = {:?}", blocks);
-                        for bi in 0 .. 4096 {
-                            //let id = data.read_u16::<byteorder::LittleEndian>()?;
-                            let id: u16 = (blocks[bi * 2] as u16) + (blocks[bi * 2 + 1] as u16) * 256;
-
-                            //println!("position={}\tread_u16 = {:04x}", data.position(), id);
-                            //println!("section {}, block #{} = {}:{}", i, bi, id>>4, id&0xF);
-                            section.blocks.set(bi, block::Block::by_vanilla_id(id as usize));
-
-                            // TODO: Spawn block entities
-                        }
+                let mut bit_size = data.read_u8()?;
+                let mut mappings: HashMap<usize, block::Block, BuildHasherDefault<FNVHash>> = HashMap::with_hasher(BuildHasherDefault::default());
+                if bit_size == 0 {
+                    bit_size = 13;
+                } else {
+                    let count = VarInt::read_from(&mut data)?.0;
+                    for i in 0 .. count {
+                        let id = VarInt::read_from(&mut data)?.0;
+                        let bl = block::Block::by_vanilla_id(id as usize);
+                        mappings.insert(i as usize, bl);
                     }
                 }
 
-                println!("about to read block_light from position={}", data.position());
-                if format == ChunkFormat::V1_8 {
-                    data.seek(SeekFrom::Start(offset_light))?;
+                let bits = LenPrefixed::<VarInt, u64>::read_from(&mut data)?.data;
+                let m = bit::Map::from_raw(bits, bit_size as usize);
+
+                for bi in 0 .. 4096 {
+                    let id = m.get(bi);
+                    section.blocks.set(bi, mappings.get(&id).cloned().unwrap_or(block::Block::by_vanilla_id(id)));
+                    // Spawn block entities
+                    let b = section.blocks.get(bi);
+                    if block_entity::BlockEntityType::get_block_entity(b).is_some() {
+                        let pos = Position::new(
+                            (bi & 0xF) as i32,
+                            (bi >> 8) as i32,
+                            ((bi >> 4) & 0xF) as i32
+                        ) + (chunk.position.0 << 4, (i << 4) as i32, chunk.position.1 << 4);
+                        if chunk.block_entities.contains_key(&pos) {
+                            self.block_entity_actions.push_back(BlockEntityAction::Remove(pos))
+                        }
+                        self.block_entity_actions.push_back(BlockEntityAction::Create(pos))
+                    }
                 }
+
                 data.read_exact(&mut section.block_light.data)?;
-                offset_light = data.position();
-                println!("done read block_light from position={}", data.position());
-                if skylight {
-                    println!("about to read skylight from position={}", data.position());
-                    if format == ChunkFormat::V1_8 {
-                        data.seek(SeekFrom::Start(offset_skylight))?;
-                    }
-                    data.read_exact(&mut section.sky_light.data)?;
-                    offset_skylight = data.position();
-                    println!("done read skylight from position={}", data.position());
-                }
+                data.read_exact(&mut section.sky_light.data)?;
             }
 
             if new {
-                println!("about to read biomes from position={}", data.position());
-                if format == ChunkFormat::V1_8 {
-                    data.seek(SeekFrom::Start(4096 * chunk_count * 3))?;
-                }
                 data.read_exact(&mut chunk.biomes)?;
-                println!("done read biomes from position={}", data.position());
             }
 
             chunk.calculate_heightmap();
@@ -726,7 +640,6 @@ impl World {
                 (x<<4) + 17, (i<<4) + 17, (z<<4) + 17
             );
         }
-        println!("done chunk from position={}", data.position());
         Ok(())
     }
 
