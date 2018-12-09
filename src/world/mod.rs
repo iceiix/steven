@@ -571,7 +571,7 @@ impl World {
 
             println!("about to load_chunk x={} z={} mask={:x}", x, z, mask);
             self.load_chunk(format, new, skylight, x, z, mask, &mut data)?;
-            panic!("done");
+            //panic!("done");
         }
         Ok(())
     }
@@ -579,6 +579,7 @@ impl World {
     fn load_chunk(&mut self, format: ChunkFormat, new: bool, skylight: bool, x: i32, z: i32, mask: u16, mut data: &mut std::io::Cursor<Vec<u8>>) -> Result<(), protocol::Error> {
         println!("about to read chunk from position={}", data.position());
         use std::io::Read;
+        use std::io::{Seek, SeekFrom};
         use byteorder::ReadBytesExt;
         use crate::protocol::{VarInt, Serializable, LenPrefixed};
 
@@ -593,6 +594,16 @@ impl World {
                 }
                 self.chunks.get_mut(&cpos).unwrap()
             };
+
+            let mut chunk_count = 0;
+            for i in 0 .. 16 {
+                if mask & (1 << i) != 0 {
+                    chunk_count += 1;
+                }
+            }
+            let mut offset_blocks = 0;
+            let mut offset_light = 4096 * chunk_count * 2;
+            let mut offset_skylight = 4096 * (chunk_count >> 1) * 5;
 
             for i in 0 .. 16 {
                 println!("iteration={}", i);
@@ -649,9 +660,13 @@ impl World {
                         }
                     }
                     ChunkFormat::V1_8 => {
+
+                        data.seek(SeekFrom::Start(offset_blocks))?;
+
                         let mut blocks = vec![0; 8192];
                         println!("about to read blocks from position={}", data.position());
                         data.read_exact(&mut blocks)?;
+                        offset_blocks = data.position();
                         println!("blocks = {:?}", blocks);
                         for bi in 0 .. 4096 {
                             //let id = data.read_u16::<byteorder::LittleEndian>()?;
@@ -667,11 +682,15 @@ impl World {
                 }
 
                 println!("about to read block_light from position={}", data.position());
+                data.seek(SeekFrom::Start(offset_light))?;
                 data.read_exact(&mut section.block_light.data)?;
+                offset_light = data.position();
                 println!("done read block_light from position={}", data.position());
                 if skylight {
                     println!("about to read skylight from position={}", data.position());
+                    data.seek(SeekFrom::Start(offset_skylight))?;
                     data.read_exact(&mut section.sky_light.data)?;
+                    offset_skylight = data.position();
                     println!("done read skylight from position={}", data.position());
                 }
             }
