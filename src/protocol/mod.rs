@@ -890,19 +890,6 @@ impl Conn {
             Direction::Serverbound => Direction::Clientbound,
         };
 
-        // Log and process only one bulk chunk packet
-        unsafe {
-            static mut BULK_SEEN: bool = false;
-            if id == 0x26 {
-                if !BULK_SEEN {
-                    println!("about to parse id={} for buf={:?}", id, buf);
-                    use std::fs::File;
-                    File::create("/tmp/p2").unwrap().write_all(buf.get_ref()).unwrap();
-                    BULK_SEEN = true;
-                }
-            }
-        }
-
         let packet = packet::packet_by_id(self.protocol_version, self.state, dir, id, &mut buf)?;
 
         match packet {
