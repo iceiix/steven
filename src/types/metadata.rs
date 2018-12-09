@@ -46,39 +46,43 @@ pub struct Metadata19 {
     map: HashMap<i32, Value>,
 }
 
-// TODO: reduce this redundancy
+trait MetadataBase {
+    fn map(&self) -> &HashMap<i32, Value>;
+    fn map_mut(&mut self) -> &mut HashMap<i32, Value>;
+
+    fn get<T: MetaValue>(&self, key: &MetadataKey<T>) -> Option<&T> {
+        self.map().get(&key.index).map(T::unwrap)
+    }
+
+    fn put<T: MetaValue>(&mut self, key: &MetadataKey<T>, val: T) {
+        self.map_mut().insert(key.index, val.wrap());
+    }
+
+    fn put_raw<T: MetaValue>(&mut self, index: i32, val: T) {
+        self.map_mut().insert(index, val.wrap());
+    }
+
+}
+
+impl MetadataBase for Metadata18 {
+    fn map(&self) -> &HashMap<i32, Value> { &self.map }
+    fn map_mut(&mut self) -> &mut HashMap<i32, Value> { &mut self.map }
+}
+
+impl MetadataBase for Metadata19 {
+    fn map(&self) -> &HashMap<i32, Value> { &self.map }
+    fn map_mut(&mut self) -> &mut HashMap<i32, Value> { &mut self.map }
+}
+
 impl Metadata18 {
     pub fn new() -> Self {
         Self { map: HashMap::new() }
     }
 
-    pub fn get<T: MetaValue>(&self, key: &MetadataKey<T>) -> Option<&T> {
-        self.map.get(&key.index).map(T::unwrap)
-    }
-
-    pub fn put<T: MetaValue>(&mut self, key: &MetadataKey<T>, val: T) {
-        self.map.insert(key.index, val.wrap());
-    }
-
-    fn put_raw<T: MetaValue>(&mut self, index: i32, val: T) {
-        self.map.insert(index, val.wrap());
-    }
 }
 impl Metadata19 {
     pub fn new() -> Self {
         Self { map: HashMap::new() }
-    }
-
-    pub fn get<T: MetaValue>(&self, key: &MetadataKey<T>) -> Option<&T> {
-        self.map.get(&key.index).map(T::unwrap)
-    }
-
-    pub fn put<T: MetaValue>(&mut self, key: &MetadataKey<T>, val: T) {
-        self.map.insert(key.index, val.wrap());
-    }
-
-    fn put_raw<T: MetaValue>(&mut self, index: i32, val: T) {
-        self.map.insert(index, val.wrap());
     }
 }
 
