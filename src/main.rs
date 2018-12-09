@@ -255,7 +255,7 @@ fn main() {
     let mut chunk_data = vec![];
     use std::io::Read;
     std::fs::File::open("/tmp/p").unwrap().read_to_end(&mut chunk_data).unwrap();
-    game.server.world.load_chunks18(true, true, &chunk_metas, chunk_data);
+    game.server.world.load_chunks18(true, true, &chunk_metas, chunk_data[103..].to_vec()).unwrap();
 
     while !game.should_close {
 
