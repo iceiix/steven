@@ -240,6 +240,7 @@ fn main() {
     };
     game.renderer.camera.pos = cgmath::Point3::new(0.5, 13.2, 0.5);
 
+    /*
     use crate::protocol::packet::ChunkMeta;
     let chunk_metas = vec![
         ChunkMeta { x: 6, z: 12, bitmask: 31 },
@@ -256,6 +257,7 @@ fn main() {
     use std::io::Read;
     std::fs::File::open("/tmp/p").unwrap().read_to_end(&mut chunk_data).unwrap();
     game.server.world.load_chunks18(true, true, &chunk_metas, chunk_data[103..].to_vec()).unwrap();
+    */
 
     while !game.should_close {
 

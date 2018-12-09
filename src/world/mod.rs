@@ -667,13 +667,13 @@ impl World {
                         println!("about to read blocks from position={}", data.position());
                         data.read_exact(&mut blocks)?;
                         offset_blocks = data.position();
-                        println!("blocks = {:?}", blocks);
+                        //println!("blocks = {:?}", blocks);
                         for bi in 0 .. 4096 {
                             //let id = data.read_u16::<byteorder::LittleEndian>()?;
                             let id: u16 = (blocks[bi * 2] as u16) + (blocks[bi * 2 + 1] as u16) * 256;
 
-                            println!("position={}\tread_u16 = {:04x}", data.position(), id);
-                            println!("section {}, block #{} = {}:{}", i, bi, id>>4, id&0xF);
+                            //println!("position={}\tread_u16 = {:04x}", data.position(), id);
+                            //println!("section {}, block #{} = {}:{}", i, bi, id>>4, id&0xF);
                             section.blocks.set(bi, block::Block::by_vanilla_id(id as usize));
 
                             // TODO: Spawn block entities
@@ -701,6 +701,9 @@ impl World {
 
             if new {
                 println!("about to read biomes from position={}", data.position());
+                if format == ChunkFormat::V1_8 {
+                    data.seek(SeekFrom::Start(4096 * chunk_count * 3))?;
+                }
                 data.read_exact(&mut chunk.biomes)?;
                 println!("done read biomes from position={}", data.position());
             }
