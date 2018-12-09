@@ -560,6 +560,12 @@ state_packets!(
                 field location: Position =,
                 field direction: u8 =,
             }
+            packet SpawnPainting_NoUUID_i32 {
+                field entity_id: VarInt =,
+                field title: String =,
+                field location: Position =,
+                field direction: i32 =,
+            }
             /// SpawnPlayer is used to spawn a player when they are in range of the client.
             /// This packet alone isn't enough to display the player as the skin and username
             /// information is in the player information packet.
@@ -594,6 +600,20 @@ state_packets!(
                 field current_item: u16 =,
                 field metadata: types::Metadata18 =,
             }
+            packet SpawnPlayer_i32_HeldItem_18_String {
+                field entity_id: VarInt =,
+                field uuid: String =,
+                field name: String =,
+                field properties: LenPrefixed<VarInt, packet::SpawnProperty> =,
+                field x: i32 =,
+                field y: i32 =,
+                field z: i32 =,
+                field yaw: i8 =,
+                field pitch: i8 =,
+                field current_item: u16 =,
+                field metadata: types::Metadata18 =,
+            }
+
             /// Animation is sent by the server to play an animation on a specific entity.
             packet Animation {
                 field entity_id: VarInt =,
@@ -617,9 +637,25 @@ state_packets!(
                 field action: u8 =,
                 field nbt: Option<nbt::NamedTag> =,
             }
+            packet UpdateBlockEntity_Data {
+                field x: i32 =,
+                field y: i16 =,
+                field z: i32 =,
+                field action: u8 =,
+                field data_length: i16 =,
+                field nbt: Option<nbt::NamedTag> = when(|p: &UpdateBlockEntity_Data| p.data_length > 0),
+            }
             /// BlockAction triggers different actions depending on the target block.
             packet BlockAction {
                 field location: Position =,
+                field byte1: u8 =,
+                field byte2: u8 =,
+                field block_type: VarInt =,
+            }
+            packet BlockAction_u16 {
+                field x: i32 =,
+                field y: u16 =,
+                field z: i32 =,
                 field byte1: u8 =,
                 field byte2: u8 =,
                 field block_type: VarInt =,
@@ -628,6 +664,13 @@ state_packets!(
             packet BlockChange {
                 field location: Position =,
                 field block_id: VarInt =,
+            }
+            packet BlockChange_u8 {
+                field x: i32 =,
+                field y: u8 =,
+                field z: i32 =,
+                field block_id: VarInt =,
+                field block_metadata: u8 =,
             }
             /// BossBar displays and/or changes a boss bar that is displayed on the
             /// top of the client's screen. This is normally used for bosses such as
@@ -660,11 +703,23 @@ state_packets!(
                 /// 0 - Chat message, 1 - System message, 2 - Action bar message
                 field position: u8 =,
             }
+            packet ServerMessage_NoPosition {
+                field message: format::Component =,
+            }
             /// MultiBlockChange is used to update a batch of blocks in a single packet.
             packet MultiBlockChange {
                 field chunk_x: i32 =,
                 field chunk_z: i32 =,
                 field records: LenPrefixed<VarInt, packet::BlockChangeRecord> =,
+            }
+            packet MultiBlockChange_i16 {
+                field chunk_x: i32 =,
+                field chunk_z: i32 =,
+                field record_count: u16 =,
+                field data_size: i32 =,
+                field data: Vec<u8> =,
+                // TODO: unusual format, has two length prefixes, where data_size=record_count*4
+                //field records: LenPrefixed<i32, packet::BlockChangeRecord> =,
             }
             /// ConfirmTransaction notifies the client whether a transaction was successful
             /// or failed (e.g. due to lag).
@@ -687,6 +742,14 @@ state_packets!(
                 field title: format::Component =,
                 field slot_count: u8 =,
                 field entity_id: i32 = when(|p: &WindowOpen| p.ty == "EntityHorse"),
+            }
+            packet WindowOpen_u8 {
+                field id: u8 =,
+                field ty: u8 =,
+                field title: format::Component =,
+                field slot_count: u8 =,
+                field use_provided_window_title: bool =,
+                field entity_id: i32 = when(|p: &WindowOpen_u8| p.ty == 11),
             }
             /// WindowItems sets every item in a window.
             packet WindowItems {
@@ -717,6 +780,10 @@ state_packets!(
             packet PluginMessageClientbound {
                 field channel: String =,
                 field data: Vec<u8> =,
+            }
+            packet PluginMessageClientbound_i16 {
+                field channel: String =,
+                field data: LenPrefixed<i16, Vec<u8>> =,
             }
             /// Plays a sound by name on the client
             packet NamedSoundEffect {
@@ -820,10 +887,25 @@ state_packets!(
                 field bitmask: u16 =,
                 field data: LenPrefixedBytes<VarInt> =,
             }
+            packet ChunkData_NoEntities_u16_Add {
+                field chunk_x: i32 =,
+                field chunk_z: i32 =,
+                field new: bool =,
+                field bitmask: u16 =,
+                field add_bitmask: u16 =,
+                field data: LenPrefixedBytes<i32> =,
+            }
             packet ChunkDataBulk {
                 field skylight: bool =,
                 field chunk_meta: LenPrefixed<VarInt, packet::ChunkMeta> =,
                 field chunk_data: Vec<u8> =,
+            }
+            packet ChunkDataBulk_17 {
+                field chunk_column_count: u16 =,
+                field data_length: i32 =,
+                field skylight: bool =,
+                field chunk_meta: LenPrefixed<VarInt, packet::ChunkMeta> =,
+                field chunk_data_and_meta: Vec<u8> =,
             }
             /// Effect plays a sound effect or particle at the target location with the
             /// volume (of sounds) being relative to the player's position unless
@@ -831,6 +913,14 @@ state_packets!(
             packet Effect {
                 field effect_id: i32 =,
                 field location: Position =,
+                field data: i32 =,
+                field disable_relative: bool =,
+            }
+            packet Effect_u8y {
+                field effect_id: i32 =,
+                field x: i32 =,
+                field y: u8 =,
+                field z: i32 =,
                 field data: i32 =,
                 field disable_relative: bool =,
             }
@@ -849,6 +939,17 @@ state_packets!(
                 field count: i32 =,
                 field data1: VarInt = when(|p: &Particle| p.particle_id == 36 || p.particle_id == 37 || p.particle_id == 38 || p.particle_id == 46),
                 field data2: VarInt = when(|p: &Particle| p.particle_id == 36),
+            }
+            packet Particle_Named {
+                field particle_id: String =,
+                field x: f32 =,
+                field y: f32 =,
+                field z: f32 =,
+                field offset_x: f32 =,
+                field offset_y: f32 =,
+                field offset_z: f32 =,
+                field speed: f32 =,
+                field count: i32 =,
             }
             /// JoinGame is sent after completing the login process. This
             /// sets the initial state for the client.
@@ -886,6 +987,14 @@ state_packets!(
                 /// information it displays in F3 mode
                 field reduced_debug_info: bool =,
             }
+            packet JoinGame_i8_NoDebug {
+                field entity_id: i32 =,
+                field gamemode: u8 =,
+                field dimension: i8 =,
+                field difficulty: u8 =,
+                field max_players: u8 =,
+                field level_type: String =,
+            }
             /// Maps updates a single map's contents
             packet Maps {
                 field item_damage: VarInt =,
@@ -908,6 +1017,10 @@ state_packets!(
                 field z: Option<u8> = when(|p: &Maps_NoTracking| p.columns > 0),
                 field data: Option<LenPrefixedBytes<VarInt>> = when(|p: &Maps_NoTracking| p.columns > 0),
             }
+            packet Maps_NoTracking_Data {
+                field item_damage: VarInt =,
+                field data: LenPrefixedBytes<i16> =,
+            }
             /// EntityMove moves the entity with the id by the offsets provided.
             packet EntityMove_i16 {
                 field entity_id: VarInt =,
@@ -922,6 +1035,12 @@ state_packets!(
                 field delta_y: i8 =,
                 field delta_z: i8 =,
                 field on_ground: bool =,
+            }
+            packet EntityMove_i8_i32_NoGround {
+                field entity_id: i32 =,
+                field delta_x: i8 =,
+                field delta_y: i8 =,
+                field delta_z: i8 =,
             }
             /// EntityLookAndMove is a combination of EntityMove and EntityLook.
             packet EntityLookAndMove_i16 {
@@ -942,6 +1061,14 @@ state_packets!(
                 field pitch: i8 =,
                 field on_ground: bool =,
             }
+            packet EntityLookAndMove_i8_i32_NoGround {
+                field entity_id: i32 =,
+                field delta_x: i8 =,
+                field delta_y: i8 =,
+                field delta_z: i8 =,
+                field yaw: i8 =,
+                field pitch: i8 =,
+            }
             /// EntityLook rotates the entity to the new angles provided.
             packet EntityLook {
                 field entity_id: VarInt =,
@@ -949,9 +1076,17 @@ state_packets!(
                 field pitch: i8 =,
                 field on_ground: bool =,
             }
+            packet EntityLook_i32_NoGround {
+                field entity_id: i32 =,
+                field yaw: i8 =,
+                field pitch: i8 =,
+            }
             /// Entity does nothing. It is a result of subclassing used in Minecraft.
             packet Entity {
                 field entity_id: VarInt =,
+            }
+            packet Entity_i32 {
+                field entity_id: i32 =,
             }
             /// EntityUpdateNBT updates the entity named binary tag.
             packet EntityUpdateNBT {
@@ -997,6 +1132,11 @@ state_packets!(
             packet PlayerInfo {
                 field inner: packet::PlayerInfoData =,
             }
+            packet PlayerInfo_String {
+                field name: String =,
+                field online: bool =,
+                field ping: u16 =,
+            }
             /// TeleportPlayer is sent to change the player's position. The client is expected
             /// to reply to the server with the same positions as contained in this packet
             /// otherwise will reject future packets.
@@ -1022,6 +1162,12 @@ state_packets!(
                 field entity_id: VarInt =,
                 field location: Position =,
             }
+            packet EntityUsedBed_i32 {
+                field entity_id: i32 =,
+                field x: i32 =,
+                field y: u8 =,
+                field z: i32 =,
+            }
             packet UnlockRecipes {
                 field action: VarInt =,
                 field crafting_book_open: bool =,
@@ -1033,9 +1179,16 @@ state_packets!(
             packet EntityDestroy {
                 field entity_ids: LenPrefixed<VarInt, VarInt> =,
             }
+            packet EntityDestroy_u8 {
+                field entity_ids: LenPrefixed<u8, i32> =,
+            }
             /// EntityRemoveEffect removes an effect from an entity.
             packet EntityRemoveEffect {
                 field entity_id: VarInt =,
+                field effect_id: i8 =,
+            }
+            packet EntityRemoveEffect_i32 {
+                field entity_id: i32 =,
                 field effect_id: i8 =,
             }
             /// ResourcePackSend causes the client to check its cache for the requested
@@ -1055,6 +1208,10 @@ state_packets!(
             /// EntityHeadLook rotates an entity's head to the new angle.
             packet EntityHeadLook {
                 field entity_id: VarInt =,
+                field head_yaw: i8 =,
+            }
+            packet EntityHeadLook_i32 {
+                field entity_id: i32 =,
                 field head_yaw: i8 =,
             }
             packet EntityStatus {
@@ -1101,6 +1258,10 @@ state_packets!(
                 field entity_id: VarInt =,
                 field metadata: types::Metadata18 =,
             }
+            packet EntityMetadata_18_i32 {
+                field entity_id: i32 =,
+                field metadata: types::Metadata18 =,
+            }
             /// EntityAttach attaches to entities together, either by mounting or leashing.
             /// -1 can be used at the EntityID to deattach.
             packet EntityAttach {
@@ -1120,6 +1281,12 @@ state_packets!(
                 field velocity_y: i16 =,
                 field velocity_z: i16 =,
             }
+            packet EntityVelocity_i32 {
+                field entity_id: i32 =,
+                field velocity_x: i16 =,
+                field velocity_y: i16 =,
+                field velocity_z: i16 =,
+            }
             /// EntityEquipment is sent to display an item on an entity, like a sword
             /// or armor. Slot 0 is the held item and slots 1 to 4 are boots, leggings
             /// chestplate and helmet respectively.
@@ -1133,16 +1300,31 @@ state_packets!(
                 field slot: u16 =,
                 field item: Option<item::Stack> =,
             }
+            packet EntityEquipment_u16_i32 {
+                field entity_id: i32 =,
+                field slot: u16 =,
+                field item: Option<item::Stack> =,
+            }
             /// SetExperience updates the experience bar on the client.
             packet SetExperience {
                 field experience_bar: f32 =,
                 field level: VarInt =,
                 field total_experience: VarInt =,
             }
+            packet SetExperience_i16 {
+                field experience_bar: f32 =,
+                field level: i16 =,
+                field total_experience: i16 =,
+            }
             /// UpdateHealth is sent by the server to update the player's health and food.
             packet UpdateHealth {
                 field health: f32 =,
                 field food: VarInt =,
+                field food_saturation: f32 =,
+            }
+            packet UpdateHealth_u16 {
+                field health: f32 =,
+                field food: u16 =,
                 field food_saturation: f32 =,
             }
             /// ScoreboardObjective creates/updates a scoreboard objective.
@@ -1151,6 +1333,11 @@ state_packets!(
                 field mode: u8 =,
                 field value: String = when(|p: &ScoreboardObjective| p.mode == 0 || p.mode == 2),
                 field ty: String = when(|p: &ScoreboardObjective| p.mode == 0 || p.mode == 2),
+            }
+            packet ScoreboardObjective_NoMode {
+                field name: String =,
+                field value: String =,
+                field ty: u8 =,
             }
             /// SetPassengers mounts entities to an entity
             packet SetPassengers {
@@ -1170,6 +1357,15 @@ state_packets!(
                 field color: Option<i8> = when(|p: &Teams| p.mode == 0 || p.mode == 2),
                 field players: Option<LenPrefixed<VarInt, String>> = when(|p: &Teams| p.mode == 0 || p.mode == 3 || p.mode == 4),
             }
+            packet Teams_NoVisColor {
+                field name: String =,
+                field mode: u8 =,
+                field display_name: Option<String> = when(|p: &Teams_NoVisColor| p.mode == 0 || p.mode == 2),
+                field prefix: Option<String> = when(|p: &Teams_NoVisColor| p.mode == 0 || p.mode == 2),
+                field suffix: Option<String> = when(|p: &Teams_NoVisColor| p.mode == 0 || p.mode == 2),
+                field flags: Option<u8> = when(|p: &Teams_NoVisColor| p.mode == 0 || p.mode == 2),
+                field players: Option<LenPrefixed<VarInt, String>> = when(|p: &Teams_NoVisColor| p.mode == 0 || p.mode == 3 || p.mode == 4),
+            }
             /// UpdateScore is used to update or remove an item from a scoreboard
             /// objective.
             packet UpdateScore {
@@ -1177,6 +1373,12 @@ state_packets!(
                 field action: u8 =,
                 field object_name: String =,
                 field value: Option<VarInt> = when(|p: &UpdateScore| p.action != 1),
+            }
+            packet UpdateScore_i32 {
+                field name: String =,
+                field action: u8 =,
+                field object_name: String =,
+                field value: Option<i32 > = when(|p: &UpdateScore_i32| p.action != 1),
             }
             /// SpawnPosition is sent to change the player's current spawn point. Currently
             /// only used by the client for the compass.
@@ -1225,6 +1427,15 @@ state_packets!(
                 field line3: format::Component =,
                 field line4: format::Component =,
             }
+            packet UpdateSign_u16 {
+                field x: i32 =,
+                field y: u16 =,
+                field z: i32 =,
+                field line1: format::Component =,
+                field line2: format::Component =,
+                field line3: format::Component =,
+                field line4: format::Component =,
+            }
             /// SoundEffect plays the named sound at the target location.
             packet SoundEffect {
                 field name: VarInt =,
@@ -1260,6 +1471,10 @@ state_packets!(
                 field collected_entity_id: VarInt =,
                 field collector_entity_id: VarInt =,
             }
+            packet CollectItem_nocount_i32 {
+                field collected_entity_id: i32 =,
+                field collector_entity_id: i32 =,
+            }
             /// EntityTeleport teleports the entity to the target location. This is
             /// sent if the entity moves further than EntityMove allows.
             packet EntityTeleport_f64 {
@@ -1280,6 +1495,14 @@ state_packets!(
                 field pitch: i8 =,
                 field on_ground: bool =,
             }
+            packet EntityTeleport_i32_i32_NoGround {
+                field entity_id: i32 =,
+                field x: i32 =,
+                field y: i32 =,
+                field z: i32 =,
+                field yaw: i8 =,
+                field pitch: i8 =,
+            }
             packet Advancements {
                 field reset_clear: bool =,
                 field mapping: LenPrefixed<VarInt, packet::Advancement> =,
@@ -1291,6 +1514,10 @@ state_packets!(
                 field entity_id: VarInt =,
                 field properties: LenPrefixed<i32, packet::EntityProperty> =,
             }
+            packet EntityProperties_i32 {
+                field entity_id: i32 =,
+                field properties: LenPrefixed<i32, packet::EntityProperty> =,
+            }
             /// EntityEffect applies a status effect to an entity for a given duration.
             packet EntityEffect {
                 field entity_id: VarInt =,
@@ -1298,6 +1525,12 @@ state_packets!(
                 field amplifier: i8 =,
                 field duration: VarInt =,
                 field hide_particles: bool =,
+            }
+            packet EntityEffect_i32 {
+                field entity_id: i32 =,
+                field effect_id: i8 =,
+                field amplifier: i8 =,
+                field duration: i16 =,
             }
        }
     }
@@ -1420,6 +1653,29 @@ state_packets!(
        }
     }
 );
+
+#[derive(Debug, Default)]
+pub struct SpawnProperty {
+    pub name: String,
+    pub value: String,
+    pub signature: String,
+}
+
+impl Serializable for SpawnProperty {
+    fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, Error> {
+        Ok(SpawnProperty {
+            name: Serializable::read_from(buf)?,
+            value: Serializable::read_from(buf)?,
+            signature: Serializable::read_from(buf)?,
+        })
+    }
+
+    fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), Error> {
+        self.name.write_to(buf)?;
+        self.value.write_to(buf)?;
+        self.signature.write_to(buf)
+    }
+}
 
 #[derive(Debug, Default)]
 pub struct Statistic {

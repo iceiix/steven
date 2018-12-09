@@ -551,6 +551,16 @@ impl <L: Lengthable> fmt::Debug for LenPrefixedBytes<L> {
     }
 }
 
+impl Lengthable for u8 {
+    fn into(self) -> usize {
+        self as usize
+    }
+
+    fn from(u: usize) -> u8 {
+        u as u8
+    }
+}
+
 impl Lengthable for i16 {
     fn into(self) -> usize {
         self as usize
