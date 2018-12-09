@@ -572,7 +572,7 @@ impl World {
             println!("about to load_chunk x={} z={} mask={:x}", x, z, mask);
             self.load_chunk(format, new, skylight, x, z, mask, &mut data)?;
         }
-        //panic!("done");
+        panic!("done");
         Ok(())
     }
 
@@ -649,14 +649,20 @@ impl World {
                     }
                     ChunkFormat::V1_8 => {
                         let mut blocks = vec![0; 8192];
+                        let mut data2 = data.clone();
                         data.read_exact(&mut blocks)?;
+                        println!("blocks = {:?}", blocks);
                         for bi in 0 .. 4096 {
-                            let id = blocks[bi * 2] + blocks[bi * 2 + 1];
+                            let id: u16 = (blocks[bi * 2] as u16) + (blocks[bi * 2 + 1] as u16) * 256;
 
-                            //let id = data.read_u16::<byteorder::LittleEndian>()?;
-                            //println!("position={}\tread_u16 = {:04x}", data.position(), id);
-                            //println!("section {}, block #{} = {}:{}", i, bi, id>>4, id&0xF);
+                            println!("position={}\tread_u16 = {:04x}", data.position(), id);
+                            println!("section {}, block #{} = {}:{}", i, bi, id>>4, id&0xF);
                             section.blocks.set(bi, block::Block::by_vanilla_id(id as usize));
+
+                            let id2 = data2.read_u16::<byteorder::LittleEndian>()?;
+                            if id != id2 {
+                                panic!("id={:04x}, id2={:04x}", id, id2);
+                            }
 
                             // TODO: Spawn block entities
                         }
