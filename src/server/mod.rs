@@ -388,6 +388,7 @@ impl Server {
         // Packets modify entities so need to handled here
         if let Some(rx) = self.read_queue.take() {
             while let Ok(pck) = rx.try_recv() {
+                println!("about to handle packet = {:?}", pck);
                 match pck {
                     Ok(pck) => handle_packet!{
                         self pck {

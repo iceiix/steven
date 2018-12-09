@@ -43,11 +43,28 @@ impl Serializable for Option<Stack> {
         if id == -1 {
             return Ok(None);
         }
+        let count = buf.read_u8()? as isize;
+        let damage = buf.read_i16::<BigEndian>()? as isize;
+
+        // 1.7
+        let tag_size = buf.read_i16::<BigEndian>()?;
+        let tag: Option<nbt::NamedTag> = if tag_size != -1 {
+            for i in 0..tag_size {
+                let _ = buf.read_u8()?;
+            }
+            // TODO: un-gzip NBT
+            None
+        } else {
+            None
+        };
+        // TODO: support 1.8+
+        //Serializable::read_from(buf)?
+
         Ok(Some(Stack {
             id: id as isize,
-            count: buf.read_u8()? as isize,
-            damage: buf.read_i16::<BigEndian>()? as isize,
-            tag: Serializable::read_from(buf)?,
+            count,
+            damage,
+            tag,
         }))
     }
     fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), protocol::Error> {
@@ -56,6 +73,7 @@ impl Serializable for Option<Stack> {
                 buf.write_i16::<BigEndian>(val.id as i16)?;
                 buf.write_u8(val.count as u8)?;
                 buf.write_i16::<BigEndian>(val.damage as i16)?;
+                // TODO: gzip nbt
                 val.tag.write_to(buf)?;
             }
             None => buf.write_i16::<BigEndian>(-1)?,

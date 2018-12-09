@@ -900,6 +900,7 @@ impl Conn {
             Direction::Serverbound => Direction::Clientbound,
         };
 
+        println!("about to parse packet={:x}, state={:?}, dir={:?}, data={:?}", id, self.state, dir, buf);
         let packet = packet::packet_by_id(self.protocol_version, self.state, dir, id, &mut buf)?;
 
         match packet {
