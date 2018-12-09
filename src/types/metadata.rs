@@ -313,7 +313,7 @@ impl Serializable for Metadata19 {
 // TODO: reduce duplication
 impl fmt::Debug for Metadata19 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Metadata19[ ")?;
+        write!(f, "Metadata[ ")?;
         for (k, v) in &self.map {
             write!(f, "{:?}={:?}, ", k, v)?;
         }
@@ -322,7 +322,7 @@ impl fmt::Debug for Metadata19 {
 }
 impl fmt::Debug for Metadata18 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Metadata18[ ")?;
+        write!(f, "Metadata[ ")?;
         for (k, v) in &self.map {
             write!(f, "{:?}={:?}, ", k, v)?;
         }
