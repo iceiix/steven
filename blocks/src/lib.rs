@@ -94,12 +94,7 @@ macro_rules! define_blocks {
             }
 
             pub fn by_vanilla_id(id: usize) -> Block {
-                if let Some(block) = VANILLA_ID_MAP.get(id).and_then(|v| *v) {
-                    block
-                } else {
-                    println!("by_vanilla_id: no block for id {} ({}:{})", id, id >> 4, id & 0xF);
-                    Block::Missing{}
-                }
+                VANILLA_ID_MAP.get(id).and_then(|v| *v).unwrap_or(Block::Missing{})
             }
 
             #[allow(unused_variables, unreachable_code)]
