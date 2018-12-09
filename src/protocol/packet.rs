@@ -66,6 +66,9 @@ state_packets!(
                 field has_target: bool =,
                 field target: Option<Position> = when(|p: &TabComplete_NoAssume| p.has_target),
             }
+            packet TabComplete_NoAssume_NoTarget {
+                field text: String =,
+            }
             /// ChatMessage is sent by the client when it sends a chat message or
             /// executes a command (prefixed by '/').
             packet ChatMessage {
@@ -74,6 +77,9 @@ state_packets!(
             /// ClientStatus is sent to update the client's status
             packet ClientStatus {
                 field action_id: VarInt =,
+            }
+            packet ClientStatus_u8 {
+                field action_id: u8=,
             }
             /// ClientSettings is sent by the client to update its current settings.
             packet ClientSettings {
@@ -97,6 +103,14 @@ state_packets!(
                 field view_distance: u8 =,
                 field chat_mode: u8 =,
                 field chat_colors: bool =,
+                field displayed_skin_parts: u8 =,
+            }
+            packet ClientSettings_u8_Handsfree_Difficulty {
+                field locale: String =,
+                field view_distance: u8 =,
+                field chat_mode: u8 =,
+                field chat_colors: bool =,
+                field difficulty: u8 =,
                 field displayed_skin_parts: u8 =,
             }
             /// ConfirmTransactionServerbound is a reply to ConfirmTransaction.
@@ -138,6 +152,10 @@ state_packets!(
                 field channel: String =,
                 field data: Vec<u8> =,
             }
+            packet PluginMessageServerbound_i16 {
+                field channel: String =,
+                field data: LenPrefixed<i16, Vec<u8>> =,
+            }
             /// UseEntity is sent when the user interacts (right clicks) or attacks
             /// (left clicks) an entity.
             packet UseEntity {
@@ -155,6 +173,10 @@ state_packets!(
                 field target_y: f32 = when(|p: &UseEntity_Handsfree| p.ty.0 == 2),
                 field target_z: f32 = when(|p: &UseEntity_Handsfree| p.ty.0 == 2),
             }
+            packet UseEntity_Handsfree_i32 {
+                field target_id: i32 =,
+                field ty: u8 =,
+            }
             /// KeepAliveServerbound is sent by a client as a response to a
             /// KeepAliveClientbound. If the client doesn't reply the server
             /// may disconnect the client.
@@ -164,10 +186,20 @@ state_packets!(
             packet KeepAliveServerbound_VarInt {
                 field id: VarInt =,
             }
+            packet KeepAliveServerbound_i32 {
+                field id: i32 =,
+            }
             /// PlayerPosition is used to update the player's position.
             packet PlayerPosition {
                 field x: f64 =,
                 field y: f64 =,
+                field z: f64 =,
+                field on_ground: bool =,
+            }
+            packet PlayerPosition_HeadY {
+                field x: f64 =,
+                field y: f64 =,
+                field head_y: f64 =,
                 field z: f64 =,
                 field on_ground: bool =,
             }
@@ -176,6 +208,15 @@ state_packets!(
             packet PlayerPositionLook {
                 field x: f64 =,
                 field y: f64 =,
+                field z: f64 =,
+                field yaw: f32 =,
+                field pitch: f32 =,
+                field on_ground: bool =,
+            }
+            packet PlayerPositionLook_HeadY {
+                field x: f64 =,
+                field y: f64 =,
+                field head_y: f64 =,
                 field z: f64 =,
                 field yaw: f32 =,
                 field pitch: f32 =,
@@ -229,11 +270,23 @@ state_packets!(
                 field location: Position =,
                 field face: u8 =,
             }
+            packet PlayerDigging_u8_u8y {
+                field status: u8 =,
+                field x: i32 =,
+                field y: u8 =,
+                field z: i32 =,
+                field face: u8 =,
+            }
             /// PlayerAction is sent when a player preforms various actions.
             packet PlayerAction {
                 field entity_id: VarInt =,
                 field action_id: VarInt =,
                 field jump_boost: VarInt =,
+            }
+            packet PlayerAction_i32 {
+                field entity_id: i32 =,
+                field action_id: i8 =,
+                field jump_boost: i32 =,
             }
             /// SteerVehicle is sent by the client when steers or preforms an action
             /// on a vehicle.
@@ -241,6 +294,12 @@ state_packets!(
                 field sideways: f32 =,
                 field forward: f32 =,
                 field flags: u8 =,
+            }
+            packet SteerVehicle_jump_unmount {
+                field sideways: f32 =,
+                field forward: f32 =,
+                field jump: bool =,
+                field unmount: bool =,
             }
             /// CraftingBookData is sent when the player interacts with the crafting book.
             packet CraftingBookData {
@@ -282,6 +341,15 @@ state_packets!(
                 field line3: String =,
                 field line4: String =,
             }
+            packet SetSign_i16y {
+                field x: i32 =,
+                field y: i16 =,
+                field z: i32 =,
+                field line1: String =,
+                field line2: String =,
+                field line3: String =,
+                field line4: String =,
+            }
             /// ArmSwing is sent by the client when the player left clicks (to swing their
             /// arm).
             packet ArmSwing {
@@ -289,6 +357,10 @@ state_packets!(
             }
             packet ArmSwing_Handsfree {
                 field empty: () =,
+            }
+            packet ArmSwing_Handsfree_ID {
+                field entity_id: i32 =,
+                field animation: u8 =,
             }
             /// SpectateTeleport is sent by clients in spectator mode to teleport to a player.
             packet SpectateTeleport {
@@ -313,6 +385,16 @@ state_packets!(
             }
             packet PlayerBlockPlacement_u8_Item {
                 field location: Position =,
+                field face: u8 =,
+                field hand: Option<item::Stack> =,
+                field cursor_x: u8 =,
+                field cursor_y: u8 =,
+                field cursor_z: u8 =,
+            }
+            packet PlayerBlockPlacement_u8_Item_u8y {
+                field x: i32 =,
+                field y: u8 =,
+                field z: i32 =,
                 field face: u8 =,
                 field hand: Option<item::Stack> =,
                 field cursor_x: u8 =,
@@ -709,6 +791,9 @@ state_packets!(
                 field id: i64 =,
             }
             packet KeepAliveClientbound_VarInt {
+                field id: VarInt =,
+            }
+            packet KeepAliveClientbound_i32 {
                 field id: VarInt =,
             }
             /// ChunkData sends or updates a single chunk on the client. If New is set

@@ -8,33 +8,33 @@ protocol_packet_ids!(
     }
     play Play {
         serverbound Serverbound {
-            0x00 => KeepAliveServerbound_VarInt
+            0x00 => KeepAliveServerbound_i32
             0x01 => ChatMessage
-            0x02 => UseEntity_Handsfree
+            0x02 => UseEntity_Handsfree_i32
             0x03 => Player
-            0x04 => PlayerPosition
+            0x04 => PlayerPosition_HeadY
             0x05 => PlayerLook
-            0x06 => PlayerPositionLook
-            0x07 => PlayerDigging_u8
-            0x08 => PlayerBlockPlacement_u8_Item
+            0x06 => PlayerPositionLook_HeadY
+            0x07 => PlayerDigging_u8_u8y
+            0x08 => PlayerBlockPlacement_u8_Item_u8y
             0x09 => HeldItemChange
-            0x0a => ArmSwing_Handsfree
-            0x0b => PlayerAction
-            0x0c => SteerVehicle
+            0x0a => ArmSwing_Handsfree_ID
+            0x0b => PlayerAction_i32
+            0x0c => SteerVehicle_jump_unmount
             0x0d => CloseWindow
             0x0e => ClickWindow_u8
             0x0f => ConfirmTransactionServerbound
             0x10 => CreativeInventoryAction
             0x11 => EnchantItem
-            0x12 => SetSign
+            0x12 => SetSign_i16y
             0x13 => ClientAbilities
-            0x14 => TabComplete_NoAssume
-            0x15 => ClientSettings_u8_Handsfree
-            0x16 => ClientStatus
-            0x17 => PluginMessageServerbound
+            0x14 => TabComplete_NoAssume_NoTarget
+            0x15 => ClientSettings_u8_Handsfree_Difficulty
+            0x16 => ClientStatus_u8
+            0x17 => PluginMessageServerbound_i16
         }
         clientbound Clientbound {
-            0x00 => KeepAliveClientbound_VarInt
+            0x00 => KeepAliveClientbound_i32
             0x01 => JoinGame_i8
             0x02 => ServerMessage
             0x03 => TimeUpdate
