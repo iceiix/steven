@@ -48,8 +48,8 @@ pub struct Metadata19 {
 
 // TODO: reduce this redundancy
 impl Metadata18 {
-    pub fn new() -> Metadata18 {
-        Metadata18 { map: HashMap::new() }
+    pub fn new() -> Self {
+        Self { map: HashMap::new() }
     }
 
     pub fn get<T: MetaValue>(&self, key: &MetadataKey<T>) -> Option<&T> {
@@ -65,8 +65,8 @@ impl Metadata18 {
     }
 }
 impl Metadata19 {
-    pub fn new() -> Metadata19 {
-        Metadata19 { map: HashMap::new() }
+    pub fn new() -> Self {
+        Self { map: HashMap::new() }
     }
 
     pub fn get<T: MetaValue>(&self, key: &MetadataKey<T>) -> Option<&T> {
