@@ -652,7 +652,7 @@ state_packets!(
                 field z: i32 =,
                 field action: u8 =,
                 field data_length: i16 =,
-                field nbt: Option<nbt::NamedTag> = when(|p: &UpdateBlockEntity_Data| p.data_length > 0),
+                field gzipped_nbt: Vec<u8> =,
             }
             /// BlockAction triggers different actions depending on the target block.
             packet BlockAction {
