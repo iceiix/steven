@@ -560,11 +560,9 @@ impl World {
          Ok(())
     }
 
-    pub fn load_chunk18(&mut self, x: i32, z: i32, new: bool, _skylight: bool, mask: u16, mut data: &mut std::io::Cursor<Vec<u8>>) -> Result<(), protocol::Error> {
-        // TODO: 1.8
+    pub fn load_chunk18(&mut self, x: i32, z: i32, new: bool, _skylight: bool, mask: u16, data: &mut std::io::Cursor<Vec<u8>>) -> Result<(), protocol::Error> {
         use std::io::Read;
         use byteorder::ReadBytesExt;
-        use crate::protocol::{VarInt, Serializable, LenPrefixed};
 
         let cpos = CPos(x, z);
         {
@@ -594,25 +592,10 @@ impl World {
                 let section = chunk.sections[i as usize].as_mut().unwrap();
                 section.dirty = true;
 
-                let mut bit_size = data.read_u8()?;
-                let mut mappings: HashMap<usize, block::Block, BuildHasherDefault<FNVHash>> = HashMap::with_hasher(BuildHasherDefault::default());
-                if bit_size == 0 {
-                    bit_size = 13;
-                } else {
-                    let count = VarInt::read_from(&mut data)?.0;
-                    for i in 0 .. count {
-                        let id = VarInt::read_from(&mut data)?.0;
-                        let bl = block::Block::by_vanilla_id(id as usize);
-                        mappings.insert(i as usize, bl);
-                    }
-                }
-
-                let bits = LenPrefixed::<VarInt, u64>::read_from(&mut data)?.data;
-                let m = bit::Map::from_raw(bits, bit_size as usize);
-
                 for bi in 0 .. 4096 {
-                    let id = m.get(bi);
-                    section.blocks.set(bi, mappings.get(&id).cloned().unwrap_or(block::Block::by_vanilla_id(id)));
+                    let id = data.read_u16::<byteorder::LittleEndian>()?;
+                    section.blocks.set(bi, block::Block::by_vanilla_id(id as usize));
+
                     // Spawn block entities
                     let b = section.blocks.get(bi);
                     if block_entity::BlockEntityType::get_block_entity(b).is_some() {
@@ -627,8 +610,23 @@ impl World {
                         self.block_entity_actions.push_back(BlockEntityAction::Create(pos))
                     }
                 }
+            }
+
+            for i in 0 .. 16 {
+                if mask & (1 << i) == 0 {
+                    continue;
+                }
+                let section = chunk.sections[i as usize].as_mut().unwrap();
 
                 data.read_exact(&mut section.block_light.data)?;
+            }
+
+            for i in 0 .. 16 {
+                if mask & (1 << i) == 0 {
+                    continue;
+                }
+                let section = chunk.sections[i as usize].as_mut().unwrap();
+
                 data.read_exact(&mut section.sky_light.data)?;
             }
 
