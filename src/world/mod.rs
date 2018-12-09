@@ -553,9 +553,7 @@ impl World {
              let z = chunk_meta.z;
              let mask = chunk_meta.bitmask;
 
-             println!("about to load_chunk x={} z={} mask={:x}", x, z, mask);
              self.load_chunk18(x, z, new, skylight, mask, &mut data)?;
-             //panic!("done");
          }
          Ok(())
     }
