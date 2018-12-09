@@ -32,8 +32,6 @@ protocol_packet_ids!(
             0x15 => ClientSettings_u8_Handsfree
             0x16 => ClientStatus
             0x17 => PluginMessageServerbound
-            0x18 => SpectateTeleport
-            0x19 => ResourcePackStatus
         }
         clientbound Clientbound {
             0x00 => KeepAliveClientbound_VarInt
@@ -101,15 +99,6 @@ protocol_packet_ids!(
             0x3e => Teams
             0x3f => PluginMessageClientbound
             0x40 => Disconnect
-            0x41 => ServerDifficulty
-            0x42 => CombatEvent
-            0x43 => Camera
-            0x44 => WorldBorder
-            0x45 => Title_notext_component
-            0x46 => SetCompression
-            0x47 => PlayerListHeaderFooter
-            0x48 => ResourcePackSend
-            0x49 => EntityUpdateNBT
         }
     }
     login Login {
@@ -121,7 +110,6 @@ protocol_packet_ids!(
             0x00 => LoginDisconnect
             0x01 => EncryptionRequest
             0x02 => LoginSuccess
-            0x03 => SetInitialCompression
         }
     }
     status Status {
