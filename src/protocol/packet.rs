@@ -1235,6 +1235,10 @@ state_packets!(
                 /// public key
                 field verify_token: LenPrefixedBytes<VarInt> =,
             }
+            packet EncryptionResponse_i16 {
+                field shared_secret: LenPrefixedBytes<i16> =,
+                field verify_token: LenPrefixedBytes<i16> =,
+            }
         }
         clientbound Clientbound {
             /// LoginDisconnect is sent by the server if there was any issues
@@ -1255,6 +1259,11 @@ state_packets!(
                 /// Token used by the server to verify encryption is working
                 /// correctly
                 field verify_token: LenPrefixedBytes<VarInt> =,
+            }
+            packet EncryptionRequest_i16 {
+                field server_id: String =,
+                field public_key: LenPrefixedBytes<i16> =,
+                field verify_token: LenPrefixedBytes<i16> =,
             }
             /// LoginSuccess is sent by the server if the player successfully
             /// authenicates with the session servers (online mode) or straight

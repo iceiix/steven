@@ -120,14 +120,23 @@ impl Server {
             username: profile.username.clone(),
         })?;
 
-        let packet;
+        use std::rc::Rc;
+        let (server_id, public_key, verify_token);
         loop {
             match conn.read_packet()? {
                 protocol::packet::Packet::SetInitialCompression(val) => {
                     conn.set_compresssion(val.threshold.0);
                 },
                 protocol::packet::Packet::EncryptionRequest(val) => {
-                    packet = val;
+                    server_id = Rc::new(val.server_id);
+                    public_key = Rc::new(val.public_key.data);
+                    verify_token = Rc::new(val.verify_token.data);
+                    break;
+                },
+                protocol::packet::Packet::EncryptionRequest_i16(val) => {
+                    server_id = Rc::new(val.server_id);
+                    public_key = Rc::new(val.public_key.data);
+                    verify_token = Rc::new(val.verify_token.data);
                     break;
                 },
                 protocol::packet::Packet::LoginSuccess(val) => {
@@ -145,25 +154,32 @@ impl Server {
             };
         }
 
-        println!("packet.public_key.data = {:?}", &packet.public_key.data);
+        println!("packet.public_key.data = {:?}", &public_key);
         let mut shared = [0; 16];
         // TODO: is this cryptographically secure enough?
         rand::thread_rng().fill(&mut shared);
 
         println!("shared ({:} bytes) = {:?}", shared.len(), &shared);
-        println!("packet.verify_token.data = {:?}", &packet.verify_token.data);
+        println!("packet.verify_token.data = {:?}", &verify_token);
 
-        let shared_e = rsa_public_encrypt_pkcs1::encrypt(&packet.public_key.data, &shared).unwrap();
-        let token_e = rsa_public_encrypt_pkcs1::encrypt(&packet.public_key.data, &packet.verify_token.data).unwrap();
+        let shared_e = rsa_public_encrypt_pkcs1::encrypt(&public_key, &shared).unwrap();
+        let token_e = rsa_public_encrypt_pkcs1::encrypt(&public_key, &verify_token).unwrap();
         println!("new shared_e({:}) = {:?}", shared_e.len(), &shared_e);
         println!("new token_e({:}) = {:?}", token_e.len(), &token_e);
 
-        profile.join_server(&packet.server_id, &shared, &packet.public_key.data)?;
+        profile.join_server(&server_id, &shared, &public_key)?;
 
-        conn.write_packet(protocol::packet::login::serverbound::EncryptionResponse {
-            shared_secret: protocol::LenPrefixedBytes::new(shared_e),
-            verify_token: protocol::LenPrefixedBytes::new(token_e),
-        })?;
+        if protocol_version >= 47 {
+            conn.write_packet(protocol::packet::login::serverbound::EncryptionResponse {
+                shared_secret: protocol::LenPrefixedBytes::new(shared_e),
+                verify_token: protocol::LenPrefixedBytes::new(token_e),
+            })?;
+        } else {
+            conn.write_packet(protocol::packet::login::serverbound::EncryptionResponse_i16 {
+                shared_secret: protocol::LenPrefixedBytes::new(shared_e),
+                verify_token: protocol::LenPrefixedBytes::new(token_e),
+            })?;
+        }
 
         let mut read = conn.clone();
         let mut write = conn.clone();
