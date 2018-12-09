@@ -333,13 +333,13 @@ impl fmt::Debug for Metadata18 {
 
 // TODO: reduce duplication
 impl Default for Metadata19 {
-    fn default() -> Metadata19 {
-        Metadata19::new()
+    fn default() -> Self {
+        Self::new()
     }
 }
 impl Default for Metadata18 {
-    fn default() -> Metadata18 {
-        Metadata18::new()
+    fn default() -> Self {
+        Self::new()
     }
 }
 
