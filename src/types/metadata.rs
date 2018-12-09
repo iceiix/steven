@@ -38,7 +38,7 @@ impl <T: MetaValue> MetadataKey<T> {
     }
 }
 
-pub struct Metadata {
+struct Metadata {
     map: HashMap<i32, Value>,
 }
 
@@ -60,12 +60,57 @@ impl Metadata {
     }
 }
 
-impl Serializable for Metadata {
+pub struct Metadata18 {
+    metadata: Metadata,
+}
+
+pub struct Metadata19 {
+    metadata: Metadata,
+}
+
+// TODO: reduce this redundancy
+impl Metadata18 {
+    pub fn new() -> Metadata18 {
+        Metadata18 { metadata: Metadata { map: HashMap::new() } }
+    }
+
+    pub fn get<T: MetaValue>(&self, key: &MetadataKey<T>) -> Option<&T> {
+        self.metadata.map.get(&key.index).map(T::unwrap)
+    }
+
+    pub fn put<T: MetaValue>(&mut self, key: &MetadataKey<T>, val: T) {
+        self.metadata.map.insert(key.index, val.wrap());
+    }
+
+    fn put_raw<T: MetaValue>(&mut self, index: i32, val: T) {
+        self.metadata.map.insert(index, val.wrap());
+    }
+}
+impl Metadata19 {
+    pub fn new() -> Metadata19 {
+        Metadata19 { metadata: Metadata { map: HashMap::new() } }
+    }
+
+    pub fn get<T: MetaValue>(&self, key: &MetadataKey<T>) -> Option<&T> {
+        self.metadata.map.get(&key.index).map(T::unwrap)
+    }
+
+    pub fn put<T: MetaValue>(&mut self, key: &MetadataKey<T>, val: T) {
+        self.metadata.map.insert(key.index, val.wrap());
+    }
+
+    fn put_raw<T: MetaValue>(&mut self, index: i32, val: T) {
+        self.metadata.map.insert(index, val.wrap());
+    }
+}
+
+
+
+impl Serializable for Metadata18 {
 
     fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, protocol::Error> {
         let mut m = Metadata::new();
         loop {
-            // 1.8-
             let ty_index = u8::read_from(buf)? as i32;
             if ty_index == 0x7f {
                 break;
@@ -90,61 +135,12 @@ impl Serializable for Metadata {
                                 f32::read_from(buf)?]),
                 _ => return Err(protocol::Error::Err("unknown metadata type".to_owned())),
             }
-
-            /* TODO: 1.9+
-            let index = u8::read_from(buf)? as i32;
-            if index == 0xFF {
-                break;
-            }
-            let ty = protocol::VarInt::read_from(buf)?.0;
-            match ty {
-                0 => m.put_raw(index, i8::read_from(buf)?),
-                1 => m.put_raw(index, protocol::VarInt::read_from(buf)?.0),
-                2 => m.put_raw(index, f32::read_from(buf)?),
-                3 => m.put_raw(index, String::read_from(buf)?),
-                4 => m.put_raw(index, format::Component::read_from(buf)?),
-                5 => m.put_raw(index, Option::<item::Stack>::read_from(buf)?),
-                6 => m.put_raw(index, bool::read_from(buf)?),
-                7 => m.put_raw(index,
-                               [f32::read_from(buf)?,
-                                f32::read_from(buf)?,
-                                f32::read_from(buf)?]),
-                8 => m.put_raw(index, Position::read_from(buf)?),
-                9 => {
-                    if bool::read_from(buf)? {
-                        m.put_raw(index, Option::<Position>::read_from(buf)?);
-                    } else {
-                        m.put_raw::<Option<Position>>(index, None);
-                    }
-                }
-                10 => m.put_raw(index, protocol::VarInt::read_from(buf)?),
-                11 => {
-                    if bool::read_from(buf)? {
-                        m.put_raw(index, Option::<protocol::UUID>::read_from(buf)?);
-                    } else {
-                        m.put_raw::<Option<protocol::UUID>>(index, None);
-                    }
-                }
-                12 => m.put_raw(index, protocol::VarInt::read_from(buf)?.0 as u16),
-                13 => {
-                    let ty = u8::read_from(buf)?;
-                    if ty != 0 {
-                        let name = nbt::read_string(buf)?;
-                        let tag = nbt::Tag::read_from(buf)?;
-
-                        m.put_raw(index, nbt::NamedTag(name, tag));
-                    }
-                }
-                _ => return Err(protocol::Error::Err("unknown metadata type".to_owned())),
-            }
-            */
         }
-        Ok(m)
+        Ok(Metadata18 {metadata: m})
     }
 
     fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), protocol::Error> {
-        // 1.8-
-        for (k, v) in &self.map {
+        for (k, v) in &self.metadata.map {
             if (*k as u8) > 0x1f {
                 panic!("write metadata index {:x} > 0x1f", *k as u8);
             }
@@ -201,10 +197,65 @@ impl Serializable for Metadata {
         }
         u8::write_to(&0x7f, buf)?;
         Ok(())
+    }
+}
 
+impl Serializable for Metadata19 {
 
-        /* TODO: 1.9+
-        for (k, v) in &self.map {
+    fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, protocol::Error> {
+        let mut m = Metadata::new();
+        loop {
+            let index = u8::read_from(buf)? as i32;
+            if index == 0xFF {
+                break;
+            }
+            let ty = protocol::VarInt::read_from(buf)?.0;
+            match ty {
+                0 => m.put_raw(index, i8::read_from(buf)?),
+                1 => m.put_raw(index, protocol::VarInt::read_from(buf)?.0),
+                2 => m.put_raw(index, f32::read_from(buf)?),
+                3 => m.put_raw(index, String::read_from(buf)?),
+                4 => m.put_raw(index, format::Component::read_from(buf)?),
+                5 => m.put_raw(index, Option::<item::Stack>::read_from(buf)?),
+                6 => m.put_raw(index, bool::read_from(buf)?),
+                7 => m.put_raw(index,
+                               [f32::read_from(buf)?,
+                                f32::read_from(buf)?,
+                                f32::read_from(buf)?]),
+                8 => m.put_raw(index, Position::read_from(buf)?),
+                9 => {
+                    if bool::read_from(buf)? {
+                        m.put_raw(index, Option::<Position>::read_from(buf)?);
+                    } else {
+                        m.put_raw::<Option<Position>>(index, None);
+                    }
+                }
+                10 => m.put_raw(index, protocol::VarInt::read_from(buf)?),
+                11 => {
+                    if bool::read_from(buf)? {
+                        m.put_raw(index, Option::<protocol::UUID>::read_from(buf)?);
+                    } else {
+                        m.put_raw::<Option<protocol::UUID>>(index, None);
+                    }
+                }
+                12 => m.put_raw(index, protocol::VarInt::read_from(buf)?.0 as u16),
+                13 => {
+                    let ty = u8::read_from(buf)?;
+                    if ty != 0 {
+                        let name = nbt::read_string(buf)?;
+                        let tag = nbt::Tag::read_from(buf)?;
+
+                        m.put_raw(index, nbt::NamedTag(name, tag));
+                    }
+                }
+                _ => return Err(protocol::Error::Err("unknown metadata type".to_owned())),
+            }
+        }
+        Ok(Metadata19 { metadata: m })
+    }
+
+    fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), protocol::Error> {
+        for (k, v) in &self.metadata.map {
             (*k as u8).write_to(buf)?;
             match *v {
                 Value::Byte(ref val) => {
@@ -268,13 +319,14 @@ impl Serializable for Metadata {
                     // TODO: write NBT tags metadata
                     //nbt::Tag(*val).write_to(buf)?;
                 }
+                _ => panic!("unexpected metadata"),
             }
         }
         u8::write_to(&0xFF, buf)?;
         Ok(())
-    */
     }
 }
+
 
 impl fmt::Debug for Metadata {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -286,11 +338,46 @@ impl fmt::Debug for Metadata {
     }
 }
 
+// TODO: reduce duplication
+impl fmt::Debug for Metadata19 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Metadata19[ ")?;
+        for (k, v) in &self.metadata.map {
+            write!(f, "{:?}={:?}, ", k, v)?;
+        }
+        write!(f, "]")
+    }
+}
+impl fmt::Debug for Metadata18 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Metadata18[ ")?;
+        for (k, v) in &self.metadata.map {
+            write!(f, "{:?}={:?}, ", k, v)?;
+        }
+        write!(f, "]")
+    }
+}
+
+
+
 impl Default for Metadata {
     fn default() -> Metadata {
         Metadata::new()
     }
 }
+// TODO: reduce duplication
+impl Default for Metadata19 {
+    fn default() -> Metadata19 {
+        Metadata19::new()
+    }
+}
+impl Default for Metadata18 {
+    fn default() -> Metadata18 {
+        Metadata18::new()
+    }
+}
+
+
 
 #[derive(Debug)]
 pub enum Value {
