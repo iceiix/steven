@@ -682,13 +682,17 @@ impl World {
                 }
 
                 println!("about to read block_light from position={}", data.position());
-                data.seek(SeekFrom::Start(offset_light))?;
+                if format == ChunkFormat::V1_8 {
+                    data.seek(SeekFrom::Start(offset_light))?;
+                }
                 data.read_exact(&mut section.block_light.data)?;
                 offset_light = data.position();
                 println!("done read block_light from position={}", data.position());
                 if skylight {
                     println!("about to read skylight from position={}", data.position());
-                    data.seek(SeekFrom::Start(offset_skylight))?;
+                    if format == ChunkFormat::V1_8 {
+                        data.seek(SeekFrom::Start(offset_skylight))?;
+                    }
                     data.read_exact(&mut section.sky_light.data)?;
                     offset_skylight = data.position();
                     println!("done read skylight from position={}", data.position());
