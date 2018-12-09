@@ -557,6 +557,7 @@ impl World {
     }
     
     pub fn load_chunks18(&mut self, new: bool, skylight: bool, chunk_metas: &[crate::protocol::packet::ChunkMeta], data: Vec<u8>) -> Result<(), protocol::Error> {
+        println!("load_chunks18 new={} skylight={} chunk_metas: {:?}", new, skylight, chunk_metas);
         self.load_chunks(ChunkFormat::V1_8, new, skylight, &chunk_metas, data)
     }
 
@@ -568,8 +569,10 @@ impl World {
             let z = chunk_meta.z;
             let mask = chunk_meta.bitmask;
 
+            println!("about to load_chunk x={} z={} mask={:x}", x, z, mask);
             self.load_chunk(format, new, skylight, x, z, mask, &mut data)?;
         }
+        panic!("done");
         Ok(())
     }
 
@@ -591,6 +594,7 @@ impl World {
             };
 
             for i in 0 .. 16 {
+                println!("iteration={}", i);
                 if chunk.sections[i].is_none() {
                     let mut fill_sky = chunk.sections.iter()
                         .skip(i)
@@ -646,6 +650,7 @@ impl World {
                     ChunkFormat::V1_8 => {
                         for bi in 0 .. 4096 {
                             let id = data.read_u16::<byteorder::LittleEndian>()?;
+                            println!("section {}, block #{} = {}:{}", i, bi, id>>4, id&0xF);
                             section.blocks.set(bi, block::Block::by_vanilla_id(id as usize));
 
                             // TODO: Spawn block entities
