@@ -46,7 +46,7 @@ pub struct Metadata19 {
     map: HashMap<i32, Value>,
 }
 
-trait MetadataBase {
+trait MetadataBase: fmt::Debug + Default {
     fn map(&self) -> &HashMap<i32, Value>;
     fn map_mut(&mut self) -> &mut HashMap<i32, Value>;
 
@@ -62,6 +62,13 @@ trait MetadataBase {
         self.map_mut().insert(index, val.wrap());
     }
 
+    fn fmt2(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Metadata[ ")?;
+        for (k, v) in self.map() {
+            write!(f, "{:?}={:?}, ", k, v)?;
+        }
+        write!(f, "]")
+    }
 }
 
 impl MetadataBase for Metadata18 {
@@ -78,8 +85,8 @@ impl Metadata18 {
     pub fn new() -> Self {
         Self { map: HashMap::new() }
     }
-
 }
+
 impl Metadata19 {
     pub fn new() -> Self {
         Self { map: HashMap::new() }
@@ -309,29 +316,10 @@ impl Serializable for Metadata19 {
     }
 }
 
+// TODO: is it possible to implement these traits on MetadataBase instead?
+impl fmt::Debug for Metadata19 { fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { self.fmt2(f) } }
+impl fmt::Debug for Metadata18 { fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { self.fmt2(f) } }
 
-// TODO: reduce duplication
-impl fmt::Debug for Metadata19 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Metadata[ ")?;
-        for (k, v) in &self.map {
-            write!(f, "{:?}={:?}, ", k, v)?;
-        }
-        write!(f, "]")
-    }
-}
-impl fmt::Debug for Metadata18 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Metadata[ ")?;
-        for (k, v) in &self.map {
-            write!(f, "{:?}={:?}, ", k, v)?;
-        }
-        write!(f, "]")
-    }
-}
-
-
-// TODO: reduce duplication
 impl Default for Metadata19 {
     fn default() -> Self {
         Self::new()
