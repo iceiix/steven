@@ -402,7 +402,9 @@ impl Server {
                             ChunkData => on_chunk_data,
                             ChunkData_NoEntities => on_chunk_data_no_entities,
                             ChunkData_NoEntities_u16 => on_chunk_data_no_entities_u16,
+                            ChunkData_NoEntities_u16_Add => on_chunk_data_no_entities_u16_add,
                             ChunkDataBulk => on_chunk_data_bulk,
+                            ChunkDataBulk_17 => on_chunk_data_bulk_17,
                             ChunkUnload => on_chunk_unload,
                             BlockChange => on_block_change,
                             MultiBlockChange => on_multi_block_change,
@@ -1071,9 +1073,17 @@ impl Server {
         self.world.load_chunks18(chunk_data.new, skylight, &chunk_meta, chunk_data.data.data).unwrap();
     }
 
+    fn on_chunk_data_no_entities_u16_add(&mut self, chunk_data: packet::play::clientbound::ChunkData_NoEntities_u16_Add) {
+        self.world.load_chunk17(chunk_data.chunk_x, chunk_data.chunk_z, chunk_data.new, chunk_data.bitmask, chunk_data.add_bitmask, chunk_data.data.data).unwrap();
+    }
+
     fn on_chunk_data_bulk(&mut self, bulk: packet::play::clientbound::ChunkDataBulk) {
         let new = true;
         self.world.load_chunks18(new, bulk.skylight, &bulk.chunk_meta.data, bulk.chunk_data.to_vec()).unwrap();
+    }
+
+    fn on_chunk_data_bulk_17(&mut self, bulk: packet::play::clientbound::ChunkDataBulk_17) {
+        self.world.load_chunks17(bulk.chunk_column_count, bulk.data_length, bulk.skylight, bulk.chunk_data_and_meta);
     }
 
     fn on_chunk_unload(&mut self, chunk_unload: packet::play::clientbound::ChunkUnload) {
