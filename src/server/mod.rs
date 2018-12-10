@@ -592,9 +592,28 @@ impl Server {
                         cursor_y: (at.y * 16.0) as u8,
                         cursor_z: (at.z * 16.0) as u8,
                     });
-                } else {
+                } else if self.protocol_version >= 47 {
                     self.write_packet(packet::play::serverbound::PlayerBlockPlacement_u8_Item {
                         location: pos,
+                        face: match face {
+                            Direction::Down => 0,
+                            Direction::Up => 1,
+                            Direction::North => 2,
+                            Direction::South => 3,
+                            Direction::West => 4,
+                            Direction::East => 5,
+                            _ => unreachable!(),
+                        },
+                        hand: None,
+                        cursor_x: (at.x * 16.0) as u8,
+                        cursor_y: (at.y * 16.0) as u8,
+                        cursor_z: (at.z * 16.0) as u8,
+                    });
+                } else {
+                    self.write_packet(packet::play::serverbound::PlayerBlockPlacement_u8_Item_u8y {
+                        x: pos.x,
+                        y: pos.y as u8,
+                        z: pos.x,
                         face: match face {
                             Direction::Down => 0,
                             Direction::Up => 1,
