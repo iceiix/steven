@@ -154,7 +154,7 @@ state_packets!(
             }
             packet PluginMessageServerbound_i16 {
                 field channel: String =,
-                field data: LenPrefixed<i16, Vec<u8>> =,
+                field data: LenPrefixedBytes<i16> =,
             }
             /// UseEntity is sent when the user interacts (right clicks) or attacks
             /// (left clicks) an entity.
@@ -792,7 +792,7 @@ state_packets!(
             }
             packet PluginMessageClientbound_i16 {
                 field channel: String =,
-                field data: LenPrefixed<i16, Vec<u8>> =,
+                field data: LenPrefixedBytes<i16> =,
             }
             /// Plays a sound by name on the client
             packet NamedSoundEffect {
