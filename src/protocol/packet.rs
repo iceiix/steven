@@ -499,7 +499,7 @@ state_packets!(
                 field velocity_x: i16 =,
                 field velocity_y: i16 =,
                 field velocity_z: i16 =,
-                field metadata: types::Metadata19 =,
+                field metadata: types::Metadata =,
             }
             packet SpawnMob_u8 {
                 field entity_id: VarInt =,
@@ -514,7 +514,7 @@ state_packets!(
                 field velocity_x: i16 =,
                 field velocity_y: i16 =,
                 field velocity_z: i16 =,
-                field metadata: types::Metadata19 =,
+                field metadata: types::Metadata =,
             }
             packet SpawnMob_u8_i32 {
                 field entity_id: VarInt =,
@@ -529,9 +529,9 @@ state_packets!(
                 field velocity_x: i16 =,
                 field velocity_y: i16 =,
                 field velocity_z: i16 =,
-                field metadata: types::Metadata19 =,
+                field metadata: types::Metadata =,
             }
-            packet SpawnMob_u8_i32_NoUUID_18 {
+            packet SpawnMob_u8_i32_NoUUID {
                 field entity_id: VarInt =,
                 field ty: u8 =,
                 field x: i32 =,
@@ -543,7 +543,7 @@ state_packets!(
                 field velocity_x: i16 =,
                 field velocity_y: i16 =,
                 field velocity_z: i16 =,
-                field metadata: types::Metadata18 =,
+                field metadata: types::Metadata =,
             }
             /// SpawnPainting spawns a painting into the world when it is in range of
             /// the client. The title effects the size and the texture of the painting.
@@ -579,7 +579,7 @@ state_packets!(
                 field z: f64 =,
                 field yaw: i8 =,
                 field pitch: i8 =,
-                field metadata: types::Metadata19 =,
+                field metadata: types::Metadata =,
             }
             packet SpawnPlayer_i32 {
                 field entity_id: VarInt =,
@@ -589,9 +589,9 @@ state_packets!(
                 field z: i32 =,
                 field yaw: i8 =,
                 field pitch: i8 =,
-                field metadata: types::Metadata19 =,
+                field metadata: types::Metadata =,
             }
-            packet SpawnPlayer_i32_HeldItem_18 {
+            packet SpawnPlayer_i32_HeldItem {
                 field entity_id: VarInt =,
                 field uuid: UUID =,
                 field x: i32 =,
@@ -600,9 +600,9 @@ state_packets!(
                 field yaw: i8 =,
                 field pitch: i8 =,
                 field current_item: u16 =,
-                field metadata: types::Metadata18 =,
+                field metadata: types::Metadata =,
             }
-            packet SpawnPlayer_i32_HeldItem_18_String {
+            packet SpawnPlayer_i32_HeldItem_String {
                 field entity_id: VarInt =,
                 field uuid: String =,
                 field name: String =,
@@ -613,7 +613,7 @@ state_packets!(
                 field yaw: i8 =,
                 field pitch: i8 =,
                 field current_item: u16 =,
-                field metadata: types::Metadata18 =,
+                field metadata: types::Metadata =,
             }
 
             /// Animation is sent by the server to play an animation on a specific entity.
@@ -1266,15 +1266,11 @@ state_packets!(
             /// EntityMetadata updates the metadata for an entity.
             packet EntityMetadata {
                 field entity_id: VarInt =,
-                field metadata: types::Metadata19 =,
+                field metadata: types::Metadata =,
             }
-            packet EntityMetadata_18 {
-                field entity_id: VarInt =,
-                field metadata: types::Metadata18 =,
-            }
-            packet EntityMetadata_18_i32 {
+            packet EntityMetadata_i32 {
                 field entity_id: i32 =,
-                field metadata: types::Metadata18 =,
+                field metadata: types::Metadata =,
             }
             /// EntityAttach attaches to entities together, either by mounting or leashing.
             /// -1 can be used at the EntityID to deattach.

@@ -46,10 +46,10 @@ protocol_packet_ids!(
             0x09 => SetCurrentHotbarSlot
             0x0a => EntityUsedBed_i32
             0x0b => Animation
-            0x0c => SpawnPlayer_i32_HeldItem_18_String
+            0x0c => SpawnPlayer_i32_HeldItem_String
             0x0d => CollectItem_nocount_i32
             0x0e => SpawnObject_i32_NoUUID
-            0x0f => SpawnMob_u8_i32_NoUUID_18
+            0x0f => SpawnMob_u8_i32_NoUUID
             0x10 => SpawnPainting_NoUUID_i32
             0x11 => SpawnExperienceOrb_i32
             0x12 => EntityVelocity_i32
@@ -62,7 +62,7 @@ protocol_packet_ids!(
             0x19 => EntityHeadLook_i32
             0x1a => EntityStatus
             0x1b => EntityAttach_leashed
-            0x1c => EntityMetadata_18_i32
+            0x1c => EntityMetadata_i32
             0x1d => EntityEffect_i32
             0x1e => EntityRemoveEffect_i32
             0x1f => SetExperience_i16
