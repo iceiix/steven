@@ -684,9 +684,15 @@ impl Server {
         self.player = Some(player);
 
         // Let the server know who we are
-        self.write_packet(plugin_messages::Brand {
-            brand: "Steven".into(),
-        }.as_message());
+        if self.protocol_version >= 47 {
+            self.write_packet(plugin_messages::Brand {
+                brand: "Steven".into(),
+            }.as_message());
+        } else {
+            self.write_packet(plugin_messages::Brand {
+                brand: "Steven".into(),
+            }.as_message17());
+        }
     }
 
     fn on_respawn(&mut self, respawn: packet::play::clientbound::Respawn) {
