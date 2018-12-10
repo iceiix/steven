@@ -397,6 +397,7 @@ impl Server {
                             Respawn => on_respawn,
                             KeepAliveClientbound_i64 => on_keep_alive_i64,
                             KeepAliveClientbound_VarInt => on_keep_alive_varint,
+                            KeepAliveClientbound_i32 => on_keep_alive_i32,
                             ChunkData => on_chunk_data,
                             ChunkData_NoEntities => on_chunk_data_no_entities,
                             ChunkData_NoEntities_u16 => on_chunk_data_no_entities_u16,
@@ -612,6 +613,12 @@ impl Server {
 
     fn on_keep_alive_varint(&mut self, keep_alive: packet::play::clientbound::KeepAliveClientbound_VarInt) {
         self.write_packet(packet::play::serverbound::KeepAliveServerbound_VarInt {
+            id: keep_alive.id,
+        });
+    }
+
+    fn on_keep_alive_i32(&mut self, keep_alive: packet::play::clientbound::KeepAliveClientbound_i32) {
+        self.write_packet(packet::play::serverbound::KeepAliveServerbound_i32 {
             id: keep_alive.id,
         });
     }
