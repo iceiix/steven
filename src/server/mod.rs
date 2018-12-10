@@ -521,15 +521,28 @@ impl Server {
 
             // Sync our position to the server
             // Use the smaller packets when possible
-            let packet = packet::play::serverbound::PlayerPositionLook {
-                x: position.position.x,
-                y: position.position.y,
-                z: position.position.z,
-                yaw: -(rotation.yaw as f32) * (180.0 / PI),
-                pitch: (-rotation.pitch as f32) * (180.0 / PI) + 180.0,
-                on_ground,
-            };
-            self.write_packet(packet);
+            if self.protocol_version >= 47 {
+                let packet = packet::play::serverbound::PlayerPositionLook {
+                    x: position.position.x,
+                    y: position.position.y,
+                    z: position.position.z,
+                    yaw: -(rotation.yaw as f32) * (180.0 / PI),
+                    pitch: (-rotation.pitch as f32) * (180.0 / PI) + 180.0,
+                    on_ground,
+                };
+                self.write_packet(packet);
+            } else {
+                let packet = packet::play::serverbound::PlayerPositionLook_HeadY {
+                    x: position.position.x,
+                    y: position.position.y,
+                    head_y: 0.0, // TODO
+                    z: position.position.z,
+                    yaw: -(rotation.yaw as f32) * (180.0 / PI),
+                    pitch: (-rotation.pitch as f32) * (180.0 / PI) + 180.0,
+                    on_ground,
+                };
+                self.write_packet(packet);
+            }
         }
     }
 
