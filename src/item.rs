@@ -46,6 +46,10 @@ impl Serializable for Option<Stack> {
         let count = buf.read_u8()? as isize;
         let damage = buf.read_i16::<BigEndian>()? as isize;
 
+        protocol::CURRENT_PROTOCOL_VERSION.with(|v| {
+            println!("cpv = {}", *v.borrow());
+        });
+
         // 1.7
         let tag_size = buf.read_i16::<BigEndian>()?;
         let tag: Option<nbt::NamedTag> = if tag_size != -1 {
