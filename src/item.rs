@@ -46,9 +46,8 @@ impl Serializable for Option<Stack> {
         let count = buf.read_u8()? as isize;
         let damage = buf.read_i16::<BigEndian>()? as isize;
 
-        protocol::CURRENT_PROTOCOL_VERSION.with(|v| {
-            println!("cpv = {}", *v.borrow());
-        });
+        let protocol_version = unsafe { protocol::CURRENT_PROTOCOL_VERSION };
+        println!("cpv = {}", protocol_version);
 
         // 1.7
         let tag_size = buf.read_i16::<BigEndian>()?;

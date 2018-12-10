@@ -26,7 +26,6 @@ pub mod mojang;
 use crate::nbt;
 use crate::format;
 use std::fmt;
-use std::cell::RefCell;
 use std::default;
 use std::net::TcpStream;
 use std::io;
@@ -40,9 +39,8 @@ use crate::shared::Position;
 
 pub const SUPPORTED_PROTOCOLS: [i32; 9] = [340, 316, 315, 210, 109, 107, 74, 47, 5];
 
-thread_local! {
-    pub static CURRENT_PROTOCOL_VERSION: RefCell<i32> = RefCell::new(SUPPORTED_PROTOCOLS[0]);
-}
+// TODO: switch to using thread_local! storage, see https://doc.rust-lang.org/std/macro.thread_local.html
+pub static mut CURRENT_PROTOCOL_VERSION: i32 = SUPPORTED_PROTOCOLS[0];
 
 /// Helper macro for defining packets
 #[macro_export]
@@ -819,9 +817,9 @@ pub struct Conn {
 
 impl Conn {
     pub fn new(target: &str, protocol_version: i32) -> Result<Conn, Error> {
-        CURRENT_PROTOCOL_VERSION.with(|v| {
-            *v.borrow_mut() = protocol_version;
-        });
+        unsafe {
+            CURRENT_PROTOCOL_VERSION = protocol_version;
+        }
 
         // TODO SRV record support
         let mut parts = target.split(':').collect::<Vec<&str>>();
