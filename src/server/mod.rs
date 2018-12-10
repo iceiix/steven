@@ -394,6 +394,7 @@ impl Server {
                         self pck {
                             JoinGame_i32 => on_game_join_i32,
                             JoinGame_i8 => on_game_join_i8,
+                            JoinGame_i8_NoDebug => on_game_join_i8_nodebug,
                             Respawn => on_respawn,
                             KeepAliveClientbound_i64 => on_keep_alive_i64,
                             KeepAliveClientbound_VarInt => on_keep_alive_varint,
@@ -662,6 +663,11 @@ impl Server {
     fn on_game_join_i8(&mut self, join: packet::play::clientbound::JoinGame_i8) {
         self.on_game_join(join.gamemode, join.entity_id)
     }
+
+    fn on_game_join_i8_nodebug(&mut self, join: packet::play::clientbound::JoinGame_i8_NoDebug) {
+        self.on_game_join(join.gamemode, join.entity_id)
+    }
+
 
     fn on_game_join(&mut self, gamemode: u8, entity_id: i32) {
         let gamemode = Gamemode::from_int((gamemode & 0x7) as i32);
