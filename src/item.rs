@@ -47,21 +47,22 @@ impl Serializable for Option<Stack> {
         let damage = buf.read_i16::<BigEndian>()? as isize;
 
         let protocol_version = unsafe { protocol::CURRENT_PROTOCOL_VERSION };
-        println!("cpv = {}", protocol_version);
 
-        // 1.7
-        let tag_size = buf.read_i16::<BigEndian>()?;
-        let tag: Option<nbt::NamedTag> = if tag_size != -1 {
-            for _ in 0..tag_size {
-                let _ = buf.read_u8()?;
-            }
-            // TODO: un-gzip NBT
-            None
+        let tag: Option<nbt::NamedTag> = if protocol_version >= 47 {
+            Serializable::read_from(buf)?
         } else {
-            None
+            // TODO: https://wiki.vg/index.php?title=Slot_Data&diff=6056&oldid=4753
+            let tag_size = buf.read_i16::<BigEndian>()?;
+            if tag_size != -1 {
+                for _ in 0..tag_size {
+                    let _ = buf.read_u8()?;
+                }
+                // TODO: un-gzip NBT
+                None
+            } else {
+                None
+            }
         };
-        // TODO: support 1.8+
-        //Serializable::read_from(buf)?
 
         Ok(Some(Stack {
             id: id as isize,
