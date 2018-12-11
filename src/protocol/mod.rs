@@ -907,6 +907,10 @@ impl Conn {
         };
 
         println!("about to parse packet={:x}, state={:?}, dir={:?}, data={:?}", id, self.state, dir, buf);
+        if id == 0x26 {
+            std::fs::File::create("/tmp/p")?.write_all(buf.get_ref())?;
+            panic!("done");
+        }
         let packet = packet::packet_by_id(self.protocol_version, self.state, dir, id, &mut buf)?;
 
         match packet {
