@@ -656,8 +656,12 @@ impl World {
     pub fn load_chunks17(&mut self, chunk_column_count: u16, data_length: i32, skylight: bool, data: &[u8]) -> Result<(), protocol::Error> {
         println!("load_chunks17 chunk_column_count={} data_length={} skylight={}", chunk_column_count, data_length, skylight);
 
-         //let compressed_chunk_data = data.slice(0, data_length as usize);
-         //let meta_data = data.slice(data_length as usize);
+         let compressed_chunk_data = &data[0..data_length as usize];
+         let meta_data = &data[data_length as usize..];
+
+         println!("compressed_chunk_data = {:?}", compressed_chunk_data);
+         println!("meta_data = {:?}", meta_data);
+
          // TODO: 1.7 chunk parsing
 
          Ok(())
