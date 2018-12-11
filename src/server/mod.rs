@@ -1082,7 +1082,7 @@ impl Server {
     }
 
     fn on_chunk_data_bulk_17(&mut self, bulk: packet::play::clientbound::ChunkDataBulk_17) {
-        self.world.load_chunks17(bulk.chunk_column_count, bulk.data_length, bulk.skylight, bulk.chunk_data_and_meta);
+        self.world.load_chunks17(bulk.chunk_column_count, bulk.data_length, bulk.skylight, &bulk.chunk_data_and_meta);
     }
 
     fn on_chunk_unload(&mut self, chunk_unload: packet::play::clientbound::ChunkUnload) {
