@@ -39,7 +39,7 @@ use crate::shared::Position;
 
 pub const SUPPORTED_PROTOCOLS: [i32; 9] = [340, 316, 315, 210, 109, 107, 74, 47, 5];
 
-// TODO: switch to using thread_local! storage, see https://doc.rust-lang.org/std/macro.thread_local.html
+// TODO: switch to using thread_local storage?, see https://doc.rust-lang.org/std/macro.thread_local.html
 pub static mut CURRENT_PROTOCOL_VERSION: i32 = SUPPORTED_PROTOCOLS[0];
 
 /// Helper macro for defining packets
