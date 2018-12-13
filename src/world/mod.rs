@@ -28,6 +28,8 @@ use crate::chunk_builder;
 use crate::ecs;
 use crate::entity::block_entity;
 use crate::format;
+use flate2::read::ZlibDecoder;
+use std::io::Read;
 
 pub mod biome;
 mod storage;
@@ -659,8 +661,16 @@ impl World {
          let compressed_chunk_data = &data[0..data_length as usize];
          let meta_data = &data[data_length as usize..];
 
-         println!("compressed_chunk_data = {:?}", compressed_chunk_data);
+         println!("compressed_chunk_data = {:?}", compressed_chunk_data.len());
          println!("meta_data = {:?}", meta_data);
+
+         let mut zlib = ZlibDecoder::new(std::io::Cursor::new(Vec::new()));
+         zlib.reset(std::io::Cursor::new(compressed_chunk_data.to_vec()));
+         // TODO: fix zero
+         println!("total in = {}", zlib.total_in());
+         println!("total out = {}", zlib.total_out());
+         let mut chunk_data = Vec::new();
+         zlib.read_to_end(&mut chunk_data)?;
 
          // TODO: 1.7 chunk parsing
 
