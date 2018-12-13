@@ -913,7 +913,6 @@ state_packets!(
                 field chunk_column_count: u16 =,
                 field data_length: i32 =,
                 field skylight: bool =,
-                field chunk_meta: LenPrefixed<VarInt, packet::ChunkMeta> =,
                 field chunk_data_and_meta: Vec<u8> =,
             }
             /// Effect plays a sound effect or particle at the target location with the
