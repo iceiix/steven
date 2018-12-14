@@ -659,10 +659,10 @@ impl World {
         println!("load_chunks17 chunk_column_count={} data_length={} skylight={}", chunk_column_count, data_length, skylight);
 
          let compressed_chunk_data = &data[0..data_length as usize];
-         let meta_data = &data[data_length as usize..];
+         let metadata = &data[data_length as usize..];
 
          println!("compressed_chunk_data = {:?}", compressed_chunk_data.len());
-         println!("meta_data = {:?}", meta_data);
+         println!("metadata = {:?}", metadata);
 
          let mut zlib = ZlibDecoder::new(std::io::Cursor::new(compressed_chunk_data.to_vec()));
          let mut chunk_data = Vec::new();
@@ -670,7 +670,19 @@ impl World {
          println!("total in = {}", zlib.total_in());
          println!("total out = {}", zlib.total_out());
 
-         // TODO: 1.7 chunk parsing
+         // Chunk metadata
+         let mut metadata = std::io::Cursor::new(metadata);
+         for i in 0..chunk_column_count {
+             use byteorder::ReadBytesExt;
+
+             let chunk_x = metadata.read_i32::<byteorder::LittleEndian>()?;
+             let chunk_z = metadata.read_i32::<byteorder::LittleEndian>()?;
+             let mask = metadata.read_u16::<byteorder::LittleEndian>()?;
+             let mask_add = metadata.read_u16::<byteorder::LittleEndian>()?;
+
+             println!("x = {}, z = {}, mask = {:x}, mask_add = {:x}", chunk_x, chunk_z, mask, mask_add);
+             // TODO: unpack from chunk_data, https://wiki.vg/index.php?title=Chunk_Format&oldid=5216#Data
+         }
 
          Ok(())
     }
