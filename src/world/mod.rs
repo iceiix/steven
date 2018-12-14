@@ -664,13 +664,11 @@ impl World {
          println!("compressed_chunk_data = {:?}", compressed_chunk_data.len());
          println!("meta_data = {:?}", meta_data);
 
-         let mut zlib = ZlibDecoder::new(std::io::Cursor::new(Vec::new()));
-         zlib.reset(std::io::Cursor::new(compressed_chunk_data.to_vec()));
-         // TODO: fix zero
-         println!("total in = {}", zlib.total_in());
-         println!("total out = {}", zlib.total_out());
+         let mut zlib = ZlibDecoder::new(std::io::Cursor::new(compressed_chunk_data.to_vec()));
          let mut chunk_data = Vec::new();
          zlib.read_to_end(&mut chunk_data)?;
+         println!("total in = {}", zlib.total_in());
+         println!("total out = {}", zlib.total_out());
 
          // TODO: 1.7 chunk parsing
 
