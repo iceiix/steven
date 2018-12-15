@@ -896,13 +896,13 @@ state_packets!(
                 field bitmask: u16 =,
                 field data: LenPrefixedBytes<VarInt> =,
             }
-            packet ChunkData_NoEntities_u16_Add {
+            packet ChunkData_17 {
                 field chunk_x: i32 =,
                 field chunk_z: i32 =,
                 field new: bool =,
                 field bitmask: u16 =,
                 field add_bitmask: u16 =,
-                field data: LenPrefixedBytes<i32> =,
+                field compressed_data: LenPrefixedBytes<i32> =,
             }
             packet ChunkDataBulk {
                 field skylight: bool =,

@@ -686,13 +686,22 @@ impl World {
 
              println!("x = {}, z = {}, mask = {:x}, mask_add = {:x}", x, z, mask, mask_add);
 
-             self.load_chunk17(x, z, new, skylight, mask, mask_add, &mut chunk_data)?;
+             self.load_uncompressed_chunk17(x, z, new, skylight, mask, mask_add, &mut chunk_data)?;
          }
 
          Ok(())
     }
 
-    pub fn load_chunk17(&mut self, x: i32, z: i32, new: bool, skylight: bool, mask: u16, mask_add: u16, data: &mut std::io::Cursor<Vec<u8>>) -> Result<(), protocol::Error> {
+    pub fn load_chunk17(&mut self, x: i32, z: i32, new: bool, mask: u16, mask_add: u16, compressed_data: Vec<u8>) -> Result<(), protocol::Error> {
+         let mut zlib = ZlibDecoder::new(std::io::Cursor::new(compressed_data.to_vec()));
+         let mut data = Vec::new();
+         zlib.read_to_end(&mut data)?;
+
+         let skylight = true;
+         self.load_uncompressed_chunk17(x, z, new, skylight, mask, mask_add, &mut std::io::Cursor::new(data))
+    }
+
+    fn load_uncompressed_chunk17(&mut self, x: i32, z: i32, new: bool, skylight: bool, mask: u16, mask_add: u16, data: &mut std::io::Cursor<Vec<u8>>) -> Result<(), protocol::Error> {
         use std::io::Read;
         use crate::types::nibble;
 

@@ -401,7 +401,7 @@ impl Server {
                             ChunkData => on_chunk_data,
                             ChunkData_NoEntities => on_chunk_data_no_entities,
                             ChunkData_NoEntities_u16 => on_chunk_data_no_entities_u16,
-                            ChunkData_NoEntities_u16_Add => on_chunk_data_no_entities_u16_add,
+                            ChunkData_17 => on_chunk_data_17,
                             ChunkDataBulk => on_chunk_data_bulk,
                             ChunkDataBulk_17 => on_chunk_data_bulk_17,
                             ChunkUnload => on_chunk_unload,
@@ -1072,10 +1072,8 @@ impl Server {
         self.world.load_chunks18(chunk_data.new, skylight, &chunk_meta, chunk_data.data.data).unwrap();
     }
 
-    fn on_chunk_data_no_entities_u16_add(&mut self, chunk_data: packet::play::clientbound::ChunkData_NoEntities_u16_Add) {
-        let skylight = true;
-        self.world.load_chunk17(chunk_data.chunk_x, chunk_data.chunk_z, chunk_data.new, skylight, chunk_data.bitmask,
-                                chunk_data.add_bitmask, &mut std::io::Cursor::new(chunk_data.data.data)).unwrap();
+    fn on_chunk_data_17(&mut self, chunk_data: packet::play::clientbound::ChunkData_17) {
+        self.world.load_chunk17(chunk_data.chunk_x, chunk_data.chunk_z, chunk_data.new, chunk_data.bitmask, chunk_data.add_bitmask, chunk_data.compressed_data.data).unwrap();
     }
 
     fn on_chunk_data_bulk(&mut self, bulk: packet::play::clientbound::ChunkDataBulk) {
