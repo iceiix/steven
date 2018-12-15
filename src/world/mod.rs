@@ -696,6 +696,8 @@ impl World {
         use std::io::Read;
         use crate::types::nibble;
 
+        println!("load_chunk17 x={} z={} new={} skylight={} mask={:x} mask_add={:x}", x, z, new, skylight, mask, mask_add);
+
         let cpos = CPos(x, z);
         {
             let chunk = if new {
@@ -727,6 +729,7 @@ impl World {
                 section.dirty = true;
 
                 data.read_exact(&mut block_types[i])?;
+                println!("block_types {} = {:?}", i, block_types[i].to_vec());
             }
 
             // Block metadata array - half byte per block
@@ -744,6 +747,7 @@ impl World {
                 }
 
                 data.read_exact(&mut block_meta[i].data)?;
+                println!("block_meta {} = {:?}", i, block_meta[i].data);
             }
 
             // Block light array - half byte per block
@@ -754,6 +758,7 @@ impl World {
                 let section = chunk.sections[i as usize].as_mut().unwrap();
 
                 data.read_exact(&mut section.block_light.data)?;
+                println!("block_light {} = {:?}", i, section.block_light.data);
             }
 
             // Sky light array - half byte per block - only if 'skylight' is true
@@ -765,6 +770,7 @@ impl World {
                     let section = chunk.sections[i as usize].as_mut().unwrap();
 
                     data.read_exact(&mut section.sky_light.data)?;
+                    println!("sky_light {} = {:?}", i, section.sky_light.data);
                 }
             }
 
@@ -782,6 +788,7 @@ impl World {
                     continue;
                 }
                 data.read_exact(&mut block_add[i].data)?;
+                println!("block_add {} = {:?}", i, block_add[i].data);
             }
 
             // Now that we have the block types, metadata, and add, combine to initialize the blocks
