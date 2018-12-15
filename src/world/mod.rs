@@ -695,6 +695,7 @@ impl World {
     pub fn load_chunk17(&mut self, x: i32, z: i32, new: bool, skylight: bool, mask: u16, mask_add: u16, mut data: &mut std::io::Cursor<Vec<u8>>) -> Result<(), protocol::Error> {
         use std::io::Read;
         use byteorder::ReadBytesExt;
+        use crate::types::nibble;
 
         let cpos = CPos(x, z);
         {
@@ -708,7 +709,8 @@ impl World {
                 self.chunks.get_mut(&cpos).unwrap()
             };
 
-            // TODO: block type array is whole byte per block (u8 not u16)
+            // Block type array - whole byte per block
+            let mut block_types = [[0u8; 4096]; 16];
             for i in 0 .. 16 {
                 if chunk.sections[i].is_none() {
                     let mut fill_sky = chunk.sections.iter()
@@ -725,8 +727,74 @@ impl World {
                 let section = chunk.sections[i as usize].as_mut().unwrap();
                 section.dirty = true;
 
+                data.read_exact(&mut block_types[i])?;
+            }
+
+            // Block metadata array - half byte per block
+            let mut block_meta: [nibble::Array; 16] = [
+                // TODO: cleanup this initialization
+                nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16),
+                nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16),
+                nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16),
+                nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16),
+            ];
+
+            for i in 0 .. 16 {
+                if mask & (1 << i) == 0 {
+                    continue;
+                }
+
+                data.read_exact(&mut block_meta[i].data)?;
+            }
+
+            // Block light array - half byte per block
+            for i in 0 .. 16 {
+                if mask & (1 << i) == 0 {
+                    continue;
+                }
+                let section = chunk.sections[i as usize].as_mut().unwrap();
+
+                data.read_exact(&mut section.block_light.data)?;
+            }
+
+            // Sky light array - half byte per block - only if 'skylight' is true
+            if skylight {
+                for i in 0 .. 16 {
+                    if mask & (1 << i) == 0 {
+                        continue;
+                    }
+                    let section = chunk.sections[i as usize].as_mut().unwrap();
+
+                    data.read_exact(&mut section.sky_light.data)?;
+                }
+            }
+
+            // Add array - half byte per block - uses secondary bitmask
+            let mut block_add: [nibble::Array; 16] = [
+                // TODO: cleanup this initialization
+                nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16),
+                nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16),
+                nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16),
+                nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16), nibble::Array::new(16 * 16 * 16),
+            ];
+
+            for i in 0 .. 16 {
+                if mask_add & (1 << i) == 0 {
+                    continue;
+                }
+                data.read_exact(&mut block_add[i].data)?;
+            }
+
+            // Now that we have the block types, metadata, and add, combine to initialize the blocks
+            for i in 0 .. 16 {
+                if mask & (1 << i) == 0 {
+                    continue;
+                }
+
+                let section = chunk.sections[i as usize].as_mut().unwrap();
+
                 for bi in 0 .. 4096 {
-                    let id = data.read_u16::<byteorder::LittleEndian>()?;
+                    let id = ((block_add[i].get(bi) as u16) << 12) | ((block_types[i][bi] as u16) << 4) | (block_meta[i].get(bi) as u16);
                     section.blocks.set(bi, block::Block::by_vanilla_id(id as usize));
 
                     // Spawn block entities
@@ -744,26 +812,6 @@ impl World {
                     }
                 }
             }
-            // TODO: block metadata array (half byte per block)
-
-            for i in 0 .. 16 {
-                if mask & (1 << i) == 0 {
-                    continue;
-                }
-                let section = chunk.sections[i as usize].as_mut().unwrap();
-
-                data.read_exact(&mut section.block_light.data)?;
-            }
-
-            for i in 0 .. 16 {
-                if mask & (1 << i) == 0 {
-                    continue;
-                }
-                let section = chunk.sections[i as usize].as_mut().unwrap();
-
-                data.read_exact(&mut section.sky_light.data)?;
-            }
-            // TODO: add array, half byte per block
 
             if new {
                 data.read_exact(&mut chunk.biomes)?;
