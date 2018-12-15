@@ -416,16 +416,20 @@ impl Server {
                             UpdateBlockEntity => on_block_entity_update,
                             UpdateBlockEntity_Data => on_block_entity_update_data,
                             UpdateSign => on_sign_update,
+                            UpdateSign_u16 => on_sign_update_u16,
                             PlayerInfo => on_player_info,
+                            PlayerInfo_String => on_player_info_string,
                             Disconnect => on_disconnect,
                             // Entities
                             EntityDestroy => on_entity_destroy,
+                            EntityDestroy_u8 => on_entity_destroy_u8,
                             SpawnPlayer_f64 => on_player_spawn_f64,
                             SpawnPlayer_i32 => on_player_spawn_i32,
                             SpawnPlayer_i32_HeldItem => on_player_spawn_i32_helditem,
                             SpawnPlayer_i32_HeldItem_String => on_player_spawn_i32_helditem_string,
                             EntityTeleport_f64 => on_entity_teleport_f64,
                             EntityTeleport_i32 => on_entity_teleport_i32,
+                            EntityTeleport_i32_i32_NoGround => on_entity_teleport_i32_i32_noground,
                             EntityMove_i16 => on_entity_move_i16,
                             EntityMove_i8 => on_entity_move_i8,
                             EntityMove_i8_i32_NoGround => on_entity_move_i8_i32_noground,
@@ -748,6 +752,14 @@ impl Server {
         }
     }
 
+    fn on_entity_destroy_u8(&mut self, entity_destroy: packet::play::clientbound::EntityDestroy_u8) {
+        for id in entity_destroy.entity_ids.data {
+            if let Some(entity) = self.entity_map.remove(&id) {
+                self.entities.remove_entity(entity);
+            }
+        }
+    }
+
     fn on_entity_teleport_f64(&mut self, entity_telport: packet::play::clientbound::EntityTeleport_f64) {
         self.on_entity_teleport(entity_telport.entity_id.0, entity_telport.x, entity_telport.y, entity_telport.z, entity_telport.yaw as f64, entity_telport.pitch as f64, entity_telport.on_ground)
     }
@@ -755,6 +767,12 @@ impl Server {
     fn on_entity_teleport_i32(&mut self, entity_telport: packet::play::clientbound::EntityTeleport_i32) {
         self.on_entity_teleport(entity_telport.entity_id.0, entity_telport.x as f64, entity_telport.y as f64, entity_telport.z as f64, entity_telport.yaw as f64, entity_telport.pitch as f64, entity_telport.on_ground)
     }
+
+    fn on_entity_teleport_i32_i32_noground(&mut self, entity_telport: packet::play::clientbound::EntityTeleport_i32_i32_NoGround) {
+        let on_ground = false; // TODO: ?
+        self.on_entity_teleport(entity_telport.entity_id, entity_telport.x as f64, entity_telport.y as f64, entity_telport.z as f64, entity_telport.yaw as f64, entity_telport.pitch as f64, on_ground)
+    }
+
 
     fn on_entity_teleport(&mut self, entity_id: i32, x: f64, y: f64, z: f64, yaw: f64, pitch: f64, _on_ground: bool) {
         use std::f64::consts::PI;
@@ -971,6 +989,26 @@ impl Server {
             update_sign.line3,
             update_sign.line4,
         ));
+    }
+
+    fn on_sign_update_u16(&mut self, mut update_sign: packet::play::clientbound::UpdateSign_u16) {
+        use crate::format;
+        format::convert_legacy(&mut update_sign.line1);
+        format::convert_legacy(&mut update_sign.line2);
+        format::convert_legacy(&mut update_sign.line3);
+        format::convert_legacy(&mut update_sign.line4);
+        self.world.add_block_entity_action(world::BlockEntityAction::UpdateSignText(
+            Position::new(update_sign.x, update_sign.y as i32, update_sign.z),
+            update_sign.line1,
+            update_sign.line2,
+            update_sign.line3,
+            update_sign.line4,
+        ));
+    }
+
+
+    fn on_player_info_string(&mut self, player_info: packet::play::clientbound::PlayerInfo_String) {
+        // TODO
     }
 
     fn on_player_info(&mut self, player_info: packet::play::clientbound::PlayerInfo) {
