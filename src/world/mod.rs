@@ -674,7 +674,7 @@ impl World {
 
          // Chunk metadata
          let mut metadata = std::io::Cursor::new(metadata);
-         for i in 0..chunk_column_count {
+         for _i in 0..chunk_column_count {
              use byteorder::ReadBytesExt;
 
              let x = metadata.read_i32::<byteorder::LittleEndian>()?;
@@ -692,9 +692,8 @@ impl World {
          Ok(())
     }
 
-    pub fn load_chunk17(&mut self, x: i32, z: i32, new: bool, skylight: bool, mask: u16, mask_add: u16, mut data: &mut std::io::Cursor<Vec<u8>>) -> Result<(), protocol::Error> {
+    pub fn load_chunk17(&mut self, x: i32, z: i32, new: bool, skylight: bool, mask: u16, mask_add: u16, data: &mut std::io::Cursor<Vec<u8>>) -> Result<(), protocol::Error> {
         use std::io::Read;
-        use byteorder::ReadBytesExt;
         use crate::types::nibble;
 
         let cpos = CPos(x, z);
