@@ -58,7 +58,7 @@ protocol_packet_ids!(
             0x13 => EntityDestroy
             0x14 => Entity
             0x15 => EntityMove_i8
-            0x16 => EntityLook
+            0x16 => EntityLook_VarInt
             0x17 => EntityLookAndMove_i8
             0x18 => EntityTeleport_i32
             0x19 => EntityHeadLook

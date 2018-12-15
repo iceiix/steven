@@ -77,7 +77,7 @@ protocol_packet_ids!(
             0x25 => Maps
             0x26 => EntityMove_i8
             0x27 => EntityLookAndMove_i8
-            0x28 => EntityLook
+            0x28 => EntityLook_VarInt
             0x29 => Entity
             0x2a => SignEditorOpen
             0x2b => PlayerAbilities

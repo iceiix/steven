@@ -406,12 +406,15 @@ impl Server {
                             ChunkDataBulk_17 => on_chunk_data_bulk_17,
                             ChunkUnload => on_chunk_unload,
                             BlockChange => on_block_change,
+                            BlockChange_u8 => on_block_change_u8,
                             MultiBlockChange => on_multi_block_change,
+                            MultiBlockChange_i16 => on_multi_block_change_i16,
                             TeleportPlayer_WithConfirm => on_teleport_player_withconfirm,
                             TeleportPlayer_NoConfirm => on_teleport_player_noconfirm,
                             TimeUpdate => on_time_update,
                             ChangeGameState => on_game_state_change,
                             UpdateBlockEntity => on_block_entity_update,
+                            UpdateBlockEntity_Data => on_block_entity_update_data,
                             UpdateSign => on_sign_update,
                             PlayerInfo => on_player_info,
                             Disconnect => on_disconnect,
@@ -425,9 +428,12 @@ impl Server {
                             EntityTeleport_i32 => on_entity_teleport_i32,
                             EntityMove_i16 => on_entity_move_i16,
                             EntityMove_i8 => on_entity_move_i8,
-                            EntityLook => on_entity_look,
+                            EntityMove_i8_i32_NoGround => on_entity_move_i8_i32_noground,
+                            EntityLook_VarInt => on_entity_look_varint,
+                            EntityLook_i32_NoGround => on_entity_look_i32_noground,
                             EntityLookAndMove_i16 => on_entity_look_and_move_i16,
                             EntityLookAndMove_i8 => on_entity_look_and_move_i8,
+                            EntityLookAndMove_i8_i32_NoGround => on_entity_look_and_move_i8_i32_noground,
                         }
                     },
                     Err(err) => panic!("Err: {:?}", err),
@@ -771,6 +777,11 @@ impl Server {
         self.on_entity_move(m.entity_id.0, m.delta_x as f64, m.delta_y as f64, m.delta_z as f64)
     }
 
+    fn on_entity_move_i8_i32_noground(&mut self, m: packet::play::clientbound::EntityMove_i8_i32_NoGround) {
+        self.on_entity_move(m.entity_id, m.delta_x as f64, m.delta_y as f64, m.delta_z as f64)
+    }
+
+
     fn on_entity_move(&mut self, entity_id: i32, delta_x: f64, delta_y: f64, delta_z: f64) {
         if let Some(entity) = self.entity_map.get(&entity_id) {
             let position = self.entities.get_component_mut(*entity, self.target_position).unwrap();
@@ -780,13 +791,21 @@ impl Server {
         }
     }
 
-    fn on_entity_look(&mut self, look: packet::play::clientbound::EntityLook) {
+    fn on_entity_look(&mut self, entity_id: i32, yaw: f64, pitch: f64) {
         use std::f64::consts::PI;
-        if let Some(entity) = self.entity_map.get(&look.entity_id.0) {
+        if let Some(entity) = self.entity_map.get(&entity_id) {
             let rotation = self.entities.get_component_mut(*entity, self.target_rotation).unwrap();
-            rotation.yaw = -((look.yaw as f64) / 256.0) * PI * 2.0;
-            rotation.pitch = -((look.pitch as f64) / 256.0) * PI * 2.0;
+            rotation.yaw = -(yaw / 256.0) * PI * 2.0;
+            rotation.pitch = -(pitch / 256.0) * PI * 2.0;
         }
+    }
+
+    fn on_entity_look_varint(&mut self, look: packet::play::clientbound::EntityLook_VarInt) {
+        self.on_entity_look(look.entity_id.0, look.yaw as f64, look.pitch as f64)
+    }
+
+    fn on_entity_look_i32_noground(&mut self, look: packet::play::clientbound::EntityLook_i32_NoGround) {
+        self.on_entity_look(look.entity_id, look.yaw as f64, look.pitch as f64)
     }
 
     fn on_entity_look_and_move_i16(&mut self, lookmove: packet::play::clientbound::EntityLookAndMove_i16) {
@@ -797,6 +816,12 @@ impl Server {
 
     fn on_entity_look_and_move_i8(&mut self, lookmove: packet::play::clientbound::EntityLookAndMove_i8) {
         self.on_entity_look_and_move(lookmove.entity_id.0,
+                                     lookmove.delta_x as f64, lookmove.delta_y as f64, lookmove.delta_z as f64,
+                                     lookmove.yaw as f64, lookmove.pitch as f64)
+    }
+
+    fn on_entity_look_and_move_i8_i32_noground(&mut self, lookmove: packet::play::clientbound::EntityLookAndMove_i8_i32_NoGround) {
+        self.on_entity_look_and_move(lookmove.entity_id,
                                      lookmove.delta_x as f64, lookmove.delta_y as f64, lookmove.delta_z as f64,
                                      lookmove.yaw as f64, lookmove.pitch as f64)
     }
@@ -927,6 +952,10 @@ impl Server {
                 }
             }
         }
+    }
+
+    fn on_block_entity_update_data(&mut self, block_update: packet::play::clientbound::UpdateBlockEntity_Data) {
+        // TODO: handle UpdateBlockEntity_Data for 1.7, decompress gzipped_nbt
     }
 
     fn on_sign_update(&mut self, mut update_sign: packet::play::clientbound::UpdateSign) {
@@ -1101,6 +1130,13 @@ impl Server {
         );
     }
 
+    fn on_block_change_u8(&mut self, block_change: packet::play::clientbound::BlockChange_u8) {
+        self.world.set_block(
+            crate::shared::Position::new(block_change.x, block_change.y as i32, block_change.z),
+            block::Block::by_vanilla_id(block_change.block_id.0 as usize)
+        );
+    }
+
     fn on_multi_block_change(&mut self, block_change: packet::play::clientbound::MultiBlockChange) {
         let ox = block_change.chunk_x << 4;
         let oz = block_change.chunk_z << 4;
@@ -1115,6 +1151,13 @@ impl Server {
             );
         }
     }
+
+    fn on_multi_block_change_i16(&mut self, block_change: packet::play::clientbound::MultiBlockChange_i16) {
+        let ox = block_change.chunk_x << 4;
+        let oz = block_change.chunk_z << 4;
+        // TODO: parse MultiBlockChange_i16 for 1.7
+    }
+
 }
 
 #[derive(Debug, Clone, Copy)]

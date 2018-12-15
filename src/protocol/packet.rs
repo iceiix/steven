@@ -1078,7 +1078,7 @@ state_packets!(
                 field pitch: i8 =,
             }
             /// EntityLook rotates the entity to the new angles provided.
-            packet EntityLook {
+            packet EntityLook_VarInt {
                 field entity_id: VarInt =,
                 field yaw: i8 =,
                 field pitch: i8 =,
