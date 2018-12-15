@@ -420,6 +420,7 @@ impl Server {
                             SpawnPlayer_f64 => on_player_spawn_f64,
                             SpawnPlayer_i32 => on_player_spawn_i32,
                             SpawnPlayer_i32_HeldItem => on_player_spawn_i32_helditem,
+                            SpawnPlayer_i32_HeldItem_String => on_player_spawn_i32_helditem_string,
                             EntityTeleport_f64 => on_entity_teleport_f64,
                             EntityTeleport_i32 => on_entity_teleport_i32,
                             EntityMove_i16 => on_entity_move_i16,
@@ -823,6 +824,10 @@ impl Server {
 
     fn on_player_spawn_i32_helditem(&mut self, spawn: packet::play::clientbound::SpawnPlayer_i32_HeldItem) {
         self.on_player_spawn(spawn.entity_id.0, spawn.uuid, spawn.x as f64, spawn.y as f64, spawn.z as f64, spawn.yaw as f64, spawn.pitch as f64)
+    }
+
+    fn on_player_spawn_i32_helditem_string(&mut self, spawn: packet::play::clientbound::SpawnPlayer_i32_HeldItem_String) {
+        self.on_player_spawn(spawn.entity_id.0, protocol::UUID::from_str(&spawn.uuid), spawn.x as f64, spawn.y as f64, spawn.z as f64, spawn.yaw as f64, spawn.pitch as f64)
     }
 
     fn on_player_spawn(&mut self, entity_id: i32, uuid: protocol::UUID, x: f64, y: f64, z: f64, pitch: f64, yaw: f64) {
