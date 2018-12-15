@@ -670,29 +670,29 @@ impl World {
          println!("total in = {}", zlib.total_in());
          println!("total out = {}", zlib.total_out());
 
+         let mut chunk_data = std::io::Cursor::new(chunk_data);
+
          // Chunk metadata
          let mut metadata = std::io::Cursor::new(metadata);
          for i in 0..chunk_column_count {
              use byteorder::ReadBytesExt;
 
-             let chunk_x = metadata.read_i32::<byteorder::LittleEndian>()?;
-             let chunk_z = metadata.read_i32::<byteorder::LittleEndian>()?;
+             let x = metadata.read_i32::<byteorder::LittleEndian>()?;
+             let z = metadata.read_i32::<byteorder::LittleEndian>()?;
              let mask = metadata.read_u16::<byteorder::LittleEndian>()?;
              let mask_add = metadata.read_u16::<byteorder::LittleEndian>()?;
 
-             println!("x = {}, z = {}, mask = {:x}, mask_add = {:x}", chunk_x, chunk_z, mask, mask_add);
-             // TODO: unpack from chunk_data, https://wiki.vg/index.php?title=Chunk_Format&oldid=5216#Data
+             let new = true;
+
+             println!("x = {}, z = {}, mask = {:x}, mask_add = {:x}", x, z, mask, mask_add);
+
+             self.load_chunk17(x, z, new, skylight, mask, mask_add, &mut chunk_data)?;
          }
 
          Ok(())
     }
 
-
-    pub fn load_chunk17(&mut self, x: i32, z: i32, new: bool, mask: u16, mask_add: u16, data: Vec<u8>) -> Result<(), protocol::Error> {
-        let data = std::io::Cursor::new(data);
-
-        // TODO: 1.7 chunk parsing
-        /*
+    pub fn load_chunk17(&mut self, x: i32, z: i32, new: bool, skylight: bool, mask: u16, mask_add: u16, mut data: &mut std::io::Cursor<Vec<u8>>) -> Result<(), protocol::Error> {
         use std::io::Read;
         use byteorder::ReadBytesExt;
 
@@ -708,6 +708,7 @@ impl World {
                 self.chunks.get_mut(&cpos).unwrap()
             };
 
+            // TODO: block type array is whole byte per block (u8 not u16)
             for i in 0 .. 16 {
                 if chunk.sections[i].is_none() {
                     let mut fill_sky = chunk.sections.iter()
@@ -743,6 +744,7 @@ impl World {
                     }
                 }
             }
+            // TODO: block metadata array (half byte per block)
 
             for i in 0 .. 16 {
                 if mask & (1 << i) == 0 {
@@ -761,6 +763,7 @@ impl World {
 
                 data.read_exact(&mut section.sky_light.data)?;
             }
+            // TODO: add array, half byte per block
 
             if new {
                 data.read_exact(&mut chunk.biomes)?;
@@ -784,10 +787,8 @@ impl World {
                 (x<<4) + 17, (i<<4) + 17, (z<<4) + 17
             );
         }
-        */
         Ok(())
     }
-
 
     pub fn load_chunk19(&mut self, x: i32, z: i32, new: bool, mask: u16, data: Vec<u8>) -> Result<(), protocol::Error> {
         use std::io::{Cursor, Read};
