@@ -705,7 +705,7 @@ state_packets!(
                 field matches: LenPrefixed<VarInt, String> =,
             }
             packet DeclareCommands {
-                field nodes: LenPrefixed<VarInt, Vec<u8>> =,
+                field nodes: LenPrefixed<VarInt, packet::CommandNode> =,
                 field root_index: VarInt =,
             }
             /// ServerMessage is a message sent by the server. It could be from a player
@@ -2307,6 +2307,7 @@ impl Serializable for Tags {
     }
 }
 
+#[derive(Debug, Default)]
 pub struct CommandNode {
     pub flags: u8,
     pub children: LenPrefixed<VarInt, VarInt>,
