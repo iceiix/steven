@@ -2236,21 +2236,15 @@ impl Serializable for Recipe {
             "crafting_shaped" => {
                 let width: VarInt = Serializable::read_from(buf)?;
                 let height: VarInt = Serializable::read_from(buf)?;
-                println!("read width={}, height={}, about to read group", width.0, height.0);
                 let group: String = Serializable::read_from(buf)?;
-                println!("read group={}", group);
 
                 let capacity = width.0 as usize * height.0 as usize;
 
                 let mut ingredients = Vec::with_capacity(capacity);
-                for i in 0 .. capacity {
-                    println!("about to read ingredient {}", i);
+                for _ in 0 .. capacity {
                     ingredients.push(Serializable::read_from(buf)?);
-                    println!("ingredient i = {:?}", ingredients[i]);
                 }
-                println!("about to read result");
                 let result: Option<item::Stack> = Serializable::read_from(buf)?;
-                println!("result = {:?}", result);
 
                 RecipeData::Shaped { width, height, group, ingredients, result }
             }
