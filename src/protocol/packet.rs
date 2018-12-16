@@ -2257,6 +2257,7 @@ impl Serializable for Recipe {
             "crafting_special_armordye" => RecipeData::ArmorDye,
             "crafting_special_bookcloning" => RecipeData::BookCloning,
             "crafting_special_mapcloning" => RecipeData::MapCloning,
+            "crafting_special_mapextending" => RecipeData::MapExtending,
             "crafting_special_firework_rocket" => RecipeData::FireworkRocket,
             "crafting_special_firework_star" => RecipeData::FireworkStar,
             "crafting_special_firework_star_fade" => RecipeData::FireworkStarFade,
@@ -2273,7 +2274,7 @@ impl Serializable for Recipe {
                 experience: Serializable::read_from(buf)?,
                 cooking_time: Serializable::read_from(buf)?,
             },
-            _ => unimplemented!()
+            _ => panic!("unrecognized recipe type: {}", ty)
         };
 
         Ok(Recipe { id, ty, data })
