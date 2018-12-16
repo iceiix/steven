@@ -104,7 +104,7 @@ protocol_packet_ids!(
             //TODO 0x31 => FacePlayer
             0x32 => TeleportPlayer_WithConfirm
             0x33 => EntityUsedBed
-            0x34 => UnlockRecipes
+            0x34 => UnlockRecipes_WithSmelting
             0x35 => EntityDestroy
             0x36 => EntityRemoveEffect
             0x37 => ResourcePackSend
