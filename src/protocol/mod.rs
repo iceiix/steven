@@ -257,7 +257,9 @@ impl Serializable for String {
         debug_assert!(len >= 0, "Negative string length: {}", len);
         debug_assert!(len <= 65536, "String length too big: {}", len);
         let mut ret = String::new();
+        println!("about to read from, string length = {}", len);
         buf.take(len as u64).read_to_string(&mut ret)?;
+        println!("read string = {}", ret);
         Result::Ok(ret)
     }
     fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), Error> {
@@ -906,6 +908,10 @@ impl Conn {
             Direction::Serverbound => Direction::Clientbound,
         };
 
+        println!("about to parse packet {:?}", buf);
+        if id == 0x54 {
+            std::fs::File::create("/tmp/p")?.write_all(buf.get_ref())?;
+        }
         let packet = packet::packet_by_id(self.protocol_version, self.state, dir, id, &mut buf)?;
 
         match packet {
