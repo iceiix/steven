@@ -198,7 +198,7 @@ state_packets!(
             }
             packet PlayerPosition_HeadY {
                 field x: f64 =,
-                field y: f64 =,
+                field feet_y: f64 =,
                 field head_y: f64 =,
                 field z: f64 =,
                 field on_ground: bool =,
@@ -215,7 +215,7 @@ state_packets!(
             }
             packet PlayerPositionLook_HeadY {
                 field x: f64 =,
-                field y: f64 =,
+                field feet_y: f64 =,
                 field head_y: f64 =,
                 field z: f64 =,
                 field yaw: f32 =,
