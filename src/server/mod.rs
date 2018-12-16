@@ -762,7 +762,7 @@ impl Server {
     }
 
     fn on_entity_teleport_i32_i32_noground(&mut self, entity_telport: packet::play::clientbound::EntityTeleport_i32_i32_NoGround) {
-        let on_ground = true; // TODO: how is this set?
+        let on_ground = true; // TODO: how is this supposed to be set? (for 1.7)
         self.on_entity_teleport(entity_telport.entity_id, entity_telport.x as f64, entity_telport.y as f64, entity_telport.z as f64, entity_telport.yaw as f64, entity_telport.pitch as f64, on_ground)
     }
 
@@ -1001,7 +1001,7 @@ impl Server {
 
 
     fn on_player_info_string(&mut self, player_info: packet::play::clientbound::PlayerInfo_String) {
-        // TODO
+        // TODO: support PlayerInfo_String for 1.7
     }
 
     fn on_player_info(&mut self, player_info: packet::play::clientbound::PlayerInfo) {
