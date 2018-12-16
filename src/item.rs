@@ -51,7 +51,7 @@ impl Serializable for Option<Stack> {
         let tag: Option<nbt::NamedTag> = if protocol_version >= 47 {
             Serializable::read_from(buf)?
         } else {
-            // TODO: https://wiki.vg/index.php?title=Slot_Data&diff=6056&oldid=4753
+            // 1.7 uses a different slot data format described on https://wiki.vg/index.php?title=Slot_Data&diff=6056&oldid=4753
             let tag_size = buf.read_i16::<BigEndian>()?;
             if tag_size != -1 {
                 for _ in 0..tag_size {
