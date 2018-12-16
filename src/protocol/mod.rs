@@ -218,7 +218,6 @@ impl Serializable for Vec<u8> {
 impl Serializable for Option<nbt::NamedTag>{
     fn read_from<R: io::Read>(buf: &mut R) -> Result<Option<nbt::NamedTag>, Error> {
         let ty = buf.read_u8()?;
-        println!("Option<nbt::NamedTag> read_from ty={}", ty);
         if ty == 0 {
             Result::Ok(None)
         } else {
@@ -258,9 +257,7 @@ impl Serializable for String {
         debug_assert!(len >= 0, "Negative string length: {}", len);
         debug_assert!(len <= 65536, "String length too big: {}", len);
         let mut ret = String::new();
-        println!("about to read from, string length = {}", len);
         buf.take(len as u64).read_to_string(&mut ret)?;
-        println!("read string = {}", ret);
         Result::Ok(ret)
     }
     fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), Error> {
