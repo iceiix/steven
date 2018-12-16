@@ -762,7 +762,7 @@ impl Server {
     }
 
     fn on_entity_teleport_i32_i32_noground(&mut self, entity_telport: packet::play::clientbound::EntityTeleport_i32_i32_NoGround) {
-        let on_ground = false; // TODO: ?
+        let on_ground = true; // TODO: how is this set?
         self.on_entity_teleport(entity_telport.entity_id, entity_telport.x as f64, entity_telport.y as f64, entity_telport.z as f64, entity_telport.yaw as f64, entity_telport.pitch as f64, on_ground)
     }
 
