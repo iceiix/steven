@@ -17,7 +17,7 @@ impl Brand {
         }
     }
 
-    // TODO: cleanup
+    // TODO: cleanup this duplication for 1.7, return either message dynamically
     pub fn as_message17(self) -> PluginMessageServerbound_i16 {
         let mut data = vec![];
         Serializable::write_to(&self.brand, &mut data).unwrap();
