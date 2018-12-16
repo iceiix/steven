@@ -39,18 +39,24 @@ impl Default for Stack {
 
 impl Serializable for Option<Stack> {
     fn read_from<R: io::Read>(buf: &mut R) -> Result<Option<Stack>, protocol::Error> {
+        println!("about to read_from for Option<Stack>");
         let id = buf.read_i16::<BigEndian>()?;
+        println!("id = {}", id);
         if id == -1 {
             return Ok(None);
         }
         let count = buf.read_u8()? as isize;
+        println!("count = {}", count);
         let damage = buf.read_i16::<BigEndian>()? as isize;
+        println!("damage = {}", damage);
 
         let protocol_version = unsafe { protocol::CURRENT_PROTOCOL_VERSION };
 
         let tag: Option<nbt::NamedTag> = if protocol_version >= 47 {
+            println!("about to read nbt tag");
             Serializable::read_from(buf)?
         } else {
+            println!("about to read nbt tag for 1.7");
             // 1.7 uses a different slot data format described on https://wiki.vg/index.php?title=Slot_Data&diff=6056&oldid=4753
             let tag_size = buf.read_i16::<BigEndian>()?;
             if tag_size != -1 {
