@@ -656,40 +656,31 @@ impl World {
     }
 
     pub fn load_chunks17(&mut self, chunk_column_count: u16, data_length: i32, skylight: bool, data: &[u8]) -> Result<(), protocol::Error> {
-        println!("load_chunks17 chunk_column_count={} data_length={} skylight={}", chunk_column_count, data_length, skylight);
+        let compressed_chunk_data = &data[0..data_length as usize];
+        let metadata = &data[data_length as usize..];
 
-         let compressed_chunk_data = &data[0..data_length as usize];
-         let metadata = &data[data_length as usize..];
+        let mut zlib = ZlibDecoder::new(std::io::Cursor::new(compressed_chunk_data.to_vec()));
+        let mut chunk_data = Vec::new();
+        zlib.read_to_end(&mut chunk_data)?;
 
-         println!("compressed_chunk_data = {:?}", compressed_chunk_data.len());
-         println!("metadata = {:?}", metadata);
+        let mut chunk_data = std::io::Cursor::new(chunk_data);
 
-         let mut zlib = ZlibDecoder::new(std::io::Cursor::new(compressed_chunk_data.to_vec()));
-         let mut chunk_data = Vec::new();
-         zlib.read_to_end(&mut chunk_data)?;
-         println!("total in = {}", zlib.total_in());
-         println!("total out = {}", zlib.total_out());
+        // Chunk metadata
+        let mut metadata = std::io::Cursor::new(metadata);
+        for _i in 0..chunk_column_count {
+            use byteorder::ReadBytesExt;
 
-         let mut chunk_data = std::io::Cursor::new(chunk_data);
+            let x = metadata.read_i32::<byteorder::BigEndian>()?;
+            let z = metadata.read_i32::<byteorder::BigEndian>()?;
+            let mask = metadata.read_u16::<byteorder::BigEndian>()?;
+            let mask_add = metadata.read_u16::<byteorder::BigEndian>()?;
 
-         // Chunk metadata
-         let mut metadata = std::io::Cursor::new(metadata);
-         for _i in 0..chunk_column_count {
-             use byteorder::ReadBytesExt;
+            let new = true;
 
-             let x = metadata.read_i32::<byteorder::BigEndian>()?;
-             let z = metadata.read_i32::<byteorder::BigEndian>()?;
-             let mask = metadata.read_u16::<byteorder::BigEndian>()?;
-             let mask_add = metadata.read_u16::<byteorder::BigEndian>()?;
+            self.load_uncompressed_chunk17(x, z, new, skylight, mask, mask_add, &mut chunk_data)?;
+        }
 
-             let new = true;
-
-             println!("x = {}, z = {}, mask = {:x}, mask_add = {:x}", x, z, mask, mask_add);
-
-             self.load_uncompressed_chunk17(x, z, new, skylight, mask, mask_add, &mut chunk_data)?;
-         }
-
-         Ok(())
+        Ok(())
     }
 
     pub fn load_chunk17(&mut self, x: i32, z: i32, new: bool, mask: u16, mask_add: u16, compressed_data: Vec<u8>) -> Result<(), protocol::Error> {
