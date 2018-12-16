@@ -94,7 +94,8 @@ protocol_packet_ids!(
             0x26 => Maps
             0x27 => Entity
             0x28 => EntityMove_i16
-            0x2a => EntityLookAndMove_i16
+            0x29 => EntityLookAndMove_i16
+            0x2a => EntityLook_VarInt
             0x2b => VehicleTeleport
             0x2c => SignEditorOpen
             0x2d => CraftRecipeResponse
