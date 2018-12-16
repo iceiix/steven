@@ -441,6 +441,27 @@ impl Serializable for UUID {
     }
 }
 
+impl <T> Serializable for BoolPrefixed<T> where T : Serializable {
+    fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, Error> {
+        let present: bool = Serializable::read_from(buf)?;
+        Result::Ok(if present {
+            let inner: T = Serializable::read_from(buf)?;
+            Some(inner)
+        } else {
+            None
+        })
+    }
+    fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), Error> {
+        if let Some(inner) = self {
+            true.write_to(buf)?;
+            Serializable::write_to(inner);
+        } else {
+            false.write_to(buf)?;
+        }
+        Result::Ok(())
+    }
+}
+
 
 pub trait Lengthable : Serializable + Copy + Default {
     fn into(self) -> usize;
