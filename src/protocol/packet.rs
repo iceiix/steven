@@ -2326,11 +2326,61 @@ enum CommandNodeType {
 
 #[derive(Debug)]
 pub enum CommandProperty {
-    Bool {
+    Bool,
+    Double {
         flags: u8,
         min: Option<f64>,
         max: Option<f64>,
-    }
+    },
+    Float {
+        flags: u8,
+        min: Option<f32>,
+        max: Option<f32>,
+    },
+    Integer {
+        flags: u8,
+        min: Option<i32>,
+        max: Option<i32>,
+    },
+    String {
+        token_type: VarInt,
+    },
+    Entity {
+        flags: u8,
+    },
+    GameProfile,
+    BlockPos,
+    Vec3,
+    Vec2,
+    BlockState,
+    BlockPredicate,
+    ItemStack,
+    ItemPredicate,
+    Color,
+    Component,
+    Message,
+    Nbt,
+    NbtPath,
+    Objective,
+    ObjectiveCriteria,
+    Operation,
+    Particle,
+    Rotation,
+    ScoreboardSlot,
+    ScoreHolder {
+        flags: u8,
+    },
+    Swizzle,
+    Team,
+    ItemSlot,
+    ResourceLocation,
+    MobEffect,
+    Function,
+    EntityAnchor,
+    Range {
+        decimals: bool,
+    },
+    ItemEnchantment,
 }
 
 
@@ -2366,8 +2416,71 @@ impl Serializable for CommandNode {
             None
         };
 
-        // TODO: parse
-        let properties = Some(CommandProperty::Bool { flags: 0, min: Some(0.0), max: Some(0.0) });
+        let properties: Option<CommandProperty> = if let Some(ref parse) = parser {
+            Some(match parse.as_ref() {
+                "brigadier:bool" => CommandProperty::Bool,
+                "brigadier:double" => {
+                    let flags = Serializable::read_from(buf)?;
+                    let min = if flags & 0x01 != 0 { Some(Serializable::read_from(buf)?) } else { None };
+                    let max = if flags & 0x02 != 0 { Some(Serializable::read_from(buf)?) } else { None };
+                    CommandProperty::Double { flags, min, max }
+                },
+                "brigadier:float" => {
+                    let flags = Serializable::read_from(buf)?;
+                    let min = if flags & 0x01 != 0 { Some(Serializable::read_from(buf)?) } else { None };
+                    let max = if flags & 0x02 != 0 { Some(Serializable::read_from(buf)?) } else { None };
+                    CommandProperty::Float { flags, min, max }
+                },
+                "brigadier:integer" => {
+                    let flags = Serializable::read_from(buf)?;
+                    let min = if flags & 0x01 != 0 { Some(Serializable::read_from(buf)?) } else { None };
+                    let max = if flags & 0x02 != 0 { Some(Serializable::read_from(buf)?) } else { None };
+                    CommandProperty::Integer { flags, min, max }
+                },
+                "brigadier:string" => {
+                    CommandProperty::String { token_type: Serializable::read_from(buf)? }
+                },
+                "minecraft:entity" => {
+                    CommandProperty::Entity { flags: Serializable::read_from(buf)? }
+                },
+                "minecraft:game_profile" => CommandProperty::GameProfile,
+                "minecraft:block_pos" => CommandProperty::BlockPos,
+                "minecraft:vec3" => CommandProperty::Vec3,
+                "minecraft:vec2" => CommandProperty::Vec2,
+                "minecraft:block_state" => CommandProperty::BlockState,
+                "minecraft:block_predicate" => CommandProperty::BlockPredicate,
+                "minecraft:item_stack" => CommandProperty::ItemStack,
+                "minecraft:item_predicate" => CommandProperty::ItemPredicate,
+                "minecraft:color" => CommandProperty::Color,
+                "minecraft:component" => CommandProperty::Component,
+                "minecraft:message" => CommandProperty::Message,
+                "minecraft:nbt" => CommandProperty::Nbt,
+                "minecraft:nbt_path" => CommandProperty::NbtPath,
+                "minecraft:objective" => CommandProperty::Objective,
+                "minecraft:objective_criteria" => CommandProperty::ObjectiveCriteria,
+                "minecraft:operation" => CommandProperty::Operation,
+                "minecraft:particle" => CommandProperty::Particle,
+                "minecraft:rotation" => CommandProperty::Rotation,
+                "minecraft:scoreboard_slot" => CommandProperty::ScoreboardSlot,
+                "minecraft:score_holder" => {
+                    CommandProperty::ScoreHolder { flags: Serializable::read_from(buf)? }
+                },
+                "minecraft:swizzle" => CommandProperty::Swizzle,
+                "minecraft:team" => CommandProperty::Team,
+                "minecraft:item_slot" => CommandProperty::ItemSlot,
+                "minecraft:resource_location" => CommandProperty::ResourceLocation,
+                "minecraft:mob_effect" => CommandProperty::MobEffect,
+                "minecraft:function" => CommandProperty::Function,
+                "minecraft:entity_anchor" => CommandProperty::EntityAnchor,
+                "minecraft:range" => {
+                    CommandProperty::Range { decimals: Serializable::read_from(buf)? }
+                },
+                "minecraft:item_enchantment" => CommandProperty::ItemEnchantment,
+                _ => panic!("unsupported command node parser {}", parse),
+            })
+        } else {
+            None
+        };
 
         let suggestions_type: Option<String> = if has_suggestions_type {
             Serializable::read_from(buf)?
