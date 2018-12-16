@@ -401,8 +401,8 @@ impl Server {
                             ChunkUnload => on_chunk_unload,
                             BlockChange_VarInt => on_block_change_varint,
                             BlockChange_u8 => on_block_change_u8,
-                            MultiBlockChange => on_multi_block_change,
-                            MultiBlockChange_i16 => on_multi_block_change_i16,
+                            MultiBlockChange_VarInt => on_multi_block_change_varint,
+                            MultiBlockChange_u16 => on_multi_block_change_u16,
                             TeleportPlayer_WithConfirm => on_teleport_player_withconfirm,
                             TeleportPlayer_NoConfirm => on_teleport_player_noconfirm,
                             TimeUpdate => on_time_update,
@@ -965,7 +965,7 @@ impl Server {
         }
     }
 
-    fn on_block_entity_update_data(&mut self, block_update: packet::play::clientbound::UpdateBlockEntity_Data) {
+    fn on_block_entity_update_data(&mut self, _block_update: packet::play::clientbound::UpdateBlockEntity_Data) {
         // TODO: handle UpdateBlockEntity_Data for 1.7, decompress gzipped_nbt
     }
 
@@ -1169,7 +1169,7 @@ impl Server {
         );
     }
 
-    fn on_multi_block_change(&mut self, block_change: packet::play::clientbound::MultiBlockChange) {
+    fn on_multi_block_change_varint(&mut self, block_change: packet::play::clientbound::MultiBlockChange_VarInt) {
         let ox = block_change.chunk_x << 4;
         let oz = block_change.chunk_z << 4;
         for record in block_change.records.data {
@@ -1184,8 +1184,27 @@ impl Server {
         }
     }
 
-    fn on_multi_block_change_i16(&mut self, _block_change: packet::play::clientbound::MultiBlockChange_i16) {
-        // TODO: parse MultiBlockChange_i16 for 1.7
+    fn on_multi_block_change_u16(&mut self, block_change: packet::play::clientbound::MultiBlockChange_u16) {
+        let ox = block_change.chunk_x << 4;
+        let oz = block_change.chunk_z << 4;
+
+        let mut data = std::io::Cursor::new(block_change.data);
+
+        for _ in 0 .. block_change.record_count {
+            use byteorder::{BigEndian, ReadBytesExt};
+
+            let record = data.read_u32::<BigEndian>().unwrap();
+
+            let id = record & 0x0000_ffff;
+            let y = ((record & 0x00ff_0000) >> 16) as i32;
+            let z = oz + ((record & 0x0f00_0000) >> 24) as i32;
+            let x = ox + ((record & 0xf000_0000) >> 28) as i32;
+
+            self.world.set_block(
+                Position::new(x, y, z),
+                block::Block::by_vanilla_id(id as usize)
+            );
+        }
     }
 
 }

@@ -716,19 +716,17 @@ state_packets!(
                 field message: format::Component =,
             }
             /// MultiBlockChange is used to update a batch of blocks in a single packet.
-            packet MultiBlockChange {
+            packet MultiBlockChange_VarInt {
                 field chunk_x: i32 =,
                 field chunk_z: i32 =,
                 field records: LenPrefixed<VarInt, packet::BlockChangeRecord> =,
             }
-            packet MultiBlockChange_i16 {
+            packet MultiBlockChange_u16 {
                 field chunk_x: i32 =,
                 field chunk_z: i32 =,
                 field record_count: u16 =,
                 field data_size: i32 =,
                 field data: Vec<u8> =,
-                // TODO: unusual format, has two length prefixes, where data_size=record_count*4
-                //field records: LenPrefixed<i32, packet::BlockChangeRecord> =,
             }
             /// ConfirmTransaction notifies the client whether a transaction was successful
             /// or failed (e.g. due to lag).

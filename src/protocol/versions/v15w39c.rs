@@ -53,7 +53,7 @@ protocol_packet_ids!(
             0x0d => ServerDifficulty
             0x0e => TabCompleteReply
             0x0f => ServerMessage
-            0x10 => MultiBlockChange
+            0x10 => MultiBlockChange_VarInt
             0x11 => ConfirmTransaction
             0x12 => WindowClose
             0x13 => WindowOpen
