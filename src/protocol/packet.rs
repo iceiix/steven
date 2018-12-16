@@ -670,7 +670,7 @@ state_packets!(
                 field block_type: VarInt =,
             }
             /// BlockChange is used to update a single block on the client.
-            packet BlockChange {
+            packet BlockChange_VarInt {
                 field location: Position =,
                 field block_id: VarInt =,
             }

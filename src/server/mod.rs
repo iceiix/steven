@@ -399,7 +399,7 @@ impl Server {
                             ChunkDataBulk => on_chunk_data_bulk,
                             ChunkDataBulk_17 => on_chunk_data_bulk_17,
                             ChunkUnload => on_chunk_unload,
-                            BlockChange => on_block_change,
+                            BlockChange_VarInt => on_block_change_varint,
                             BlockChange_u8 => on_block_change_u8,
                             MultiBlockChange => on_multi_block_change,
                             MultiBlockChange_i16 => on_multi_block_change_i16,
@@ -1154,17 +1154,18 @@ impl Server {
         self.world.unload_chunk(chunk_unload.x, chunk_unload.z, &mut self.entities);
     }
 
-    fn on_block_change(&mut self, block_change: packet::play::clientbound::BlockChange) {
-        self.world.set_block(
-            block_change.location,
-            block::Block::by_vanilla_id(block_change.block_id.0 as usize)
-        );
+    fn on_block_change(&mut self, location: Position, id: i32) {
+        self.world.set_block(location, block::Block::by_vanilla_id(id as usize))
+    }
+
+    fn on_block_change_varint(&mut self, block_change: packet::play::clientbound::BlockChange_VarInt) {
+        self.on_block_change(block_change.location, block_change.block_id.0)
     }
 
     fn on_block_change_u8(&mut self, block_change: packet::play::clientbound::BlockChange_u8) {
-        self.world.set_block(
+        self.on_block_change(
             crate::shared::Position::new(block_change.x, block_change.y as i32, block_change.z),
-            block::Block::by_vanilla_id(block_change.block_id.0 as usize)
+            (block_change.block_id.0 << 4) | (block_change.block_metadata as i32)
         );
     }
 
@@ -1183,9 +1184,7 @@ impl Server {
         }
     }
 
-    fn on_multi_block_change_i16(&mut self, block_change: packet::play::clientbound::MultiBlockChange_i16) {
-        let ox = block_change.chunk_x << 4;
-        let oz = block_change.chunk_z << 4;
+    fn on_multi_block_change_i16(&mut self, _block_change: packet::play::clientbound::MultiBlockChange_i16) {
         // TODO: parse MultiBlockChange_i16 for 1.7
     }
 

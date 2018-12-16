@@ -54,7 +54,7 @@ protocol_packet_ids!(
             0x08 => BlockBreakAnimation
             0x09 => UpdateBlockEntity
             0x0a => BlockAction
-            0x0b => BlockChange
+            0x0b => BlockChange_VarInt
             0x0c => BossBar
             0x0d => ServerDifficulty
             0x0e => TabCompleteReply

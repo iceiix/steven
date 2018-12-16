@@ -71,7 +71,7 @@ protocol_packet_ids!(
             0x20 => EntityProperties
             0x21 => ChunkData_NoEntities_u16
             0x22 => MultiBlockChange
-            0x23 => BlockChange
+            0x23 => BlockChange_VarInt
             0x24 => BlockAction
             0x25 => BlockBreakAnimation
             0x26 => ChunkDataBulk
