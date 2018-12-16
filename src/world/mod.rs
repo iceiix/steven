@@ -677,10 +677,10 @@ impl World {
          for _i in 0..chunk_column_count {
              use byteorder::ReadBytesExt;
 
-             let x = metadata.read_i32::<byteorder::LittleEndian>()?;
-             let z = metadata.read_i32::<byteorder::LittleEndian>()?;
-             let mask = metadata.read_u16::<byteorder::LittleEndian>()?;
-             let mask_add = metadata.read_u16::<byteorder::LittleEndian>()?;
+             let x = metadata.read_i32::<byteorder::BigEndian>()?;
+             let z = metadata.read_i32::<byteorder::BigEndian>()?;
+             let mask = metadata.read_u16::<byteorder::BigEndian>()?;
+             let mask_add = metadata.read_u16::<byteorder::BigEndian>()?;
 
              let new = true;
 
