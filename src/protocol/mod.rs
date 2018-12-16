@@ -285,6 +285,30 @@ impl Serializable for format::Component {
     }
 }
 
+impl Serializable for Option<format::Component> {
+    fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, Error> {
+        println!("read_from impl Serializable for Option<format::Component>");
+
+        let present: bool = Serializable::read_from(buf)?;
+        Result::Ok(if present {
+            let chat: format::Component = Serializable::read_from(buf)?;
+            Some(chat)
+        } else {
+            None
+        })
+    }
+    fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), Error> {
+        if let Some(chat) = self {
+            true.write_to(buf)?;
+            Serializable::write_to(chat);
+        } else {
+            false.write_to(buf)?;
+        }
+        Result::Ok(())
+    }
+}
+
+
 impl Serializable for () {
     fn read_from<R: io::Read>(_: &mut R) -> Result<(), Error> {
         Result::Ok(())
