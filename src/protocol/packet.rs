@@ -1544,6 +1544,9 @@ state_packets!(
                 field amplifier: i8 =,
                 field duration: i16 =,
             }
+            packet DeclareRecipes {
+                field recipes: LenPrefixed<VarInt, packet::Recipe> =,
+            }
        }
     }
     login Login {
@@ -2165,3 +2168,113 @@ pub struct PlayerProperty {
     pub value: String,
     pub signature: Option<String>,
 }
+
+use crate::item;
+type RecipeIngredient = LenPrefixed<VarInt, Option<item::Stack>>;
+
+#[derive(Debug)]
+pub enum RecipeData {
+    Shapeless {
+        group: String,
+        ingredients: LenPrefixed<VarInt, RecipeIngredient>,
+        result: Option<item::Stack>,
+    },
+    Shaped {
+        width: VarInt,
+        height: VarInt,
+        group: String,
+        ingredients: Vec<RecipeIngredient>,
+        result: Option<item::Stack>,
+    },
+    ArmorDye,
+    BookCloning,
+    MapCloning,
+    MapExtending,
+    FireworkRocket,
+    FireworkStar,
+    FireworkStarFade,
+    RepairItem,
+    TippedArrow,
+    BannerDuplicate,
+    BannerAddPattern,
+    ShieldDecoration,
+    ShulkerBoxColoring,
+    Smelting {
+        group: String,
+        ingredient: RecipeIngredient,
+        result: Option<item::Stack>,
+        experience: f32,
+        cooking_time: VarInt,
+    },
+}
+
+impl Default for RecipeData {
+    fn default() -> Self {
+        RecipeData::ArmorDye
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct Recipe {
+    pub id: String,
+    pub ty: String,
+    pub data: RecipeData,
+}
+
+impl Serializable for Recipe {
+    fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, Error> {
+        let id = String::read_from(buf)?;
+        let ty = String::read_from(buf)?;
+
+        let data =
+        match ty.as_ref() {
+            "crafting_shapeless" => RecipeData::Shapeless {
+                group: Serializable::read_from(buf)?,
+                ingredients: Serializable::read_from(buf)?,
+                result: Serializable::read_from(buf)?,
+            },
+            "crafting_shaped" => {
+                let width: VarInt = Serializable::read_from(buf)?;
+                let height: VarInt = Serializable::read_from(buf)?;
+                let group: String = Serializable::read_from(buf)?;
+
+                let capacity = width.0 as usize * height.0 as usize;
+
+                let mut ingredients = Vec::with_capacity(capacity);
+                for i in 0 .. capacity {
+                    ingredients[i] = Serializable::read_from(buf)?;
+                }
+                let result: Option<item::Stack> = Serializable::read_from(buf)?;
+
+                RecipeData::Shaped { width, height, group, ingredients, result }
+            }
+            "crafting_special_armordye" => RecipeData::ArmorDye,
+            "crafting_special_bookcloning" => RecipeData::BookCloning,
+            "crafting_special_mapcloning" => RecipeData::MapCloning,
+            "crafting_special_firework_rocket" => RecipeData::FireworkRocket,
+            "crafting_special_firework_star" => RecipeData::FireworkStar,
+            "crafting_special_firework_star_fade" => RecipeData::FireworkStarFade,
+            "crafting_special_repairitem" => RecipeData::RepairItem,
+            "crafting_special_tippedarrow" => RecipeData::TippedArrow,
+            "crafting_special_bannerduplicate" => RecipeData::BannerDuplicate,
+            "crafting_special_banneraddpattern" => RecipeData::BannerAddPattern,
+            "crafting_special_shielddecoration" => RecipeData::ShieldDecoration,
+            "crafting_special_shulkerboxcoloring" => RecipeData::ShulkerBoxColoring,
+            "smelting" => RecipeData::Smelting {
+                group: Serializable::read_from(buf)?,
+                ingredient: Serializable::read_from(buf)?,
+                result: Serializable::read_from(buf)?,
+                experience: Serializable::read_from(buf)?,
+                cooking_time: Serializable::read_from(buf)?,
+            },
+            _ => unimplemented!()
+        };
+
+        Ok(Recipe { id, ty, data })
+    }
+
+    fn write_to<W: io::Write>(&self, _: &mut W) -> Result<(), Error> {
+        unimplemented!()
+    }
+}
+

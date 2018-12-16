@@ -135,7 +135,7 @@ protocol_packet_ids!(
             0x51 => Advancements
             0x52 => EntityProperties
             0x53 => EntityEffect
-            //TODO 0x54 => DeclareRecipes
+            0x54 => DeclareRecipes
             //TODO 0x55 => Tags
         }
     }
