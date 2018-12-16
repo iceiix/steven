@@ -560,6 +560,24 @@ impl World {
          Ok(())
     }
 
+    fn dirty_chunks_by_bitmask(&mut self, x: i32, z: i32, mask: u16) {
+        for i in 0 .. 16 {
+            if mask & (1 << i) == 0 {
+                continue;
+            }
+            for pos in [
+                (-1, 0, 0), (1, 0, 0),
+                (0, -1, 0), (0, 1, 0),
+                (0, 0, -1), (0, 0, 1)].into_iter() {
+                self.flag_section_dirty(x + pos.0, i as i32 + pos.1, z + pos.2);
+            }
+            self.update_range(
+                (x<<4) - 1, (i<<4) - 1, (z<<4) - 1,
+                (x<<4) + 17, (i<<4) + 17, (z<<4) + 17
+            );
+        }
+    }
+
     pub fn load_chunk18(&mut self, x: i32, z: i32, new: bool, _skylight: bool, mask: u16, data: &mut std::io::Cursor<Vec<u8>>) -> Result<(), protocol::Error> {
         use std::io::Read;
         use byteorder::ReadBytesExt;
@@ -637,21 +655,7 @@ impl World {
             chunk.calculate_heightmap();
         }
 
-        for i in 0 .. 16 {
-            if mask & (1 << i) == 0 {
-                continue;
-            }
-            for pos in [
-                (-1, 0, 0), (1, 0, 0),
-                (0, -1, 0), (0, 1, 0),
-                (0, 0, -1), (0, 0, 1)].into_iter() {
-                self.flag_section_dirty(x + pos.0, i as i32 + pos.1, z + pos.2);
-            }
-            self.update_range(
-                (x<<4) - 1, (i<<4) - 1, (z<<4) - 1,
-                (x<<4) + 17, (i<<4) + 17, (z<<4) + 17
-            );
-        }
+        self.dirty_chunks_by_bitmask(x, z, mask);
         Ok(())
     }
 
@@ -819,21 +823,7 @@ impl World {
             chunk.calculate_heightmap();
         }
 
-        for i in 0 .. 16 {
-            if mask & (1 << i) == 0 {
-                continue;
-            }
-            for pos in [
-                (-1, 0, 0), (1, 0, 0),
-                (0, -1, 0), (0, 1, 0),
-                (0, 0, -1), (0, 0, 1)].into_iter() {
-                self.flag_section_dirty(x + pos.0, i as i32 + pos.1, z + pos.2);
-            }
-            self.update_range(
-                (x<<4) - 1, (i<<4) - 1, (z<<4) - 1,
-                (x<<4) + 17, (i<<4) + 17, (z<<4) + 17
-            );
-        }
+        self.dirty_chunks_by_bitmask(x, z, mask);
         Ok(())
     }
 
@@ -917,21 +907,7 @@ impl World {
             chunk.calculate_heightmap();
         }
 
-        for i in 0 .. 16 {
-            if mask & (1 << i) == 0 {
-                continue;
-            }
-            for pos in [
-                (-1, 0, 0), (1, 0, 0),
-                (0, -1, 0), (0, 1, 0),
-                (0, 0, -1), (0, 0, 1)].into_iter() {
-                self.flag_section_dirty(x + pos.0, i as i32 + pos.1, z + pos.2);
-            }
-            self.update_range(
-                (x<<4) - 1, (i<<4) - 1, (z<<4) - 1,
-                (x<<4) + 17, (i<<4) + 17, (z<<4) + 17
-            );
-        }
+        self.dirty_chunks_by_bitmask(x, z, mask);
         Ok(())
     }
 
