@@ -1000,7 +1000,7 @@ impl Server {
     }
 
 
-    fn on_player_info_string(&mut self, player_info: packet::play::clientbound::PlayerInfo_String) {
+    fn on_player_info_string(&mut self, _player_info: packet::play::clientbound::PlayerInfo_String) {
         // TODO: support PlayerInfo_String for 1.7
     }
 

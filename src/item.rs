@@ -21,7 +21,7 @@ use byteorder::{BigEndian, WriteBytesExt, ReadBytesExt};
 pub struct Stack {
     id: isize,
     count: isize,
-    damage: isize,
+    damage: Option<isize>,
     tag: Option<nbt::NamedTag>,
 }
 
@@ -31,7 +31,7 @@ impl Default for Stack {
         Stack {
             id: -1,
             count: 0,
-            damage: 0,
+            damage: None,
             tag: None,
         }
     }
@@ -62,8 +62,13 @@ impl Serializable for Option<Stack> {
         }
         let count = buf.read_u8()? as isize;
         println!("count = {}", count);
-        let damage = buf.read_i16::<BigEndian>()? as isize;
-        println!("damage = {}", damage);
+        let damage = if protocol_version >= 404 {
+            // 1.13.2+ stores damage in the NBT
+            None
+        } else {
+            Some(buf.read_i16::<BigEndian>()? as isize)
+        };
+        println!("damage = {:?}", damage);
 
         let tag: Option<nbt::NamedTag> = if protocol_version >= 47 {
             println!("about to read nbt tag");
@@ -93,9 +98,10 @@ impl Serializable for Option<Stack> {
     fn write_to<W: io::Write>(&self, buf: &mut W) -> Result<(), protocol::Error> {
         match *self {
             Some(ref val) => {
+                // TODO: if protocol_version >= 404, send present and id varint, no damage, for 1.13.2
                 buf.write_i16::<BigEndian>(val.id as i16)?;
                 buf.write_u8(val.count as u8)?;
-                buf.write_i16::<BigEndian>(val.damage as i16)?;
+                buf.write_i16::<BigEndian>(val.damage.unwrap_or(0) as i16)?;
                 // TODO: compress zlib NBT if 1.7
                 val.tag.write_to(buf)?;
             }

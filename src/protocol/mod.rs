@@ -218,6 +218,7 @@ impl Serializable for Vec<u8> {
 impl Serializable for Option<nbt::NamedTag>{
     fn read_from<R: io::Read>(buf: &mut R) -> Result<Option<nbt::NamedTag>, Error> {
         let ty = buf.read_u8()?;
+        println!("Option<nbt::NamedTag> read_from ty={}", ty);
         if ty == 0 {
             Result::Ok(None)
         } else {
