@@ -70,7 +70,7 @@ protocol_packet_ids!(
             0x0e => ServerMessage
             0x0f => MultiBlockChange_VarInt
             0x10 => TabCompleteReply
-            //TODO 0x11 => DeclareCommands
+            0x11 => DeclareCommands
             0x12 => ConfirmTransaction
             0x13 => WindowClose
             0x14 => WindowOpen

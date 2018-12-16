@@ -704,6 +704,10 @@ state_packets!(
             packet TabCompleteReply {
                 field matches: LenPrefixed<VarInt, String> =,
             }
+            packet DeclareCommands {
+                field nodes: LenPrefixed<VarInt, Vec<u8>> =,
+                field root_index: VarInt =,
+            }
             /// ServerMessage is a message sent by the server. It could be from a player
             /// or just a system message. The Type field controls the location the
             /// message is displayed at and when the message is displayed.
@@ -2296,6 +2300,82 @@ impl Serializable for Tags {
             tag_name: Serializable::read_from(buf)?,
             entries: Serializable::read_from(buf)?,
         })
+    }
+
+    fn write_to<W: io::Write>(&self, _: &mut W) -> Result<(), Error> {
+        unimplemented!()
+    }
+}
+
+pub struct CommandNode {
+    pub flags: u8,
+    pub children: LenPrefixed<VarInt, VarInt>,
+    pub redirect_node: Option<VarInt>,
+    pub name: Option<String>,
+    pub parser: Option<String>,
+    pub properties: Option<CommandProperty>,
+    pub suggestions_type: Option<String>,
+}
+
+#[derive(Debug, Eq, PartialEq)]
+enum CommandNodeType {
+    Root,
+    Literal,
+    Argument,
+}
+
+#[derive(Debug)]
+pub enum CommandProperty {
+    Bool {
+        flags: u8,
+        min: Option<f64>,
+        max: Option<f64>,
+    }
+}
+
+
+impl Serializable for CommandNode {
+    fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, Error> {
+        let flags: u8 = Serializable::read_from(buf)?;
+        let children: LenPrefixed<VarInt, VarInt> = Serializable::read_from(buf)?;
+
+        let node_type = match flags & 0x03 {
+            0 => CommandNodeType::Root,
+            1 => CommandNodeType::Literal,
+            2 => CommandNodeType::Argument,
+            _ => panic!("unrecognized command node type {}", flags & 0x03),
+        };
+        let _is_executable = flags & 0x04 != 0;
+        let has_redirect = flags & 0x08 != 0;
+        let has_suggestions_type = flags & 0x10 != 0;
+
+        let redirect_node: Option<VarInt> = if has_redirect {
+            Some(Serializable::read_from(buf)?)
+        } else {
+            None
+        };
+
+        let name: Option<String> = if node_type == CommandNodeType::Argument || node_type == CommandNodeType::Literal {
+            Serializable::read_from(buf)?
+        } else {
+            None
+        };
+        let parser: Option<String> = if node_type == CommandNodeType::Argument {
+            Serializable::read_from(buf)?
+        } else {
+            None
+        };
+
+        // TODO: parse
+        let properties = Some(CommandProperty::Bool { flags: 0, min: Some(0.0), max: Some(0.0) });
+
+        let suggestions_type: Option<String> = if has_suggestions_type {
+            Serializable::read_from(buf)?
+        } else {
+            None
+        };
+
+        Ok(CommandNode { flags, children, redirect_node, name, parser, properties, suggestions_type })
     }
 
     fn write_to<W: io::Write>(&self, _: &mut W) -> Result<(), Error> {
