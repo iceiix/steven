@@ -18,6 +18,7 @@ use std::io;
 use std::fmt;
 use crate::protocol;
 use crate::protocol::Serializable;
+use crate::protocol::LenPrefixed;
 use crate::format;
 use crate::item;
 use crate::shared::Position;
@@ -286,7 +287,7 @@ impl Metadata {
                 2 => m.put_raw(index, f32::read_from(buf)?),
                 3 => m.put_raw(index, String::read_from(buf)?),
                 4 => m.put_raw(index, format::Component::read_from(buf)?),
-                5 => m.put_raw(index, Option::<format::Component>::read_from(buf)?),
+                5 => m.put_raw(index, LenPrefixed::<bool, format::Component>::read_from(buf)?),
                 6 => m.put_raw(index, Option::<item::Stack>::read_from(buf)?),
                 7 => m.put_raw(index, bool::read_from(buf)?),
                 8 => m.put_raw(index,
@@ -352,12 +353,7 @@ impl Metadata {
                 }
                 Value::OptionalFormatComponent(ref val) => {
                     u8::write_to(&5, buf)?;
-                    if let Some(chat) = val {
-                        u8::write_to(&1, buf)?;
-                        chat.write_to(buf)?;
-                    } else {
-                        u8::write_to(&0, buf)?;
-                    }
+                    val.write_to(buf)?;
                 }
                 Value::OptionalItemStack(ref val) => {
                     u8::write_to(&6, buf)?;
@@ -464,7 +460,7 @@ pub enum Value {
     Float(f32),
     String(String),
     FormatComponent(format::Component),
-    OptionalFormatComponent(Option<format::Component>),
+    OptionalFormatComponent(LenPrefixed<bool, format::Component>),
     OptionalItemStack(Option<item::Stack>),
     Bool(bool),
     Vector([f32; 3]),
@@ -555,7 +551,7 @@ impl MetaValue for format::Component {
     }
 }
 
-impl MetaValue for Option<format::Component> {
+impl MetaValue for LenPrefixed<bool, format::Component> {
     fn unwrap(value: &Value) -> &Self {
         match *value {
             Value::OptionalFormatComponent(ref val) => val,
