@@ -2245,7 +2245,7 @@ impl Serializable for Recipe {
                 let mut ingredients = Vec::with_capacity(capacity);
                 for i in 0 .. capacity {
                     println!("about to read ingredient {}", i);
-                    ingredients[i] = Serializable::read_from(buf)?;
+                    ingredients.push(Serializable::read_from(buf)?);
                     println!("ingredient i = {:?}", ingredients[i]);
                 }
                 println!("about to read result");
