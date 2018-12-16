@@ -917,10 +917,6 @@ impl Conn {
             Direction::Serverbound => Direction::Clientbound,
         };
 
-        println!("about to parse packet {:?}", buf);
-        if id == 0x55 {
-            std::fs::File::create("/tmp/p")?.write_all(buf.get_ref())?;
-        }
         let packet = packet::packet_by_id(self.protocol_version, self.state, dir, id, &mut buf)?;
 
         match packet {
