@@ -396,9 +396,9 @@ impl Metadata {
                     // TODO: write NBT tags metadata
                     //nbt::Tag(*val).write_to(buf)?;
                 }
-                Value::Particle(ref _val) => {
+                Value::Particle(ref val) => {
                     u8::write_to(&15, buf)?;
-                    // TODO: write Particle for 1.13.2
+                    val.write_to(buf)?;
                 }
                 _ => panic!("unexpected metadata"),
             }
@@ -471,7 +471,146 @@ pub enum Value {
     OptionalUUID(Option<protocol::UUID>),
     Block(u16), // TODO: Proper type
     NBTTag(nbt::NamedTag),
-    Particle(i32), // TODO: data
+    Particle(ParticleData),
+}
+
+#[derive(Debug)]
+pub enum ParticleData {
+    AmbientEntityEffect,
+    AngryVillager,
+    Barrier,
+    Block {
+        block_state: protocol::VarInt,
+    },
+    Bubble,
+    Cloud,
+    Crit,
+    DamageIndicator,
+    DragonBreath,
+    DrippingLava,
+    DrippingWater,
+    Dust {
+        red: f32,
+        green: f32,
+        blue: f32,
+        scale: f32,
+    },
+    Effect,
+    ElderGuardian,
+    EnchantedHit,
+    Enchant,
+    EndRod,
+    EntityEffect,
+    ExplosionEmitter,
+    Explosion,
+    FallingDust {
+        block_state: protocol::VarInt,
+    },
+    Firework,
+    Fishing,
+    Flame,
+    HappyVillager,
+    Heart,
+    InstantEffect,
+    Item {
+        item: Option<item::Stack>,
+    },
+    ItemSlime,
+    ItemSnowball,
+    LargeSmoke,
+    Lava,
+    Mycelium,
+    Note,
+    Poof,
+    Portal,
+    Rain,
+    Smoke,
+    Spit,
+    SquidInk,
+    SweepAttack,
+    TotemOfUndying,
+    Underwater,
+    Splash,
+    Witch,
+    BubblePop,
+    CurrentDown,
+    BubbleColumnUp,
+    Nautilus,
+    Dolphin,
+}
+
+impl Serializable for ParticleData {
+    fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, protocol::Error> {
+        let id = protocol::VarInt::read_from(buf)?.0;
+        Ok(match id {
+            0 => ParticleData::AmbientEntityEffect,
+            1 => ParticleData::AngryVillager,
+            2 => ParticleData::Barrier,
+            3 => ParticleData::Block {
+                block_state: Serializable::read_from(buf)?
+            },
+            4 => ParticleData::Bubble,
+            5 => ParticleData::Cloud,
+            6 => ParticleData::Crit,
+            7 => ParticleData::DamageIndicator,
+            8 => ParticleData::DragonBreath,
+            9 => ParticleData::DrippingLava,
+            10 => ParticleData::DrippingWater,
+            11 => ParticleData::Dust {
+                red: Serializable::read_from(buf)?,
+                green: Serializable::read_from(buf)?,
+                blue: Serializable::read_from(buf)?,
+                scale: Serializable::read_from(buf)?,
+            },
+            12 => ParticleData::Effect,
+            13 => ParticleData::ElderGuardian,
+            14 => ParticleData::EnchantedHit,
+            15 => ParticleData::Enchant,
+            16 => ParticleData::EndRod,
+            17 => ParticleData::EntityEffect,
+            18 => ParticleData::ExplosionEmitter,
+            19 => ParticleData::Explosion,
+            20 => ParticleData::FallingDust {
+                block_state: Serializable::read_from(buf)?,
+            },
+            21 => ParticleData::Firework,
+            22 => ParticleData::Fishing,
+            23 => ParticleData::Flame,
+            24 => ParticleData::HappyVillager,
+            25 => ParticleData::Heart,
+            26 => ParticleData::InstantEffect,
+            27 => ParticleData::Item {
+                item: Serializable::read_from(buf)?,
+            },
+            28 => ParticleData::ItemSlime,
+            29 => ParticleData::ItemSnowball,
+            30 => ParticleData::LargeSmoke,
+            31 => ParticleData::Lava,
+            32 => ParticleData::Mycelium,
+            33 => ParticleData::Note,
+            34 => ParticleData::Poof,
+            35 => ParticleData::Portal,
+            36 => ParticleData::Rain,
+            37 => ParticleData::Smoke,
+            38 => ParticleData::Spit,
+            39 => ParticleData::SquidInk,
+            40 => ParticleData::SweepAttack,
+            41 => ParticleData::TotemOfUndying,
+            42 => ParticleData::Underwater,
+            43 => ParticleData::Splash,
+            44 => ParticleData::Witch,
+            45 => ParticleData::BubblePop,
+            46 => ParticleData::CurrentDown,
+            47 => ParticleData::BubbleColumnUp,
+            48 => ParticleData::Nautilus,
+            49 => ParticleData::Dolphin,
+            _ => panic!("unrecognized particle data id {}", id),
+        })
+    }
+
+    fn write_to<W: io::Write>(&self, _buf: &mut W) -> Result<(), protocol::Error> {
+        unimplemented!()
+    }
 }
 
 pub trait MetaValue {
