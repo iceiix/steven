@@ -40,7 +40,22 @@ impl Default for Stack {
 impl Serializable for Option<Stack> {
     fn read_from<R: io::Read>(buf: &mut R) -> Result<Option<Stack>, protocol::Error> {
         println!("about to read_from for Option<Stack>");
-        let id = buf.read_i16::<BigEndian>()?;
+
+        let protocol_version = unsafe { protocol::CURRENT_PROTOCOL_VERSION };
+
+        if protocol_version >= 404 {
+            let present = buf.read_u8()? != 0;
+            if !present {
+                return Ok(None)
+            }
+        }
+
+        let id = if protocol_version >= 404 {
+            protocol::VarInt::read_from(buf)?.0 as isize
+        } else {
+            buf.read_i16::<BigEndian>()? as isize
+        };
+
         println!("id = {}", id);
         if id == -1 {
             return Ok(None);
@@ -49,8 +64,6 @@ impl Serializable for Option<Stack> {
         println!("count = {}", count);
         let damage = buf.read_i16::<BigEndian>()? as isize;
         println!("damage = {}", damage);
-
-        let protocol_version = unsafe { protocol::CURRENT_PROTOCOL_VERSION };
 
         let tag: Option<nbt::NamedTag> = if protocol_version >= 47 {
             println!("about to read nbt tag");
