@@ -57,7 +57,7 @@ impl Serializable for Option<Stack> {
                 for _ in 0..tag_size {
                     let _ = buf.read_u8()?;
                 }
-                // TODO: un-gzip NBT
+                // TODO: decompress zlib NBT for 1.7
                 None
             } else {
                 None
@@ -77,7 +77,7 @@ impl Serializable for Option<Stack> {
                 buf.write_i16::<BigEndian>(val.id as i16)?;
                 buf.write_u8(val.count as u8)?;
                 buf.write_i16::<BigEndian>(val.damage as i16)?;
-                // TODO: gzip nbt
+                // TODO: compress zlib NBT if 1.7
                 val.tag.write_to(buf)?;
             }
             None => buf.write_i16::<BigEndian>(-1)?,
