@@ -136,7 +136,7 @@ protocol_packet_ids!(
             0x52 => EntityProperties
             0x53 => EntityEffect
             0x54 => DeclareRecipes
-            //TODO 0x55 => Tags
+            0x55 => Tags
         }
     }
     login Login {

@@ -1547,6 +1547,11 @@ state_packets!(
             packet DeclareRecipes {
                 field recipes: LenPrefixed<VarInt, packet::Recipe> =,
             }
+            packet Tags {
+                field block_tags: LenPrefixed<VarInt, packet::Tags> =,
+                field item_tags: LenPrefixed<VarInt, packet::Tags> =,
+                field fluid_tags: LenPrefixed<VarInt, packet::Tags> =,
+            }
        }
     }
     login Login {
@@ -2278,4 +2283,24 @@ impl Serializable for Recipe {
         unimplemented!()
     }
 }
+
+#[derive(Debug, Default)]
+pub struct Tags {
+    pub tag_name: String,
+    pub entries: LenPrefixed<VarInt, VarInt>,
+}
+
+impl Serializable for Tags {
+    fn read_from<R: io::Read>(buf: &mut R) -> Result<Self, Error> {
+        Ok(Tags {
+            tag_name: Serializable::read_from(buf)?,
+            entries: Serializable::read_from(buf)?,
+        })
+    }
+
+    fn write_to<W: io::Write>(&self, _: &mut W) -> Result<(), Error> {
+        unimplemented!()
+    }
+}
+
 
