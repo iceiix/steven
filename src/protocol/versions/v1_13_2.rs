@@ -9,7 +9,7 @@ protocol_packet_ids!(
     play Play {
         serverbound Serverbound {
             0x00 => TeleportConfirm
-            //TODO 0x01 => QueryBlockNBT
+            0x01 => QueryBlockNBT
             0x02 => ChatMessage
             0x03 => ClientStatus
             0x04 => ClientSettings
@@ -19,8 +19,8 @@ protocol_packet_ids!(
             0x08 => ClickWindow
             0x09 => CloseWindow
             0x0a => PluginMessageServerbound
-            //TODO 0x0b => EditBook
-            //TODO 0x0c => QueryEntityNBT
+            0x0b => EditBook
+            0x0c => QueryEntityNBT
             0x0d => UseEntity
             0x0e => KeepAliveServerbound_i64
             0x0f => Player
@@ -29,23 +29,23 @@ protocol_packet_ids!(
             0x12 => PlayerLook
             0x13 => VehicleMove
             0x14 => SteerBoat
-            //TODO 0x15 => PickItem
+            0x15 => PickItem
             0x16 => CraftRecipeRequest
             0x17 => ClientAbilities
             0x18 => PlayerDigging
             0x19 => PlayerAction
             0x1a => SteerVehicle
             0x1b => CraftingBookData
-            //TODO 0x1c => NameItem
+            0x1c => NameItem
             0x1d => ResourcePackStatus
             0x1e => AdvancementTab
-            //TODO 0x1f => SelectTrade
-            //TODO 0x20 => SetBeaconEffect
+            0x1f => SelectTrade
+            0x20 => SetBeaconEffect
             0x21 => HeldItemChange
-            //TODO 0x22 => UpdateCommandBlock
-            //TODO 0x23 => UpdateCommandBlockMinecart
+            0x22 => UpdateCommandBlock
+            0x23 => UpdateCommandBlockMinecart
             0x24 => CreativeInventoryAction
-            //TODO 0x25 => UpdateStructureBlock
+            0x25 => UpdateStructureBlock
             0x26 => SetSign
             0x27 => ArmSwing
             0x28 => SpectateTeleport
@@ -82,7 +82,7 @@ protocol_packet_ids!(
             0x1a => NamedSoundEffect
             0x1b => Disconnect
             0x1c => EntityAction
-            //TODO 0x1d => NBTQueryResponse
+            0x1d => NBTQueryResponse
             0x1e => Explosion
             0x1f => ChunkUnload
             0x20 => ChangeGameState
@@ -102,7 +102,7 @@ protocol_packet_ids!(
             0x2e => PlayerAbilities
             0x2f => CombatEvent
             0x30 => PlayerInfo
-            //TODO 0x31 => FacePlayer
+            0x31 => FacePlayer
             0x32 => TeleportPlayer_WithConfirm
             0x33 => EntityUsedBed
             0x34 => UnlockRecipes_WithSmelting
@@ -128,7 +128,7 @@ protocol_packet_ids!(
             0x48 => UpdateScore
             0x49 => SpawnPosition
             0x4a => TimeUpdate
-            //TODO 0x4c => StopSound
+            0x4c => StopSound
             0x4d => SoundEffect
             0x4e => PlayerListHeaderFooter
             0x4f => CollectItem
@@ -144,14 +144,14 @@ protocol_packet_ids!(
         serverbound Serverbound {
             0x00 => LoginStart
             0x01 => EncryptionResponse
-            //TODO 0x02 => LoginPluginResponse
+            0x02 => LoginPluginResponse
         }
         clientbound Clientbound {
             0x00 => LoginDisconnect
             0x01 => EncryptionRequest
             0x02 => LoginSuccess
             0x03 => SetInitialCompression
-            //TODO 0x04 => LoginPluginRequest
+            0x04 => LoginPluginRequest
         }
     }
     status Status {

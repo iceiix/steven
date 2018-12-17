@@ -53,6 +53,10 @@ state_packets!(
             packet TeleportConfirm {
                 field teleport_id: VarInt =,
             }
+            packet QueryBlockNBT {
+                field transaction_id: VarInt =,
+                field location: Position =,
+            }
             /// TabComplete is sent by the client when the client presses tab in
             /// the chat box.
             packet TabComplete {
@@ -156,6 +160,15 @@ state_packets!(
                 field channel: String =,
                 field data: LenPrefixedBytes<i16> =,
             }
+            packet EditBook {
+                field new_book: Option<item::Stack> =,
+                field is_signing: bool =,
+                field hand: VarInt =,
+            }
+            packet QueryEntityNBT {
+                field transaction_id: VarInt =,
+                field entity_id: VarInt =,
+            }
             /// UseEntity is sent when the user interacts (right clicks) or attacks
             /// (left clicks) an entity.
             packet UseEntity {
@@ -240,10 +253,13 @@ state_packets!(
                 field yaw: f32 =,
                 field pitch: f32 =,
             }
-            /// TODO: Document
+            /// SteerBoat is used to visually update the boat paddles.
             packet SteerBoat {
-                field unknown: bool =,
-                field unknown2: bool =,
+                field left_paddle_turning: bool =,
+                field right_paddle_turning: bool =,
+            }
+            packet PickItem {
+                field slot_to_use: VarInt =,
             }
             /// CraftRecipeRequest is sent when player clicks a recipe in the crafting book.
             packet CraftRecipeRequest {
@@ -308,6 +324,9 @@ state_packets!(
                 field crafting_book_open: bool = when(|p: &CraftingBookData| p.action.0 == 1),
                 field crafting_filter: bool = when(|p: &CraftingBookData| p.action.0 == 1),
             }
+            packet NameItem {
+                field item_name: String =,
+            }
             /// ResourcePackStatus informs the server of the client's current progress
             /// in activating the requested resource pack
             packet ResourcePackStatus {
@@ -322,16 +341,52 @@ state_packets!(
                 field action: VarInt =,
                 field tab_id: String = when(|p: &AdvancementTab| p.action.0 == 0),
             }
+            packet SelectTrade {
+                field selected_slot: VarInt =,
+            }
+            packet SetBeaconEffect {
+                field primary_effect: VarInt =,
+                field secondary_effect: VarInt =,
+            }
             /// HeldItemChange is sent when the player changes the currently active
             /// hotbar slot.
             packet HeldItemChange {
                 field slot: i16 =,
+            }
+            packet UpdateCommandBlock {
+                field location: Position =,
+                field command: String =,
+                field mode: VarInt =,
+                field flags: u8 =,
+            }
+            packet UpdateCommandBlockMinecart {
+                field entity_id: VarInt =,
+                field command: String =,
+                field track_output: bool =,
             }
             /// CreativeInventoryAction is sent when the client clicks in the creative
             /// inventory. This is used to spawn items in creative.
             packet CreativeInventoryAction {
                 field slot: i16 =,
                 field clicked_item: Option<item::Stack> =,
+            }
+            packet UpdateStructureBlock {
+                field location: Position =,
+                field action: VarInt =,
+                field mode: VarInt =,
+                field name: String =,
+                field offset_x: i8 =,
+                field offset_y: i8 =,
+                field offset_z: i8 =,
+                field size_x: i8 =,
+                field size_y: i8 =,
+                field size_z: i8 =,
+                field mirror: VarInt =,
+                field rotation: VarInt =,
+                field metadata: String =,
+                field integrity: f32 =,
+                field seed: VarLong =,
+                field flags: i8 =,
             }
             /// SetSign sets the text on a sign after placing it.
             packet SetSign {
@@ -1152,6 +1207,15 @@ state_packets!(
                 field online: bool =,
                 field ping: u16 =,
             }
+            packet FacePlayer {
+                field feet_eyes: VarInt =,
+                field target_x: f64 =,
+                field target_y: f64 =,
+                field target_z: f64 =,
+                field is_entity: bool =,
+                field entity_id: Option<VarInt> = when(|p: &FacePlayer| p.is_entity),
+                field entity_feet_eyes: Option<VarInt> = when(|p: &FacePlayer| p.is_entity),
+            }
             /// TeleportPlayer is sent to change the player's position. The client is expected
             /// to reply to the server with the same positions as contained in this packet
             /// otherwise will reject future packets.
@@ -1241,6 +1305,10 @@ state_packets!(
             packet EntityStatus {
                 field entity_id: i32 =,
                 field entity_status: i8 =,
+            }
+            packet NBTQueryResponse {
+                field transaction_id: VarInt =,
+                field nbt: Option<nbt::NamedTag> =,
             }
             /// SelectAdvancementTab indicates the client should switch the advancement tab.
             packet SelectAdvancementTab {
@@ -1418,6 +1486,11 @@ state_packets!(
                 field world_age: i64 =,
                 field time_of_day: i64 =,
             }
+            packet StopSound {
+                field flags: u8 =,
+                field source: Option<VarInt> = when(|p: &StopSound| p.flags & 0x01 != 0),
+                field sound: Option<String> = when(|p: &StopSound| p.flags & 0x02 != 0),
+            }
             /// Title configures an on-screen title.
             packet Title {
                 field action: VarInt =,
@@ -1590,6 +1663,11 @@ state_packets!(
                 field shared_secret: LenPrefixedBytes<i16> =,
                 field verify_token: LenPrefixedBytes<i16> =,
             }
+            packet LoginPluginResponse {
+                field message_id: VarInt =,
+                field successful: bool =,
+                field data: Vec<u8> =,
+            }
         }
         clientbound Clientbound {
             /// LoginDisconnect is sent by the server if there was any issues
@@ -1629,6 +1707,11 @@ state_packets!(
             packet SetInitialCompression {
                 /// Threshold where a packet should be sent compressed
                 field threshold: VarInt =,
+            }
+            packet LoginPluginRequest {
+                field message_id: VarInt =,
+                field channel: String =,
+                field data: Vec<u8> =,
             }
         }
     }
