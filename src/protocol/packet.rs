@@ -1260,8 +1260,8 @@ state_packets!(
                 field filtering_craftable: bool =,
                 field smelting_book_open: bool =,
                 field filtering_smeltable: bool =,
-                field recipe_ids: LenPrefixed<VarInt, VarInt> =,
-                field recipe_ids2: LenPrefixed<VarInt, VarInt> = when(|p: &UnlockRecipes_WithSmelting| p.action.0 == 0),
+                field recipe_ids: LenPrefixed<VarInt, String> =,
+                field recipe_ids2: LenPrefixed<VarInt, String> = when(|p: &UnlockRecipes_WithSmelting| p.action.0 == 0),
             }
             /// EntityDestroy destroys the entities with the ids in the provided slice.
             packet EntityDestroy {
