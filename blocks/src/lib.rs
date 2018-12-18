@@ -3761,6 +3761,14 @@ define_blocks! {
         props {},
         model { ("minecraft", "red_nether_brick") },
     }
+    BoneBlock {
+        props {
+            axis: Axis = [Axis::Y, Axis::Z, Axis::X],
+        },
+        data Some(axis.index() << 2),
+        model { ("minecraft", "bone_block") },
+        variant format!("axis={}", axis.as_string()),
+    }
     Missing {
         props {},
         data None::<usize>,
