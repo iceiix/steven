@@ -3769,6 +3769,17 @@ define_blocks! {
         model { ("minecraft", "bone_block") },
         variant format!("axis={}", axis.as_string()),
     }
+    StructureVoid {
+        props {},
+        material material::Material {
+            collidable: false,
+            .. material::INVISIBLE
+        },
+        model { ("minecraft", "structure_void") },
+        // TODO: a small hit box but no collision
+        collision vec![],
+    }
+
     Missing {
         props {},
         data None::<usize>,
