@@ -3753,6 +3753,14 @@ define_blocks! {
         props {},
         model { ("minecraft", "magma") },
     }
+    NetherWartBlock {
+        props {},
+        model { ("minecraft", "nether_wart_block") },
+    }
+    RedNetherBrick {
+        props {},
+        model { ("minecraft", "red_nether_brick") },
+    }
     Missing {
         props {},
         data None::<usize>,
