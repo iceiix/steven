@@ -3749,6 +3749,10 @@ define_blocks! {
         props {},
         model { ("minecraft", "frosted_ice") },
     }
+    MagmaBlock {
+        props {},
+        model { ("minecraft", "magma") },
+    }
     Missing {
         props {},
         data None::<usize>,
