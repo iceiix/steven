@@ -3779,6 +3779,22 @@ define_blocks! {
         // TODO: a small hit box but no collision
         collision vec![],
     }
+    Observer {
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            powered: bool = [false, true],
+        },
+        data Some(facing.index() | (if powered { 0x8 } else { 0x0 })),
+        model { ("minecraft", "observer") },
+        variant format!("facing={},powered={}", facing.as_string(), powered),
+    }
 
     Missing {
         props {},
