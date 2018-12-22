@@ -3795,6 +3795,233 @@ define_blocks! {
         model { ("minecraft", "observer") },
         variant format!("facing={},powered={}", facing.as_string(), powered),
     }
+    // TODO: Shulker box textures (1.11+), since there is no model, we use wool for now
+    // The textures should be built from textures/blocks/shulker_top_<color>.png
+    // and textures/entity/shulker/shulker_<color>.png
+    WhiteShulkerBox {
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.index()),
+        model { ("minecraft", "white_wool") },
+    }
+    OrangeShulkerBox {
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.index()),
+        model { ("minecraft", "orange_wool") },
+    }
+    MagentaShulkerBox {
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.index()),
+        model { ("minecraft", "magenta_wool") },
+    }
+    LightBlueShulkerBox {
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.index()),
+        model { ("minecraft", "light_blue_wool") },
+    }
+    YellowShulkerBox {
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.index()),
+        model { ("minecraft", "yellow_wool") },
+    }
+    LimeShulkerBox {
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.index()),
+        model { ("minecraft", "lime_wool") },
+    }
+    PinkShulkerBox {
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.index()),
+        model { ("minecraft", "pink_wool") },
+    }
+    GrayShulkerBox {
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.index()),
+        model { ("minecraft", "gray_wool") },
+    }
+    LightGrayShulkerBox {
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.index()),
+        model { ("minecraft", "light_gray_wool") },
+    }
+    CyanShulkerBox {
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.index()),
+        model { ("minecraft", "cyan_wool") },
+    }
+    PurpleShulkerBox {
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.index()),
+        model { ("minecraft", "purple_wool") },
+    }
+    BlueShulkerBox {
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.index()),
+        model { ("minecraft", "blue_wool") },
+    }
+    BrownShulkerBox {
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.index()),
+        model { ("minecraft", "brown_wool") },
+    }
+    GreenShulkerBox {
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.index()),
+        model { ("minecraft", "green_wool") },
+    }
+    RedShulkerBox {
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.index()),
+        model { ("minecraft", "red_wool") },
+    }
+    BlackShulkerBox {
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.index()),
+        model { ("minecraft", "black_wool") },
+    }
 
     Missing {
         props {},
