@@ -4230,6 +4230,54 @@ define_blocks! {
         model { ("minecraft", "black_glazed_terracotta") },
         variant format!("facing={}", facing.as_string()),
     }
+    Concrete {
+        props {
+            color: ColoredVariant = [
+                ColoredVariant::White,
+                ColoredVariant::Orange,
+                ColoredVariant::Magenta,
+                ColoredVariant::LightBlue,
+                ColoredVariant::Yellow,
+                ColoredVariant::Lime,
+                ColoredVariant::Pink,
+                ColoredVariant::Gray,
+                ColoredVariant::Silver,
+                ColoredVariant::Cyan,
+                ColoredVariant::Purple,
+                ColoredVariant::Blue,
+                ColoredVariant::Brown,
+                ColoredVariant::Green,
+                ColoredVariant::Red,
+                ColoredVariant::Black
+            ],
+        },
+        data Some(color.data()),
+        model { ("minecraft", format!("{}_concrete", color.as_string()) ) },
+    }
+    ConcretePowder {
+        props {
+            color: ColoredVariant = [
+                ColoredVariant::White,
+                ColoredVariant::Orange,
+                ColoredVariant::Magenta,
+                ColoredVariant::LightBlue,
+                ColoredVariant::Yellow,
+                ColoredVariant::Lime,
+                ColoredVariant::Pink,
+                ColoredVariant::Gray,
+                ColoredVariant::Silver,
+                ColoredVariant::Cyan,
+                ColoredVariant::Purple,
+                ColoredVariant::Blue,
+                ColoredVariant::Brown,
+                ColoredVariant::Green,
+                ColoredVariant::Red,
+                ColoredVariant::Black
+            ],
+        },
+        data Some(color.data()),
+        model { ("minecraft", format!("{}_concrete_powder", color.as_string()) ) },
+    }
 
     Missing {
         props {},
