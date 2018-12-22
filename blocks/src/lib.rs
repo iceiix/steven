@@ -4278,6 +4278,29 @@ define_blocks! {
         data Some(color.data()),
         model { ("minecraft", format!("{}_concrete_powder", color.as_string()) ) },
     }
+    Missing253 {
+        props {},
+        data None::<usize>,
+        model { ("steven", "missing_block") },
+    }
+    Missing254 {
+        props {},
+        data None::<usize>,
+        model { ("steven", "missing_block") },
+    }
+    StructureBlock {
+        props {
+            mode: StructureBlockMode = [
+                StructureBlockMode::Save,
+                StructureBlockMode::Load,
+                StructureBlockMode::Corner,
+                StructureBlockMode::Data
+            ],
+        },
+        data Some(mode.data()),
+        model { ("minecraft", "structure_block") },
+        variant format!("mode={}", mode.as_string()),
+    }
 
     Missing {
         props {},
@@ -5562,6 +5585,34 @@ impl StairShape {
             StairShape::InnerRight => "inner_right",
             StairShape::OuterLeft => "outer_left",
             StairShape::OuterRight => "outer_right",
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum StructureBlockMode {
+    Save,
+    Load,
+    Corner,
+    Data,
+}
+
+impl StructureBlockMode {
+    pub fn data(self) -> usize {
+        match self {
+            StructureBlockMode::Save => 0,
+            StructureBlockMode::Load => 1,
+            StructureBlockMode::Corner => 2,
+            StructureBlockMode::Data => 3,
+        }
+    }
+
+    pub fn as_string(self) -> &'static str {
+        match self {
+            StructureBlockMode::Save => "save",
+            StructureBlockMode::Load => "load",
+            StructureBlockMode::Corner => "corner",
+            StructureBlockMode::Data => "data",
         }
     }
 }
