@@ -4022,6 +4022,214 @@ define_blocks! {
         data Some(facing.index()),
         model { ("minecraft", "black_wool") },
     }
+    WhiteGlazedTerracotta {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.horizontal_index()),
+        model { ("minecraft", "white_glazed_terracotta") },
+        variant format!("facing={}", facing.as_string()),
+    }
+    OrangeGlazedTerracotta {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.horizontal_index()),
+        model { ("minecraft", "orange_glazed_terracotta") },
+        variant format!("facing={}", facing.as_string()),
+    }
+    MagentaGlazedTerracotta {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.horizontal_index()),
+        model { ("minecraft", "magenta_glazed_terracotta") },
+        variant format!("facing={}", facing.as_string()),
+    }
+    LightBlueGlazedTerracotta {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.horizontal_index()),
+        model { ("minecraft", "light_blue_glazed_terracotta") },
+        variant format!("facing={}", facing.as_string()),
+    }
+    YellowGlazedTerracotta {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.horizontal_index()),
+        model { ("minecraft", "yellow_glazed_terracotta") },
+        variant format!("facing={}", facing.as_string()),
+    }
+    LimeGlazedTerracotta {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.horizontal_index()),
+        model { ("minecraft", "lime_glazed_terracotta") },
+        variant format!("facing={}", facing.as_string()),
+    }
+    PinkGlazedTerracotta {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.horizontal_index()),
+        model { ("minecraft", "pink_glazed_terracotta") },
+        variant format!("facing={}", facing.as_string()),
+    }
+    GrayGlazedTerracotta {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.horizontal_index()),
+        model { ("minecraft", "gray_glazed_terracotta") },
+        variant format!("facing={}", facing.as_string()),
+    }
+    LightGrayGlazedTerracotta {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.horizontal_index()),
+        model { ("minecraft", "silver_glazed_terracotta") },
+        variant format!("facing={}", facing.as_string()),
+    }
+    CyanGlazedTerracotta {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.horizontal_index()),
+        model { ("minecraft", "cyan_glazed_terracotta") },
+        variant format!("facing={}", facing.as_string()),
+    }
+    PurpleGlazedTerracotta {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.horizontal_index()),
+        model { ("minecraft", "purple_glazed_terracotta") },
+        variant format!("facing={}", facing.as_string()),
+    }
+    BlueGlazedTerracotta {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.horizontal_index()),
+        model { ("minecraft", "blue_glazed_terracotta") },
+        variant format!("facing={}", facing.as_string()),
+    }
+    BrownGlazedTerracotta {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.horizontal_index()),
+        model { ("minecraft", "brown_glazed_terracotta") },
+        variant format!("facing={}", facing.as_string()),
+    }
+    GreenGlazedTerracotta {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.horizontal_index()),
+        model { ("minecraft", "green_glazed_terracotta") },
+        variant format!("facing={}", facing.as_string()),
+    }
+    RedGlazedTerracotta {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.horizontal_index()),
+        model { ("minecraft", "red_glazed_terracotta") },
+        variant format!("facing={}", facing.as_string()),
+    }
+    BlackGlazedTerracotta {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data Some(facing.horizontal_index()),
+        model { ("minecraft", "black_glazed_terracotta") },
+        variant format!("facing={}", facing.as_string()),
+    }
 
     Missing {
         props {},
