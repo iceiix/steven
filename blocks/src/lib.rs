@@ -94,7 +94,8 @@ macro_rules! define_blocks {
             }
 
             pub fn by_vanilla_id(id: usize) -> Block {
-                VANILLA_ID_MAP.get(id).and_then(|v| *v).unwrap_or(Block::Missing{})
+                //VANILLA_ID_MAP.get(id).and_then(|v| *v).unwrap_or(Block::Missing{})
+                FLAT_VANILLA_ID_MAP.get(id).and_then(|v| *v).unwrap_or(Block::Missing{})
             }
 
             #[allow(unused_variables, unreachable_code)]
@@ -207,6 +208,30 @@ macro_rules! define_blocks {
                     )+
                 }
             }
+        }
+
+        lazy_static! {
+            static ref FLAT_VANILLA_ID_MAP: Vec<Option<Block>> = {
+                let mut blocks = vec![];
+                let mut flat_id = 0;
+                for id in 0..4096 {
+                    let block = Block::by_vanilla_id(id);
+                    println!("block {} = {:?}", id, block);
+
+                    match block {
+                        Block::Missing{..} => (),
+                        _ => {
+
+                            if blocks.len() <= flat_id {
+                                blocks.resize(flat_id + 1, None);
+                            }
+                            blocks[flat_id] = Some(block);
+                            flat_id += 1;
+                        }
+                    }
+                }
+                blocks
+            };
         }
 
         lazy_static! {

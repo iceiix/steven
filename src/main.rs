@@ -167,6 +167,7 @@ impl Game {
 }
 
 fn main() {
+    println!("dumping blocks");
     for id in 0..4096 {
         let block = crate::world::block::Block::by_vanilla_id(id);
         println!("block {} = {:?}", id, block);
