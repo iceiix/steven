@@ -167,6 +167,11 @@ impl Game {
 }
 
 fn main() {
+    for id in 0..4096 {
+        let block = crate::world::block::Block::by_vanilla_id(id);
+        println!("block {} = {:?}", id, block);
+    }
+
     let con = Arc::new(Mutex::new(console::Console::new()));
     let (vars, vsync) = {
         let mut vars = console::Vars::new();
