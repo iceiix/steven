@@ -233,7 +233,6 @@ macro_rules! define_blocks {
         }
 
         lazy_static! {
-            #[allow(unused_assignments)]
             static ref VANILLA_ID_MAP: Vec<Option<Block>> = {
                 let mut blocks = vec![];
                 let mut flat_id = 0;
@@ -357,7 +356,11 @@ macro_rules! define_blocks {
                             }
                         }
                     }
-                    flat_id += last_offset + 1;
+
+                    #[allow(unused_assignments)]
+                    {
+                        flat_id += last_offset + 1;
+                    }
                 })+
 
                 blocks
