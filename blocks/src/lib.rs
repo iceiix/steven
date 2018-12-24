@@ -233,6 +233,7 @@ macro_rules! define_blocks {
         }
 
         lazy_static! {
+            #[allow(unused_assignments)]
             static ref VANILLA_ID_MAP: Vec<Option<Block>> = {
                 let mut blocks = vec![];
                 let mut flat_id = 0;
@@ -419,6 +420,17 @@ define_blocks! {
             ],
         },
         data if !snowy { Some(variant.data()) } else { None },
+        offset {
+            if variant == DirtVariant::Podzol {
+                Some(variant.data() + if snowy { 0 } else { 1 })
+            } else {
+                if snowy {
+                    None
+                } else {
+                    Some(variant.data())
+                }
+            }
+        },
         model { ("minecraft", variant.as_string()) },
         variant {
             if variant == DirtVariant::Podzol {
