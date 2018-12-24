@@ -51,6 +51,7 @@ macro_rules! define_blocks {
                     )*
                 },
                 $(data $datafunc:expr,)*
+                $(flatoffset $flatoffsetfunc:expr,)*
                 $(material $mat:expr,)*
                 model $model:expr,
                 $(variant $variant:expr,)*
@@ -92,6 +93,28 @@ macro_rules! define_blocks {
                     )+
                 }
             }
+
+            #[allow(unused_variables, unreachable_code)]
+            pub fn get_flat_offset(&self) -> Option<usize> {
+                match *self {
+                    $(
+                        Block::$name {
+                            $($fname,)*
+                        } => {
+                            $(
+                                let offset: Option<usize> = ($flatoffsetfunc).map(|v| v);
+                                return offset;
+                            )*
+                            $(
+                                let data: Option<usize> = ($datafunc).map(|v| v);
+                                return data;
+                            )*
+                            Some(0)
+                        }
+                    )+
+                }
+            }
+
 
             pub fn by_vanilla_id(id: usize) -> Block {
                 VANILLA_ID_MAP.get(id).and_then(|v| *v).unwrap_or(Block::Missing{})
