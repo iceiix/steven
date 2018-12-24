@@ -182,7 +182,6 @@ impl Factory {
             let mut m = models.write().unwrap();
             let model = m.models.get(&Key("steven".to_owned(), "missing_block".to_owned())).unwrap().clone();
             m.models.insert(key, model);
-            println!("get_state_model(): no model found for block {:?} at {},{},{}", block, x, y, z);
         }
         ret
     }
