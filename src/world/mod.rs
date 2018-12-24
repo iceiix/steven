@@ -871,6 +871,7 @@ impl World {
                     for i in 0 .. count {
                         let id = VarInt::read_from(&mut data)?.0;
                         let bl = block::Block::by_vanilla_id(id as usize);
+                        println!("by_vanilla_id({}) = {:?}", id, bl);
                         mappings.insert(i as usize, bl);
                     }
                 }
