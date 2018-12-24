@@ -212,6 +212,7 @@ macro_rules! define_blocks {
         lazy_static! {
             static ref VANILLA_ID_MAP: Vec<Option<Block>> = {
                 let mut blocks = vec![];
+                let mut flat_id = 0;
                 $({
                     #[allow(non_camel_case_types, dead_code)]
                     struct CombinationIter<$($fname),*> {
@@ -302,7 +303,11 @@ macro_rules! define_blocks {
                         }),*
                     );
                     for block in iter {
-                        if let Some(id) = block.get_vanilla_id() {
+                        if let Some(vanilla_id) = block.get_vanilla_id() {
+                            let id = flat_id;
+                            //let id = vanilla_id;
+                            println!("Block {:#?} flat {} hierarchical {}:{}", block, flat_id, vanilla_id >> 4, vanilla_id & 0xF);
+                            flat_id += 1;
                             if blocks.len() <= id {
                                 blocks.resize(id + 1, None);
                             }
