@@ -333,9 +333,9 @@ macro_rules! define_blocks {
                             let id = flat_id + offset;
                             //let id = vanilla_id;
                             if let Some(vanilla_id) = vanilla_id {
-                                println!("Block {:#?} flat {} hierarchical {}:{} offset={}", block, flat_id, vanilla_id >> 4, vanilla_id & 0xF, offset);
+                                println!("Block {:?} flat {} hierarchical {}:{} offset={}", block, id, vanilla_id >> 4, vanilla_id & 0xF, offset);
                             } else {
-                                println!("Block {:#?} flat {} hierarchical none, offset={}", block, flat_id, offset);
+                                println!("Block {:?} flat {} hierarchical none, offset={}", block, id, offset);
                             }
                             if offset > last_offset {
                                 last_offset = offset;
