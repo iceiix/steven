@@ -399,6 +399,7 @@ define_blocks! {
             snowy: bool = [false, true],
         },
         data { if snowy { None } else { Some(0) } },
+        flatoffset { if snowy { Some(0) } else { Some(1) } },
         model { ("minecraft", "grass") },
         variant format!("snowy={}", snowy),
         tint TintType::Grass,
