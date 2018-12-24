@@ -325,18 +325,21 @@ macro_rules! define_blocks {
                             vals.into_iter()
                         }),*
                     );
+                    let mut last_offset = 0;
                     for block in iter {
                         let vanilla_id = block.get_vanilla_id();
                         let offset = block.get_flat_offset();
                         if let Some(offset) = offset {
-                            let id = flat_id;
+                            let id = flat_id + offset;
                             //let id = vanilla_id;
                             if let Some(vanilla_id) = vanilla_id {
                                 println!("Block {:#?} flat {} hierarchical {}:{} offset={}", block, flat_id, vanilla_id >> 4, vanilla_id & 0xF, offset);
                             } else {
                                 println!("Block {:#?} flat {} hierarchical none, offset={}", block, flat_id, offset);
                             }
-                            flat_id += 1;
+                            if offset > last_offset {
+                                last_offset = offset;
+                            }
                             if blocks.len() <= id {
                                 blocks.resize(id + 1, None);
                             }
@@ -353,6 +356,7 @@ macro_rules! define_blocks {
                             }
                         }
                     }
+                    flat_id += last_offset + 1;
                 })+
 
                 blocks
