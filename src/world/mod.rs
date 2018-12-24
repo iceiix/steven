@@ -148,10 +148,7 @@ impl World {
     pub fn get_block(&self, pos: Position) -> block::Block {
         match self.chunks.get(&CPos(pos.x >> 4, pos.z >> 4)) {
             Some(chunk) => chunk.get_block(pos.x & 0xF, pos.y, pos.z & 0xF),
-            None => {
-                println!("get_block World pos={:?} is Missing", pos);
-                block::Missing{}
-            },
+            None => block::Missing{},
         }
     }
 
@@ -1090,7 +1087,6 @@ impl Chunk {
     fn get_block(&self, x: i32, y: i32, z: i32) -> block::Block {
         let s_idx = y >> 4;
         if s_idx < 0 || s_idx > 15 {
-            println!("get_block() Chunk missing x={}, y={}, z={}, s_idx={}", x,y,z,s_idx);
             return block::Missing{};
         }
         match self.sections[s_idx as usize].as_ref() {
