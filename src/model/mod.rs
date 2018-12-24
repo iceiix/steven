@@ -756,7 +756,9 @@ pub struct Variants {
 impl Variants {
     fn choose_model<R: Rng>(&self, rng: &mut R) -> &Model {
         // TODO: Weighted random
-        rng.choose(&self.models).unwrap()
+        let res = rng.choose(&self.models);
+        println!("choose_model about to return {:?}", res);
+        res.unwrap()
     }
 }
 
@@ -828,14 +830,14 @@ struct BlockFace {
     tint_index: i32,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct Model {
     faces: Vec<Face>,
     ambient_occlusion: bool,
     weight: f64,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct Face {
     cull_face: Direction,
     facing: Direction,
@@ -1028,7 +1030,7 @@ pub const PRECOMPUTED_VERTS: [&[BlockVertex; 4]; 6] = [
     ],
 ];
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct BlockVertex {
     pub x: f32,
     pub y: f32,
