@@ -51,7 +51,7 @@ macro_rules! define_blocks {
                     )*
                 },
                 $(data $datafunc:expr,)*
-                $(flatoffset $flatoffsetfunc:expr,)*
+                $(offset $offsetfunc:expr,)*
                 $(material $mat:expr,)*
                 model $model:expr,
                 $(variant $variant:expr,)*
@@ -102,7 +102,7 @@ macro_rules! define_blocks {
                             $($fname,)*
                         } => {
                             $(
-                                let offset: Option<usize> = ($flatoffsetfunc).map(|v| v);
+                                let offset: Option<usize> = ($offsetfunc).map(|v| v);
                                 return offset;
                             )*
                             $(
@@ -399,7 +399,7 @@ define_blocks! {
             snowy: bool = [false, true],
         },
         data { if snowy { None } else { Some(0) } },
-        flatoffset { if snowy { Some(0) } else { Some(1) } },
+        offset { if snowy { Some(0) } else { Some(1) } },
         model { ("minecraft", "grass") },
         variant format!("snowy={}", snowy),
         tint TintType::Grass,
