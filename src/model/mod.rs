@@ -756,9 +756,7 @@ pub struct Variants {
 impl Variants {
     fn choose_model<R: Rng>(&self, rng: &mut R) -> &Model {
         // TODO: Weighted random
-        let res = rng.choose(&self.models);
-        println!("choose_model about to return {:?}", res);
-        res.unwrap()
+        rng.choose(&self.models).unwrap()
     }
 }
 
