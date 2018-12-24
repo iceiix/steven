@@ -117,7 +117,9 @@ macro_rules! define_blocks {
 
 
             pub fn by_vanilla_id(id: usize) -> Block {
-                VANILLA_ID_MAP.get(id).and_then(|v| *v).unwrap_or(Block::Missing{})
+                let ret = VANILLA_ID_MAP.get(id).and_then(|v| *v).unwrap_or(Block::Missing{});
+                println!("by_vanilla_id({}) = {:?}", id, ret);
+                ret
             }
 
             #[allow(unused_variables, unreachable_code)]
