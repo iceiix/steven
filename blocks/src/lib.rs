@@ -303,10 +303,14 @@ macro_rules! define_blocks {
                         }),*
                     );
                     for block in iter {
-                        if let Some(vanilla_id) = block.get_vanilla_id() {
+                        let vanilla_id = block.get_vanilla_id();
                             let id = flat_id;
                             //let id = vanilla_id;
-                            println!("Block {:#?} flat {} hierarchical {}:{}", block, flat_id, vanilla_id >> 4, vanilla_id & 0xF);
+                            if let Some(vanilla_id) = vanilla_id {
+                                println!("Block {:#?} flat {} hierarchical {}:{}", block, flat_id, vanilla_id >> 4, vanilla_id & 0xF);
+                            } else {
+                                println!("Block {:#?} flat {} hierarchical none", block, flat_id);
+                            }
                             flat_id += 1;
                             if blocks.len() <= id {
                                 blocks.resize(id + 1, None);
@@ -322,7 +326,7 @@ macro_rules! define_blocks {
                                     blocks[id]
                                 );
                             }
-                        }
+                        //}
                     }
                 })+
 
