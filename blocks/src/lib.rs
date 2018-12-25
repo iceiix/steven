@@ -156,8 +156,7 @@ macro_rules! define_blocks {
                             $($fname,)*
                         } => {
                             $(return String::from($variant);)*
-                            //"normal".to_owned()
-                            "".to_owned()
+                            "normal".to_owned()
                         }
                     )+
                 }

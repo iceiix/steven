@@ -1,5 +1,5 @@
 {
     "variants": {
-        "": { "model": "missing_block" }
+        "normal": { "model": "missing_block" }
     }
 }
