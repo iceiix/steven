@@ -728,7 +728,6 @@ define_blocks! {
             ],
             occupied: bool = [false, true],
             part: BedPart = [BedPart::Head, BedPart::Foot],
-            // TODO: colored beds
         },
         data Some(facing.horizontal_index()
                   | (if occupied { 0x4 } else { 0x0 })
@@ -738,6 +737,306 @@ define_blocks! {
                   | (if part == BedPart::Head { 0 } else { 1 })),
         material material::NON_SOLID,
         model { ("minecraft", "bed") },
+        variant format!("facing={},part={}", facing.as_string(), part.as_string()),
+        collision vec![Aabb3::new(Point3::new(0.0, 0.0, 0.0), Point3::new(1.0, 9.0/16.0, 1.0))],
+    }
+    OrangeBed {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            occupied: bool = [false, true],
+            part: BedPart = [BedPart::Head, BedPart::Foot],
+        },
+        data None::<usize>,
+        offset Some((facing.horizontal_offset() << 2)
+                  | (if occupied { 0 } else { 2 })
+                  | (if part == BedPart::Head { 0 } else { 1 })),
+        material material::NON_SOLID,
+        model { ("minecraft", "orange_bed") },
+        variant format!("facing={},part={}", facing.as_string(), part.as_string()),
+        collision vec![Aabb3::new(Point3::new(0.0, 0.0, 0.0), Point3::new(1.0, 9.0/16.0, 1.0))],
+    }
+    MagentaBed {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            occupied: bool = [false, true],
+            part: BedPart = [BedPart::Head, BedPart::Foot],
+        },
+        data None::<usize>,
+        offset Some((facing.horizontal_offset() << 2)
+                  | (if occupied { 0 } else { 2 })
+                  | (if part == BedPart::Head { 0 } else { 1 })),
+        material material::NON_SOLID,
+        model { ("minecraft", "magenta_bed") },
+        variant format!("facing={},part={}", facing.as_string(), part.as_string()),
+        collision vec![Aabb3::new(Point3::new(0.0, 0.0, 0.0), Point3::new(1.0, 9.0/16.0, 1.0))],
+    }
+    LightBlueBed {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            occupied: bool = [false, true],
+            part: BedPart = [BedPart::Head, BedPart::Foot],
+        },
+        data None::<usize>,
+        offset Some((facing.horizontal_offset() << 2)
+                  | (if occupied { 0 } else { 2 })
+                  | (if part == BedPart::Head { 0 } else { 1 })),
+        material material::NON_SOLID,
+        model { ("minecraft", "light_blue_bed") },
+        variant format!("facing={},part={}", facing.as_string(), part.as_string()),
+        collision vec![Aabb3::new(Point3::new(0.0, 0.0, 0.0), Point3::new(1.0, 9.0/16.0, 1.0))],
+    }
+    YellowBed {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            occupied: bool = [false, true],
+            part: BedPart = [BedPart::Head, BedPart::Foot],
+        },
+        data None::<usize>,
+        offset Some((facing.horizontal_offset() << 2)
+                  | (if occupied { 0 } else { 2 })
+                  | (if part == BedPart::Head { 0 } else { 1 })),
+        material material::NON_SOLID,
+        model { ("minecraft", "yellow_bed") },
+        variant format!("facing={},part={}", facing.as_string(), part.as_string()),
+        collision vec![Aabb3::new(Point3::new(0.0, 0.0, 0.0), Point3::new(1.0, 9.0/16.0, 1.0))],
+    }
+    LimeBed {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            occupied: bool = [false, true],
+            part: BedPart = [BedPart::Head, BedPart::Foot],
+        },
+        data None::<usize>,
+        offset Some((facing.horizontal_offset() << 2)
+                  | (if occupied { 0 } else { 2 })
+                  | (if part == BedPart::Head { 0 } else { 1 })),
+        material material::NON_SOLID,
+        model { ("minecraft", "lime_bed") },
+        variant format!("facing={},part={}", facing.as_string(), part.as_string()),
+        collision vec![Aabb3::new(Point3::new(0.0, 0.0, 0.0), Point3::new(1.0, 9.0/16.0, 1.0))],
+    }
+    PinkBed {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            occupied: bool = [false, true],
+            part: BedPart = [BedPart::Head, BedPart::Foot],
+        },
+        data None::<usize>,
+        offset Some((facing.horizontal_offset() << 2)
+                  | (if occupied { 0 } else { 2 })
+                  | (if part == BedPart::Head { 0 } else { 1 })),
+        material material::NON_SOLID,
+        model { ("minecraft", "pink_bed") },
+        variant format!("facing={},part={}", facing.as_string(), part.as_string()),
+        collision vec![Aabb3::new(Point3::new(0.0, 0.0, 0.0), Point3::new(1.0, 9.0/16.0, 1.0))],
+    }
+    GrayBed {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            occupied: bool = [false, true],
+            part: BedPart = [BedPart::Head, BedPart::Foot],
+        },
+        data None::<usize>,
+        offset Some((facing.horizontal_offset() << 2)
+                  | (if occupied { 0 } else { 2 })
+                  | (if part == BedPart::Head { 0 } else { 1 })),
+        material material::NON_SOLID,
+        model { ("minecraft", "gray_bed") },
+        variant format!("facing={},part={}", facing.as_string(), part.as_string()),
+        collision vec![Aabb3::new(Point3::new(0.0, 0.0, 0.0), Point3::new(1.0, 9.0/16.0, 1.0))],
+    }
+    LightGrayBed {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            occupied: bool = [false, true],
+            part: BedPart = [BedPart::Head, BedPart::Foot],
+        },
+        data None::<usize>,
+        offset Some((facing.horizontal_offset() << 2)
+                  | (if occupied { 0 } else { 2 })
+                  | (if part == BedPart::Head { 0 } else { 1 })),
+        material material::NON_SOLID,
+        model { ("minecraft", "light_gray_bed") },
+        variant format!("facing={},part={}", facing.as_string(), part.as_string()),
+        collision vec![Aabb3::new(Point3::new(0.0, 0.0, 0.0), Point3::new(1.0, 9.0/16.0, 1.0))],
+    }
+    CyanBed {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            occupied: bool = [false, true],
+            part: BedPart = [BedPart::Head, BedPart::Foot],
+        },
+        data None::<usize>,
+        offset Some((facing.horizontal_offset() << 2)
+                  | (if occupied { 0 } else { 2 })
+                  | (if part == BedPart::Head { 0 } else { 1 })),
+        material material::NON_SOLID,
+        model { ("minecraft", "cyan_bed") },
+        variant format!("facing={},part={}", facing.as_string(), part.as_string()),
+        collision vec![Aabb3::new(Point3::new(0.0, 0.0, 0.0), Point3::new(1.0, 9.0/16.0, 1.0))],
+    }
+    PurpleBed {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            occupied: bool = [false, true],
+            part: BedPart = [BedPart::Head, BedPart::Foot],
+        },
+        data None::<usize>,
+        offset Some((facing.horizontal_offset() << 2)
+                  | (if occupied { 0 } else { 2 })
+                  | (if part == BedPart::Head { 0 } else { 1 })),
+        material material::NON_SOLID,
+        model { ("minecraft", "purple_bed") },
+        variant format!("facing={},part={}", facing.as_string(), part.as_string()),
+        collision vec![Aabb3::new(Point3::new(0.0, 0.0, 0.0), Point3::new(1.0, 9.0/16.0, 1.0))],
+    }
+    BlueBed {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            occupied: bool = [false, true],
+            part: BedPart = [BedPart::Head, BedPart::Foot],
+        },
+        data None::<usize>,
+        offset Some((facing.horizontal_offset() << 2)
+                  | (if occupied { 0 } else { 2 })
+                  | (if part == BedPart::Head { 0 } else { 1 })),
+        material material::NON_SOLID,
+        model { ("minecraft", "blue_bed") },
+        variant format!("facing={},part={}", facing.as_string(), part.as_string()),
+        collision vec![Aabb3::new(Point3::new(0.0, 0.0, 0.0), Point3::new(1.0, 9.0/16.0, 1.0))],
+    }
+    BrownBed {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            occupied: bool = [false, true],
+            part: BedPart = [BedPart::Head, BedPart::Foot],
+        },
+        data None::<usize>,
+        offset Some((facing.horizontal_offset() << 2)
+                  | (if occupied { 0 } else { 2 })
+                  | (if part == BedPart::Head { 0 } else { 1 })),
+        material material::NON_SOLID,
+        model { ("minecraft", "brown_bed") },
+        variant format!("facing={},part={}", facing.as_string(), part.as_string()),
+        collision vec![Aabb3::new(Point3::new(0.0, 0.0, 0.0), Point3::new(1.0, 9.0/16.0, 1.0))],
+    }
+    GreenBed {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            occupied: bool = [false, true],
+            part: BedPart = [BedPart::Head, BedPart::Foot],
+        },
+        data None::<usize>,
+        offset Some((facing.horizontal_offset() << 2)
+                  | (if occupied { 0 } else { 2 })
+                  | (if part == BedPart::Head { 0 } else { 1 })),
+        material material::NON_SOLID,
+        model { ("minecraft", "green_bed") },
+        variant format!("facing={},part={}", facing.as_string(), part.as_string()),
+        collision vec![Aabb3::new(Point3::new(0.0, 0.0, 0.0), Point3::new(1.0, 9.0/16.0, 1.0))],
+    }
+    RedBed {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            occupied: bool = [false, true],
+            part: BedPart = [BedPart::Head, BedPart::Foot],
+        },
+        data None::<usize>,
+        offset Some((facing.horizontal_offset() << 2)
+                  | (if occupied { 0 } else { 2 })
+                  | (if part == BedPart::Head { 0 } else { 1 })),
+        material material::NON_SOLID,
+        model { ("minecraft", "red_bed") },
+        variant format!("facing={},part={}", facing.as_string(), part.as_string()),
+        collision vec![Aabb3::new(Point3::new(0.0, 0.0, 0.0), Point3::new(1.0, 9.0/16.0, 1.0))],
+    }
+    BlackBed {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            occupied: bool = [false, true],
+            part: BedPart = [BedPart::Head, BedPart::Foot],
+        },
+        data None::<usize>,
+        offset Some((facing.horizontal_offset() << 2)
+                  | (if occupied { 0 } else { 2 })
+                  | (if part == BedPart::Head { 0 } else { 1 })),
+        material material::NON_SOLID,
+        model { ("minecraft", "black_bed") },
         variant format!("facing={},part={}", facing.as_string(), part.as_string()),
         collision vec![Aabb3::new(Point3::new(0.0, 0.0, 0.0), Point3::new(1.0, 9.0/16.0, 1.0))],
     }
