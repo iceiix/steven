@@ -1232,7 +1232,19 @@ define_blocks! {
         model { ("minecraft", format!("{}_wool", color.as_string()) ) },
     }
     PistonExtension {
-        props {},
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            variant: PistonType = [PistonType::Normal, PistonType::Sticky],
+        },
+        data if facing == Direction::Up && variant == PistonType::Normal { Some(0) } else { None },
+        offset Some(facing.offset() * 2 + (if variant == PistonType::Normal { 0 } else { 1 })),
         material material::INVISIBLE,
         model { ("minecraft", "piston_extension") },
     }
