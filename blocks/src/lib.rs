@@ -1763,34 +1763,16 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data {
-            let facing_data = match (face, facing) {
-                (AttachedFace::Ceiling, Direction::East) => 0,
-                (AttachedFace::Wall, Direction::East) => 1,
-                (AttachedFace::Wall, Direction::West) => 2,
-                (AttachedFace::Wall, Direction::South) => 3,
-                (AttachedFace::Wall, Direction::North) => 4,
-                (AttachedFace::Floor, Direction::South) => 5,
-                (AttachedFace::Floor, Direction::East) => 6,
-                (AttachedFace::Ceiling, Direction::South) => 7,
-                _ => return None,
-            };
-            Some(facing_data | (if powered { 0x8 } else { 0x0 }))
+            if let Some(facing_data) = face.data_with_facing(facing) {
+                Some(facing_data | (if powered { 0x8 } else { 0x0 }))
+            } else {
+                None
+            }
         },
         offset Some(face.offset() * (4 * 2) + facing.horizontal_offset() * 2 + if powered { 0 } else { 1 }),
         material material::NON_SOLID,
         model { ("minecraft", "lever") },
-        variant format!("facing={},powered={}", 
-            match (face, facing) {
-                (AttachedFace::Ceiling, Direction::East) => "down_x",
-                (AttachedFace::Wall, Direction::East) => "east",
-                (AttachedFace::Wall, Direction::West) => "west",
-                (AttachedFace::Wall, Direction::South) => "south",
-                (AttachedFace::Wall, Direction::North) => "north",
-                (AttachedFace::Floor, Direction::South) => "up_z",
-                (AttachedFace::Floor, Direction::East) => "up_x",
-                (AttachedFace::Ceiling, Direction::South) => "down_z",
-                _ => "north", // TODO: support 1.13.2+ new directions
-            }, powered),
+        variant format!("facing={},powered={}", face.variant_with_facing(facing), powered),
         collision vec![],
     }
     StonePressurePlate {
@@ -2012,30 +1994,17 @@ define_blocks! {
             ],
             powered: bool = [false, true],
         },
-        data Some(match (face, facing) {
-            (AttachedFace::Ceiling, Direction::North) => 0,
-            (AttachedFace::Wall, Direction::East) => 1,
-            (AttachedFace::Wall, Direction::West) => 2,
-            (AttachedFace::Wall, Direction::South) => 3,
-            (AttachedFace::Wall, Direction::North) => 4,
-            (AttachedFace::Floor, Direction::North)=> 5,
-            _ => return None,
-            } | (if powered { 0x8 } else { 0x0 })),
+        data {
+            if let Some(facing_data) = face.data_with_facing(facing) {
+                Some(facing_data | (if powered { 0x8 } else { 0x0 }))
+            } else {
+                None
+            }
+        },
         offset Some(face.offset() * (4 * 2) + facing.horizontal_offset() * 2 + if powered { 0 } else { 1 }),
         material material::NON_SOLID,
         model { ("minecraft", "stone_button") },
-        variant format!("facing={},powered={}",
-            match (face, facing) {
-                (AttachedFace::Ceiling, Direction::East) => "down_x",
-                (AttachedFace::Wall, Direction::East) => "east",
-                (AttachedFace::Wall, Direction::West) => "west",
-                (AttachedFace::Wall, Direction::South) => "south",
-                (AttachedFace::Wall, Direction::North) => "north",
-                (AttachedFace::Floor, Direction::South) => "up_z",
-                (AttachedFace::Floor, Direction::East) => "up_x",
-                (AttachedFace::Ceiling, Direction::South) => "down_z",
-                _ => "north", // TODO: support 1.13.2+ new directions
-            }, powered),
+        variant format!("facing={},powered={}", face.variant_with_facing(facing), powered),
     }
     SnowLayer {
         props {
@@ -6343,6 +6312,34 @@ impl AttachedFace {
             AttachedFace::Wall => 1,
             AttachedFace::Ceiling => 2,
         }
+    }
+
+    pub fn data_with_facing(self, facing: Direction) -> Option<usize> {
+        Some(match (self, facing) {
+            (AttachedFace::Ceiling, Direction::East) => 0,
+            (AttachedFace::Wall, Direction::East) => 1,
+            (AttachedFace::Wall, Direction::West) => 2,
+            (AttachedFace::Wall, Direction::South) => 3,
+            (AttachedFace::Wall, Direction::North) => 4,
+            (AttachedFace::Floor, Direction::South) => 5,
+            (AttachedFace::Floor, Direction::East) => 6,
+            (AttachedFace::Ceiling, Direction::South) => 7,
+            _ => return None,
+        })
+    }
+
+    pub fn variant_with_facing(self, facing: Direction) -> String {
+        match (self, facing) {
+            (AttachedFace::Ceiling, Direction::East) => "down_x",
+            (AttachedFace::Wall, Direction::East) => "east",
+            (AttachedFace::Wall, Direction::West) => "west",
+            (AttachedFace::Wall, Direction::South) => "south",
+            (AttachedFace::Wall, Direction::North) => "north",
+            (AttachedFace::Floor, Direction::South) => "up_z",
+            (AttachedFace::Floor, Direction::East) => "up_x",
+            (AttachedFace::Ceiling, Direction::South) => "down_z",
+            _ => "north", // TODO: support 1.13.2+ new directions
+        }.to_owned()
     }
 }
 
