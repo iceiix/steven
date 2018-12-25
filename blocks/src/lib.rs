@@ -1053,6 +1053,7 @@ define_blocks! {
             ],
         },
         data Some(shape.data() | (if powered { 0x8 } else { 0x0 })),
+        offset Some(shape.data() + (if powered { 0 } else { 6 })),
         material material::NON_SOLID,
         model { ("minecraft", "golden_rail") },
         variant format!("powered={},shape={}", powered, shape.as_string()),
@@ -1071,6 +1072,7 @@ define_blocks! {
             ],
         },
         data Some(shape.data() | (if powered { 0x8 } else { 0x0 })),
+        offset Some(shape.data() + (if powered { 0 } else { 6 })),
         material material::NON_SOLID,
         model { ("minecraft", "detector_rail") },
         variant format!("powered={},shape={}", powered, shape.as_string()),
@@ -1089,6 +1091,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index() | (if extended { 0x8 } else { 0x0 })),
+        offset Some(facing.offset() + (if extended { 0 } else { 6 })),
         material Material {
             should_cull_against: !extended,
             ..material::NON_SOLID
