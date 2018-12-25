@@ -4414,11 +4414,13 @@ define_blocks! {
     Missing253 {
         props {},
         data None::<usize>,
+        offset None,
         model { ("steven", "missing_block") },
     }
     Missing254 {
         props {},
         data None::<usize>,
+        offset None,
         model { ("steven", "missing_block") },
     }
     StructureBlock {
