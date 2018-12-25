@@ -105,6 +105,19 @@ impl Direction {
         }
     }
 
+    pub fn offset(&self) -> usize {
+        match *self {
+            Direction::North => 0,
+            Direction::East => 1,
+            Direction::South => 2,
+            Direction::West => 3,
+            Direction::Up => 4,
+            Direction::Down => 5,
+            _ => unreachable!(),
+        }
+    }
+
+
     pub fn horizontal_index(&self) -> usize {
         match *self {
             Direction::North => 2,

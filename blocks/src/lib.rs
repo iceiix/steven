@@ -613,7 +613,7 @@ define_blocks! {
             ],
             axis: Axis = [Axis::X, Axis::Y, Axis::Z],
         },
-        data None::<usize>,
+        data None::<usize>, // TODO: skip pre-1.13.2!
         offset Some(variant.offset() * 3 + axis.index()),
         model { ("minecraft", format!("{}_wood", variant.as_string()) ) },
         variant format!("axis={}", axis.as_string()),
@@ -682,6 +682,7 @@ define_blocks! {
             triggered: bool = [false, true],
         },
         data Some(facing.index() | (if triggered { 0x8 } else { 0x0 })),
+        offset Some((facing.offset() << 1) | (if triggered { 0 } else { 1 })),
         model { ("minecraft", "dispenser") },
         variant format!("facing={}", facing.as_string()),
     }
