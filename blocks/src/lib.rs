@@ -4190,7 +4190,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index()),
-        model { ("minecraft", "light_gray_glazed_terracotta") },
+        model { ("minecraft", "silver_glazed_terracotta") },
         variant format!("facing={}", facing.as_string()),
     }
     CyanGlazedTerracotta {
