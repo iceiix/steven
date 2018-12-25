@@ -1635,8 +1635,10 @@ define_blocks! {
                 Rotation::SouthEast,
                 Rotation::SouthSouthEast
             ],
+            waterlogged: bool = [true, false],
         },
-        data Some(rotation.data()),
+        data if !waterlogged { Some(rotation.data()) } else { None },
+        offset Some(rotation.data() * 2 + if waterlogged { 0 } else { 1 }),
         material material::INVISIBLE,
         model { ("minecraft", "standing_sign") },
         collision vec![],
@@ -1655,6 +1657,7 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data door_data(facing, half, hinge, open, powered),
+        offset door_offset(facing, half, hinge, open, powered),
         material material::NON_SOLID,
         model { ("minecraft", "wooden_door") },
         variant format!("facing={},half={},hinge={},open={}", facing.as_string(), half.as_string(), hinge.as_string(), open),
@@ -1784,6 +1787,7 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data door_data(facing, half, hinge, open, powered),
+        offset door_offset(facing, half, hinge, open, powered),
         material material::NON_SOLID,
         model { ("minecraft", "iron_door") },
         variant format!("facing={},half={},hinge={},open={}", facing.as_string(), half.as_string(), hinge.as_string(), open),
@@ -3942,6 +3946,7 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data door_data(facing, half, hinge, open, powered),
+        offset door_offset(facing, half, hinge, open, powered),
         material material::NON_SOLID,
         model { ("minecraft", "spruce_door") },
         variant format!("facing={},half={},hinge={},open={}", facing.as_string(), half.as_string(), hinge.as_string(), open),
@@ -3965,6 +3970,7 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data door_data(facing, half, hinge, open, powered),
+        offset door_offset(facing, half, hinge, open, powered),
         material material::NON_SOLID,
         model { ("minecraft", "birch_door") },
         variant format!("facing={},half={},hinge={},open={}", facing.as_string(), half.as_string(), hinge.as_string(), open),
@@ -3988,6 +3994,7 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data door_data(facing, half, hinge, open, powered),
+        offset door_offset(facing, half, hinge, open, powered),
         material material::NON_SOLID,
         model { ("minecraft", "jungle_door") },
         variant format!("facing={},half={},hinge={},open={}", facing.as_string(), half.as_string(), hinge.as_string(), open),
@@ -4011,6 +4018,7 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data door_data(facing, half, hinge, open, powered),
+        offset door_offset(facing, half, hinge, open, powered),
         material material::NON_SOLID,
         model { ("minecraft", "acacia_door") },
         variant format!("facing={},half={},hinge={},open={}", facing.as_string(), half.as_string(), hinge.as_string(), open),
@@ -4034,6 +4042,7 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data door_data(facing, half, hinge, open, powered),
+        offset door_offset(facing, half, hinge, open, powered),
         material material::NON_SOLID,
         model { ("minecraft", "dark_oak_door") },
         variant format!("facing={},half={},hinge={},open={}", facing.as_string(), half.as_string(), hinge.as_string(), open),
@@ -5023,6 +5032,15 @@ fn door_data(facing: Direction, half: DoorHalf, hinge: Side, open: bool, powered
         }
     }
 }
+
+fn door_offset(facing: Direction, half: DoorHalf, hinge: Side, open: bool, powered: bool) -> Option<usize> {
+    Some(if powered { 0 } else { 1<<0 } +
+         if open { 0 } else { 1<<1 } +
+         if hinge == Side::Left { 0 } else { 1<<2 } +
+         if half == DoorHalf::Upper { 0 } else { 1<<3 } +
+         facing.horizontal_offset() * (1<<4))
+}
+
 
 fn update_door_state<W: WorldAccess>(world: &W, pos: Position, ohalf: DoorHalf, ofacing: Direction, ohinge: Side, oopen: bool, opowered: bool) -> (Direction, Side, bool, bool) {
     let oy = if ohalf == DoorHalf::Upper { -1 } else { 1 };
