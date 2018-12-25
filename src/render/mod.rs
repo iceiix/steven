@@ -1036,6 +1036,7 @@ impl TextureManager {
             ("minecraft", name)
         };
         let path = format!("textures/{}.png", name);
+        println!("load_texture path={}", path);
         let res = self.resources.clone();
         if let Some(mut val) = res.read().unwrap().open(plugin, &path) {
             let mut data = Vec::new();
@@ -1052,10 +1053,12 @@ impl TextureManager {
                         return;
                     }
                 }
+                println!("FOUND {}", path);
                 self.put_texture(plugin, name, width, height, img.to_rgba().into_vec());
                 return;
             }
         }
+        println!("missing, inserting dummy texture {}", path);
         self.insert_texture_dummy(plugin, name);
     }
 
