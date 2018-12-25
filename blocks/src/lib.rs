@@ -1590,8 +1590,10 @@ define_blocks! {
                 Direction::West,
                 Direction::East
             ],
+            lit: bool = [true, false],
         },
-        data Some(facing.index()),
+        data if !lit { Some(facing.index()) } else { None },
+        offset Some(if lit { 0 } else { 1 } + facing.horizontal_offset() * 2),
         model { ("minecraft", "furnace") },
         variant format!("facing={}", facing.as_string()),
     }
@@ -1605,6 +1607,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index()),
+        offset None,
         material Material {
             emitted_light: 13,
             ..material::SOLID
