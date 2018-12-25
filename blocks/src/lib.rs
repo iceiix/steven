@@ -1749,27 +1749,48 @@ define_blocks! {
     }
     Lever {
         props {
-            facing: LeverDirection = [
-                LeverDirection::FloorNorth,
-                LeverDirection::FloorSouth,
-                LeverDirection::FloorEast,
-                LeverDirection::FloorWest,
-                LeverDirection::WallNorth,
-                LeverDirection::WallSouth,
-                LeverDirection::WallEast,
-                LeverDirection::WallWest,
-                LeverDirection::CeilingNorth,
-                LeverDirection::CeilingSouth,
-                LeverDirection::CeilingEast,
-                LeverDirection::CeilingWest
+            face: AttachedFace = [
+                AttachedFace::Floor,
+                AttachedFace::Wall,
+                AttachedFace::Ceiling
+            ],
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
             ],
             powered: bool = [false, true],
         },
-        data if facing.valid_data() { Some(facing.data() | (if powered { 0x8 } else { 0x0 })) } else { None },
-        offset Some(facing.offset() * 2 + if powered { 1 } else { 0 }),
+        data {
+            let facing_data = match (face, facing) {
+                (AttachedFace::Ceiling, Direction::East) => 0,
+                (AttachedFace::Wall, Direction::East) => 1,
+                (AttachedFace::Wall, Direction::West) => 2,
+                (AttachedFace::Wall, Direction::South) => 3,
+                (AttachedFace::Wall, Direction::North) => 4,
+                (AttachedFace::Floor, Direction::South) => 5,
+                (AttachedFace::Floor, Direction::East) => 6,
+                (AttachedFace::Ceiling, Direction::South) => 7,
+                _ => return None,
+            };
+            Some(facing_data | (if powered { 0x8 } else { 0x0 }))
+        },
+        offset Some(face.offset() * (4 * 2) + facing.horizontal_offset() * 2 + if powered { 0 } else { 1 }),
         material material::NON_SOLID,
         model { ("minecraft", "lever") },
-        variant format!("facing={},powered={}", facing.as_string(), powered),
+        variant format!("facing={},powered={}", 
+            match (face, facing) {
+                (AttachedFace::Ceiling, Direction::East) => "down_x",
+                (AttachedFace::Wall, Direction::East) => "east",
+                (AttachedFace::Wall, Direction::West) => "west",
+                (AttachedFace::Wall, Direction::South) => "south",
+                (AttachedFace::Wall, Direction::North) => "north",
+                (AttachedFace::Floor, Direction::South) => "up_z",
+                (AttachedFace::Floor, Direction::East) => "up_x",
+                (AttachedFace::Ceiling, Direction::South) => "down_z",
+                _ => "north", // TODO: support 1.13.2+ new lever directions
+            }, powered),
         collision vec![],
     }
     StonePressurePlate {
@@ -6359,6 +6380,31 @@ impl StairShape {
             StairShape::InnerRight => 2,
             StairShape::OuterLeft => 3,
             StairShape::OuterRight => 4,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum AttachedFace {
+    Floor,
+    Wall,
+    Ceiling,
+}
+
+impl AttachedFace {
+    pub fn as_string(self) -> &'static str {
+        match self {
+            AttachedFace::Floor => "floor",
+            AttachedFace::Wall => "wall",
+            AttachedFace::Ceiling => "ceiling",
+        }
+    }
+
+    pub fn offset(self) -> usize {
+        match self {
+            AttachedFace::Floor => 0,
+            AttachedFace::Wall => 1,
+            AttachedFace::Ceiling => 2,
         }
     }
 }
