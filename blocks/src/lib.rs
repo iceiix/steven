@@ -1738,8 +1738,10 @@ define_blocks! {
                 Direction::West,
                 Direction::East
             ],
+            waterlogged: bool = [true, false],
         },
-        data Some(facing.index()),
+        data if !waterlogged { Some(facing.index()) } else { None },
+        offset Some(if waterlogged { 0 } else { 1 } + facing.horizontal_offset() * 2),
         material material::INVISIBLE,
         model { ("minecraft", "wall_sign") },
         variant format!("facing={}", facing.as_string()),

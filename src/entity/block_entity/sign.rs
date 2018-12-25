@@ -92,7 +92,7 @@ impl ecs::System for SignRenderer {
         let info = m.get_component_mut(e, self.sign_info).unwrap();
         info.dirty = false;
         match world.get_block(position) {
-            Block::WallSign{facing} => {
+            Block::WallSign{facing, ..} => {
                 info.offset_z = 7.5 / 16.0;
                 match facing {
                     Direction::North => {},
