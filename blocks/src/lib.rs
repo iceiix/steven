@@ -1474,13 +1474,15 @@ define_blocks! {
                 StairShape::OuterLeft,
                 StairShape::OuterRight
             ],
+            waterlogged: bool = [true, false],
         },
-        data stair_data(facing, half, shape),
+        data stair_data(facing, half, shape, waterlogged),
+        offset stair_offset(facing, half, shape, waterlogged),
         material material::NON_SOLID,
         model { ("minecraft", "oak_stairs") },
         variant format!("facing={},half={},shape={}", facing.as_string(), half.as_string(), shape.as_string()),
         collision stair_collision(facing, shape, half),
-        update_state (world, pos) => Block::OakStairs{facing: facing, half: half, shape: update_stair_shape(world, pos, facing)},
+        update_state (world, pos) => Block::OakStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
     }
     Chest {
         props {
@@ -1695,13 +1697,15 @@ define_blocks! {
                 StairShape::OuterLeft,
                 StairShape::OuterRight
             ],
+            waterlogged: bool = [true, false],
         },
-        data stair_data(facing, half, shape),
+        data stair_data(facing, half, shape, waterlogged),
+        offset stair_offset(facing, half, shape, waterlogged),
         material material::NON_SOLID,
         model { ("minecraft", "stone_stairs") },
         variant format!("facing={},half={},shape={}", facing.as_string(), half.as_string(), shape.as_string()),
         collision stair_collision(facing, shape, half),
-        update_state (world, pos) => Block::StoneStairs{facing: facing, half: half, shape: update_stair_shape(world, pos, facing)},
+        update_state (world, pos) => Block::StoneStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
     }
     WallSign {
         props {
@@ -2385,13 +2389,15 @@ define_blocks! {
                 StairShape::OuterLeft,
                 StairShape::OuterRight
             ],
+            waterlogged: bool = [true, false],
         },
-        data stair_data(facing, half, shape),
+        data stair_data(facing, half, shape, waterlogged),
+        offset stair_offset(facing, half, shape, waterlogged),
         material material::NON_SOLID,
         model { ("minecraft", "brick_stairs") },
         variant format!("facing={},half={},shape={}", facing.as_string(), half.as_string(), shape.as_string()),
         collision stair_collision(facing, shape, half),
-        update_state (world, pos) => Block::BrickStairs{facing: facing, half: half, shape: update_stair_shape(world, pos, facing)},
+        update_state (world, pos) => Block::BrickStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
     }
     StoneBrickStairs {
         props {
@@ -2409,13 +2415,15 @@ define_blocks! {
                 StairShape::OuterLeft,
                 StairShape::OuterRight
             ],
+            waterlogged: bool = [true, false],
         },
-        data stair_data(facing, half, shape),
+        data stair_data(facing, half, shape, waterlogged),
+        offset stair_offset(facing, half, shape, waterlogged),
         material material::NON_SOLID,
         model { ("minecraft", "stone_brick_stairs") },
         variant format!("facing={},half={},shape={}", facing.as_string(), half.as_string(), shape.as_string()),
         collision stair_collision(facing, shape, half),
-        update_state (world, pos) => Block::StoneBrickStairs{facing: facing, half: half, shape: update_stair_shape(world, pos, facing)},
+        update_state (world, pos) => Block::StoneBrickStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
     }
     Mycelium {
         props {
@@ -2491,13 +2499,15 @@ define_blocks! {
                 StairShape::OuterLeft,
                 StairShape::OuterRight
             ],
+            waterlogged: bool = [true, false],
         },
-        data stair_data(facing, half, shape),
+        data stair_data(facing, half, shape, waterlogged),
+        offset stair_offset(facing, half, shape, waterlogged),
         material material::NON_SOLID,
         model { ("minecraft", "nether_brick_stairs") },
         variant format!("facing={},half={},shape={}", facing.as_string(), half.as_string(), shape.as_string()),
         collision stair_collision(facing, shape, half),
-        update_state (world, pos) => Block::NetherBrickStairs{facing: facing, half: half, shape: update_stair_shape(world, pos, facing)},
+        update_state (world, pos) => Block::NetherBrickStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
     }
     NetherWart {
         props {
@@ -2699,13 +2709,15 @@ define_blocks! {
                 StairShape::OuterLeft,
                 StairShape::OuterRight
             ],
+            waterlogged: bool = [true, false],
         },
-        data stair_data(facing, half, shape),
+        data stair_data(facing, half, shape, waterlogged),
+        offset stair_offset(facing, half, shape, waterlogged),
         material material::NON_SOLID,
         model { ("minecraft", "sandstone_stairs") },
         variant format!("facing={},half={},shape={}", facing.as_string(), half.as_string(), shape.as_string()),
         collision stair_collision(facing, shape, half),
-        update_state (world, pos) => Block::SandstoneStairs{facing: facing, half: half, shape: update_stair_shape(world, pos, facing)},
+        update_state (world, pos) => Block::SandstoneStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
     }
     EmeraldOre {
         props {},
@@ -2816,13 +2828,15 @@ define_blocks! {
                 StairShape::OuterLeft,
                 StairShape::OuterRight
             ],
+            waterlogged: bool = [true, false],
         },
-        data stair_data(facing, half, shape),
+        data stair_data(facing, half, shape, waterlogged),
+        offset stair_offset(facing, half, shape, waterlogged),
         material material::NON_SOLID,
         model { ("minecraft", "spruce_stairs") },
         variant format!("facing={},half={},shape={}", facing.as_string(), half.as_string(), shape.as_string()),
         collision stair_collision(facing, shape, half),
-        update_state (world, pos) => Block::SpruceStairs{facing: facing, half: half, shape: update_stair_shape(world, pos, facing)},
+        update_state (world, pos) => Block::SpruceStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
     }
     BirchStairs {
         props {
@@ -2840,13 +2854,15 @@ define_blocks! {
                 StairShape::OuterLeft,
                 StairShape::OuterRight
             ],
+            waterlogged: bool = [true, false],
         },
-        data stair_data(facing, half, shape),
+        data stair_data(facing, half, shape, waterlogged),
+        offset stair_offset(facing, half, shape, waterlogged),
         material material::NON_SOLID,
         model { ("minecraft", "birch_stairs") },
         variant format!("facing={},half={},shape={}", facing.as_string(), half.as_string(), shape.as_string()),
         collision stair_collision(facing, shape, half),
-        update_state (world, pos) => Block::BirchStairs{facing: facing, half: half, shape: update_stair_shape(world, pos, facing)},
+        update_state (world, pos) => Block::BirchStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
     }
     JungleStairs {
         props {
@@ -2864,13 +2880,15 @@ define_blocks! {
                 StairShape::OuterLeft,
                 StairShape::OuterRight
             ],
+            waterlogged: bool = [true, false],
         },
-        data stair_data(facing, half, shape),
+        data stair_data(facing, half, shape, waterlogged),
+        offset stair_offset(facing, half, shape, waterlogged),
         material material::NON_SOLID,
         model { ("minecraft", "jungle_stairs") },
         variant format!("facing={},half={},shape={}", facing.as_string(), half.as_string(), shape.as_string()),
         collision stair_collision(facing, shape, half),
-        update_state (world, pos) => Block::JungleStairs{facing: facing, half: half, shape: update_stair_shape(world, pos, facing)},
+        update_state (world, pos) => Block::JungleStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
     }
     CommandBlock {
         props {
@@ -3229,13 +3247,15 @@ define_blocks! {
                 StairShape::OuterLeft,
                 StairShape::OuterRight
             ],
+            waterlogged: bool = [true, false],
         },
-        data stair_data(facing, half, shape),
+        data stair_data(facing, half, shape, waterlogged),
+        offset stair_offset(facing, half, shape, waterlogged),
         material material::NON_SOLID,
         model { ("minecraft", "quartz_stairs") },
         variant format!("facing={},half={},shape={}", facing.as_string(), half.as_string(), shape.as_string()),
         collision stair_collision(facing, shape, half),
-        update_state (world, pos) => Block::QuartzStairs{facing: facing, half: half, shape: update_stair_shape(world, pos, facing)},
+        update_state (world, pos) => Block::QuartzStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
     }
     ActivatorRail {
         props {
@@ -3382,13 +3402,15 @@ define_blocks! {
                 StairShape::OuterLeft,
                 StairShape::OuterRight
             ],
+            waterlogged: bool = [true, false],
         },
-        data stair_data(facing, half, shape),
+        data stair_data(facing, half, shape, waterlogged),
+        offset stair_offset(facing, half, shape, waterlogged),
         material material::NON_SOLID,
         model { ("minecraft", "acacia_stairs") },
         variant format!("facing={},half={},shape={}", facing.as_string(), half.as_string(), shape.as_string()),
         collision stair_collision(facing, shape, half),
-        update_state (world, pos) => Block::AcaciaStairs{facing: facing, half: half, shape: update_stair_shape(world, pos, facing)},
+        update_state (world, pos) => Block::AcaciaStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
     }
     DarkOakStairs {
         props {
@@ -3406,13 +3428,15 @@ define_blocks! {
                 StairShape::OuterLeft,
                 StairShape::OuterRight
             ],
+            waterlogged: bool = [true, false],
         },
-        data stair_data(facing, half, shape),
+        data stair_data(facing, half, shape, waterlogged),
+        offset stair_offset(facing, half, shape, waterlogged),
         material material::NON_SOLID,
         model { ("minecraft", "dark_oak_stairs") },
         variant format!("facing={},half={},shape={}", facing.as_string(), half.as_string(), shape.as_string()),
         collision stair_collision(facing, shape, half),
-        update_state (world, pos) => Block::DarkOakStairs{facing: facing, half: half, shape: update_stair_shape(world, pos, facing)},
+        update_state (world, pos) => Block::DarkOakStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
     }
     Slime {
         props {},
@@ -3618,13 +3642,15 @@ define_blocks! {
                 StairShape::OuterLeft,
                 StairShape::OuterRight
             ],
+            waterlogged: bool = [true, false],
         },
-        data stair_data(facing, half, shape),
+        data stair_data(facing, half, shape, waterlogged),
+        offset stair_offset(facing, half, shape, waterlogged),
         material material::NON_SOLID,
         model { ("minecraft", "red_sandstone_stairs") },
         variant format!("facing={},half={},shape={}", facing.as_string(), half.as_string(), shape.as_string()),
         collision stair_collision(facing, shape, half),
-        update_state (world, pos) => Block::RedSandstoneStairs{facing: facing, half: half, shape: update_stair_shape(world, pos, facing)},
+        update_state (world, pos) => Block::RedSandstoneStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
     }
     DoubleStoneSlab2 {
         props {
@@ -4152,13 +4178,15 @@ define_blocks! {
                 StairShape::OuterLeft,
                 StairShape::OuterRight
             ],
+            waterlogged: bool = [true, false],
         },
-        data stair_data(facing, half, shape),
+        data stair_data(facing, half, shape, waterlogged),
+        offset stair_offset(facing, half, shape, waterlogged),
         material material::NON_SOLID,
         model { ("minecraft", "purpur_stairs") },
         variant format!("facing={},half={},shape={}", facing.as_string(), half.as_string(), shape.as_string()),
         collision stair_collision(facing, shape, half),
-        update_state (world, pos) => Block::PurpurStairs{facing: facing, half: half, shape: update_stair_shape(world, pos, facing)},
+        update_state (world, pos) => Block::PurpurStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
     }
     PurpurDoubleSlab {
         props {
@@ -5219,10 +5247,18 @@ fn update_stair_shape<W: WorldAccess>(world: &W, pos: Position, facing: Directio
     StairShape::Straight
 }
 
-fn stair_data(facing: Direction, half: BlockHalf, shape: StairShape) -> Option<usize> {
+fn stair_data(facing: Direction, half: BlockHalf, shape: StairShape, waterlogged: bool) -> Option<usize> {
     if shape != StairShape::Straight { return None; }
+    if waterlogged { return None; }
 
     Some((5 - facing.index()) | (if half == BlockHalf::Top { 0x4 } else { 0x0 }))
+}
+
+fn stair_offset(facing: Direction, half: BlockHalf, shape: StairShape, waterlogged: bool) -> Option<usize> {
+    Some(if waterlogged { 0 } else { 1 } +
+         shape.offset() * 2 +
+         if half == BlockHalf::Top { 0 } else { 2 * 5 } +
+         facing.horizontal_offset() * 2 * 5 * 2)
 }
 
 #[allow(clippy::many_single_char_names)]
@@ -6127,6 +6163,16 @@ impl StairShape {
             StairShape::InnerRight => "inner_right",
             StairShape::OuterLeft => "outer_left",
             StairShape::OuterRight => "outer_right",
+        }
+    }
+
+    pub fn offset(self) -> usize {
+        match self {
+            StairShape::Straight => 0,
+            StairShape::InnerLeft => 1,
+            StairShape::InnerRight => 2,
+            StairShape::OuterLeft => 3,
+            StairShape::OuterRight => 4,
         }
     }
 }
