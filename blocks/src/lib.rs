@@ -479,6 +479,7 @@ define_blocks! {
             stage: u8 = [0, 1],
         },
         data Some(variant.plank_data() | ((stage as usize) << 3)),
+        offset Some((variant.plank_data() << 1) | (stage as usize)),
         material material::NON_SOLID,
         model { ("minecraft", format!("{}_sapling", variant.as_string()) ) },
         variant format!("stage={}", stage),
