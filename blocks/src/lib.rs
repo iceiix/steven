@@ -595,6 +595,29 @@ define_blocks! {
         model { ("minecraft", format!("{}_log", variant.as_string()) ) },
         variant format!("axis={}", axis.as_string()),
     }
+    Wood {
+        props {
+            variant: TreeVariant = [
+                TreeVariant::Oak,
+                TreeVariant::Spruce,
+                TreeVariant::Birch,
+                TreeVariant::Jungle,
+                TreeVariant::Acacia,
+                TreeVariant::DarkOak,
+                TreeVariant::StrippedSpruce,
+                TreeVariant::StrippedBirch,
+                TreeVariant::StrippedJungle,
+                TreeVariant::StrippedAcacia,
+                TreeVariant::StrippedDarkOak,
+                TreeVariant::StrippedOak
+            ],
+            axis: Axis = [Axis::X, Axis::Y, Axis::Z],
+        },
+        data None::<usize>,
+        offset Some(variant.offset() * 3 + axis.index()),
+        model { ("minecraft", format!("{}_wood", variant.as_string()) ) },
+        variant format!("axis={}", axis.as_string()),
+    }
     Leaves {
         props {
             variant: TreeVariant = [
