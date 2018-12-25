@@ -3131,28 +3131,123 @@ define_blocks! {
     }
     WoodenButton {
         props {
+            face: AttachedFace = [
+                AttachedFace::Floor,
+                AttachedFace::Wall,
+                AttachedFace::Ceiling
+            ],
             facing: Direction = [
-                Direction::Down,
                 Direction::East,
                 Direction::West,
                 Direction::South,
-                Direction::North,
-                Direction::Up
+                Direction::North
             ],
             powered: bool = [false, true],
         },
-        data Some(match facing {
-            Direction::Down => 0,
-            Direction::East => 1,
-            Direction::West => 2,
-            Direction::South => 3,
-            Direction::North => 4,
-            Direction::Up => 5,
-            _ => unreachable!(),
-        } | (if powered { 0x8 } else { 0x0 })),
+        data face.data_with_facing_and_powered(facing, powered),
         material material::NON_SOLID,
         model { ("minecraft", "wooden_button") },
-        variant format!("facing={},powered={}", facing.as_string(), powered),
+        variant format!("facing={},powered={}", face.variant_with_facing(facing), powered),
+    }
+    SpruceButton {
+        props {
+            face: AttachedFace = [
+                AttachedFace::Floor,
+                AttachedFace::Wall,
+                AttachedFace::Ceiling
+            ],
+            facing: Direction = [
+                Direction::East,
+                Direction::West,
+                Direction::South,
+                Direction::North
+            ],
+            powered: bool = [false, true],
+        },
+        data None::<usize>,
+        material material::NON_SOLID,
+        model { ("minecraft", "spruce_button") },
+        variant format!("facing={},powered={}", face.variant_with_facing(facing), powered),
+    }
+    BirchButton {
+        props {
+            face: AttachedFace = [
+                AttachedFace::Floor,
+                AttachedFace::Wall,
+                AttachedFace::Ceiling
+            ],
+            facing: Direction = [
+                Direction::East,
+                Direction::West,
+                Direction::South,
+                Direction::North
+            ],
+            powered: bool = [false, true],
+        },
+        data None::<usize>,
+        material material::NON_SOLID,
+        model { ("minecraft", "birch_button") },
+        variant format!("facing={},powered={}", face.variant_with_facing(facing), powered),
+    }
+    JungleButton {
+        props {
+            face: AttachedFace = [
+                AttachedFace::Floor,
+                AttachedFace::Wall,
+                AttachedFace::Ceiling
+            ],
+            facing: Direction = [
+                Direction::East,
+                Direction::West,
+                Direction::South,
+                Direction::North
+            ],
+            powered: bool = [false, true],
+        },
+        data None::<usize>,
+        material material::NON_SOLID,
+        model { ("minecraft", "jungle_button") },
+        variant format!("facing={},powered={}", face.variant_with_facing(facing), powered),
+    }
+    AcaciaButton {
+        props {
+            face: AttachedFace = [
+                AttachedFace::Floor,
+                AttachedFace::Wall,
+                AttachedFace::Ceiling
+            ],
+            facing: Direction = [
+                Direction::East,
+                Direction::West,
+                Direction::South,
+                Direction::North
+            ],
+            powered: bool = [false, true],
+        },
+        data None::<usize>,
+        material material::NON_SOLID,
+        model { ("minecraft", "acacia_button") },
+        variant format!("facing={},powered={}", face.variant_with_facing(facing), powered),
+    }
+    DarkOakButton {
+        props {
+            face: AttachedFace = [
+                AttachedFace::Floor,
+                AttachedFace::Wall,
+                AttachedFace::Ceiling
+            ],
+            facing: Direction = [
+                Direction::East,
+                Direction::West,
+                Direction::South,
+                Direction::North
+            ],
+            powered: bool = [false, true],
+        },
+        data None::<usize>,
+        material material::NON_SOLID,
+        model { ("minecraft", "dark_oak_button") },
+        variant format!("facing={},powered={}", face.variant_with_facing(facing), powered),
     }
     Skull {
         props {
