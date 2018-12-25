@@ -165,7 +165,6 @@ impl Factory {
                 Err(val) => missing_variant = val,
             };
         }
-        if missing_variant { println!("get_state_model() missing variant={} for {:?} at {},{},{}", missing_variant, block, x, y, z); }
         if !missing_variant {
             // Whole model not loaded, try and load
             let mut m = models.write().unwrap();
@@ -177,7 +176,6 @@ impl Factory {
                 Err(val) => missing_variant = val,
             };
         }
-        if missing_variant { println!("get_state_model() still missing variant={} for {:?} at {},{},{}", missing_variant, block, x, y, z); }
         let ret = Factory::get_state_model(models, Block::Missing{}, rng, snapshot, x, y, z, buf);
         if !missing_variant {
             // Still no model, replace with placeholder
