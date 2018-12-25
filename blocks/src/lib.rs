@@ -624,15 +624,21 @@ define_blocks! {
                 TreeVariant::Oak,
                 TreeVariant::Spruce,
                 TreeVariant::Birch,
-                TreeVariant::Jungle
+                TreeVariant::Jungle,
+                TreeVariant::Acacia,
+                TreeVariant::DarkOak
             ],
             decayable: bool = [false, true],
             check_decay: bool = [false, true],
             distance: u8 = [1, 2, 3, 4, 5, 6, 7],
         },
-        data Some(variant.data()
-                  | (if decayable { 0x4 } else { 0x0 })
-                  | (if check_decay { 0x8 } else { 0x0 })),
+        data match variant {
+            TreeVariant::Oak | TreeVariant::Spruce | TreeVariant::Birch | TreeVariant::Jungle =>
+                Some(variant.data()
+                      | (if decayable { 0x4 } else { 0x0 })
+                      | (if check_decay { 0x8 } else { 0x0 })),
+            _ => None,
+        },
         offset if check_decay {
             None
         } else {
@@ -2960,6 +2966,7 @@ define_blocks! {
         data Some(variant.data()
                   | (if decayable { 0x4 } else { 0x0 })
                   | (if check_decay { 0x8 } else { 0x0 })),
+        offset None,
         material material::LEAVES,
         model { ("minecraft", format!("{}_leaves", variant.as_string()) ) },
         tint TintType::Foliage,
