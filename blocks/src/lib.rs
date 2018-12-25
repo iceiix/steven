@@ -1750,18 +1750,23 @@ define_blocks! {
     Lever {
         props {
             facing: LeverDirection = [
-                LeverDirection::North,
-                LeverDirection::South,
-                LeverDirection::East,
-                LeverDirection::West,
-                LeverDirection::UpX,
-                LeverDirection::DownX,
-                LeverDirection::UpZ,
-                LeverDirection::DownZ
+                LeverDirection::FloorNorth,
+                LeverDirection::FloorSouth,
+                LeverDirection::FloorEast,
+                LeverDirection::FloorWest,
+                LeverDirection::WallNorth,
+                LeverDirection::WallSouth,
+                LeverDirection::WallEast,
+                LeverDirection::WallWest,
+                LeverDirection::CeilingNorth,
+                LeverDirection::CeilingSouth,
+                LeverDirection::CeilingEast,
+                LeverDirection::CeilingWest
             ],
             powered: bool = [false, true],
         },
-        data Some(facing.data() | (if powered { 0x8 } else { 0x0 })),
+        data if facing.valid_data() { Some(facing.data() | (if powered { 0x8 } else { 0x0 })) } else { None },
+        offset Some(facing.offset() * 2 + if powered { 1 } else { 0 }),
         material material::NON_SOLID,
         model { ("minecraft", "lever") },
         variant format!("facing={},powered={}", facing.as_string(), powered),
@@ -5993,40 +5998,78 @@ impl ComparatorMode {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum LeverDirection {
-    North,
-    South,
-    East,
-    West,
-    UpX,
-    DownX,
-    UpZ,
-    DownZ,
+    FloorNorth,
+    FloorSouth,
+    FloorEast,
+    FloorWest,
+    WallNorth,
+    WallSouth,
+    WallEast,
+    WallWest,
+    CeilingNorth,
+    CeilingSouth,
+    CeilingEast,
+    CeilingWest,
 }
 
 impl LeverDirection {
     pub fn as_string(self) -> &'static str {
         match self {
-            LeverDirection::North => "north",
-            LeverDirection::South => "south",
-            LeverDirection::East => "east",
-            LeverDirection::West => "west",
-            LeverDirection::UpX => "up_x",
-            LeverDirection::DownX => "down_x",
-            LeverDirection::UpZ => "up_z",
-            LeverDirection::DownZ => "down_z",
+            LeverDirection::WallNorth => "north",
+            LeverDirection::WallSouth => "south",
+            LeverDirection::WallEast => "east",
+            LeverDirection::WallWest => "west",
+            LeverDirection::FloorEast => "up_x",
+            LeverDirection::CeilingEast => "down_x",
+            LeverDirection::FloorSouth => "up_z",
+            LeverDirection::CeilingSouth => "down_z",
+            _ => "north" // TODO: 1.13.2+ other lever directions
         }
     }
 
     pub fn data(self) -> usize {
         match self {
-            LeverDirection::DownX => 0,
-            LeverDirection::East => 1,
-            LeverDirection::West => 2,
-            LeverDirection::South => 3,
-            LeverDirection::North => 4,
-            LeverDirection::UpZ => 5,
-            LeverDirection::UpX => 6,
-            LeverDirection::DownZ => 7,
+            LeverDirection::CeilingEast => 0,
+            LeverDirection::WallEast => 1,
+            LeverDirection::WallWest => 2,
+            LeverDirection::WallSouth => 3,
+            LeverDirection::WallNorth => 4,
+            LeverDirection::FloorSouth => 5,
+            LeverDirection::FloorEast => 6,
+            LeverDirection::CeilingSouth => 7,
+            _ => panic!("LeverDirection no data for {:?}, 1.13.2+ only", self),
+        }
+    }
+
+    pub fn valid_data(self) -> bool {
+        match self {
+            LeverDirection::CeilingEast |
+            LeverDirection::WallEast |
+            LeverDirection::WallWest |
+            LeverDirection::WallSouth |
+            LeverDirection::WallNorth |
+            LeverDirection::FloorSouth |
+            LeverDirection::FloorEast |
+            LeverDirection::CeilingSouth => true,
+            _ => false,
+        }
+    }
+
+
+    pub fn offset(self) -> usize {
+        match self {
+            LeverDirection::FloorNorth => 0,
+            LeverDirection::FloorSouth => 1,
+            LeverDirection::FloorWest => 2,
+            LeverDirection::FloorEast => 3,
+            LeverDirection::WallNorth => 4,
+            LeverDirection::WallSouth => 5,
+            LeverDirection::WallWest => 6,
+            LeverDirection::WallEast => 7,
+            LeverDirection::CeilingNorth => 8,
+            LeverDirection::CeilingSouth => 9,
+            LeverDirection::CeilingWest => 10,
+            LeverDirection::CeilingEast => 11,
         }
     }
 }
