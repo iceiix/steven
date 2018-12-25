@@ -1910,12 +1910,13 @@ define_blocks! {
                 _ => unreachable!(),
             })
         },
+        offset None,
         material material::NON_SOLID,
         model { ("minecraft", "unlit_redstone_torch") },
         variant format!("facing={}", facing.as_string()),
         collision vec![],
     }
-    RedstoneTorch {
+    RedstoneTorchLit {
         props {
             facing: Direction = [
                 Direction::East,
@@ -1935,11 +1936,43 @@ define_blocks! {
                 _ => unreachable!(),
             })
         },
+        offset None,
         material Material {
             emitted_light: 7,
             ..material::NON_SOLID
         },
         model { ("minecraft", "redstone_torch") },
+        variant format!("facing={}", facing.as_string()),
+        collision vec![],
+    }
+    RedstoneTorchStanding {
+        props {
+            lit: bool = [true, false],
+        },
+        data None::<usize>,
+        offset Some(if lit { 0 } else { 1 }),
+        material material::NON_SOLID,
+        model { ("minecraft", if lit { "redstone_torch" } else { "unlit_redstone_torch" }) },
+        variant "facing=up",
+        collision vec![],
+    }
+    RedstoneTorchWall {
+        props {
+            facing: Direction = [
+                Direction::East,
+                Direction::West,
+                Direction::South,
+                Direction::North
+            ],
+            lit: bool = [true, false],
+        },
+        data None::<usize>,
+        offset Some(if lit { 0 } else { 1 } + facing.horizontal_offset() * 2),
+        material Material {
+            emitted_light: 7,
+            ..material::NON_SOLID
+        },
+        model { ("minecraft", if lit { "redstone_torch" } else { "unlit_redstone_torch" }) },
         variant format!("facing={}", facing.as_string()),
         collision vec![],
     }
