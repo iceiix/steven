@@ -574,6 +574,12 @@ define_blocks! {
             axis: Axis = [Axis::Y, Axis::Z, Axis::X, Axis::None],
         },
         data Some(variant.data() | (axis.index() << 2)),
+        offset match axis {
+            Axis::None => None,
+            Axis::X => Some(variant.data() * 3 + 0),
+            Axis::Y => Some(variant.data() * 3 + 1),
+            Axis::Z => Some(variant.data() * 3 + 2),
+        },
         model { ("minecraft", format!("{}_log", variant.as_string()) ) },
         variant format!("axis={}", axis.as_string()),
     }
