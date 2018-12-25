@@ -569,16 +569,28 @@ define_blocks! {
                 TreeVariant::Oak,
                 TreeVariant::Spruce,
                 TreeVariant::Birch,
-                TreeVariant::Jungle
+                TreeVariant::Jungle,
+                TreeVariant::Acacia,
+                TreeVariant::DarkOak,
+                TreeVariant::StrippedSpruce,
+                TreeVariant::StrippedBirch,
+                TreeVariant::StrippedJungle,
+                TreeVariant::StrippedAcacia,
+                TreeVariant::StrippedDarkOak,
+                TreeVariant::StrippedOak
             ],
             axis: Axis = [Axis::Y, Axis::Z, Axis::X, Axis::None],
         },
-        data Some(variant.data() | (axis.index() << 2)),
+        data match variant {
+            TreeVariant::Oak | TreeVariant::Spruce | TreeVariant::Birch | TreeVariant::Jungle =>
+                Some(variant.data() | (axis.index() << 2)),
+            _ => None,
+        },
         offset match axis {
             Axis::None => None,
-            Axis::X => Some(variant.data() * 3 + 0),
-            Axis::Y => Some(variant.data() * 3 + 1),
-            Axis::Z => Some(variant.data() * 3 + 2),
+            Axis::X => Some(variant.offset() * 3 + 0),
+            Axis::Y => Some(variant.offset() * 3 + 1),
+            Axis::Z => Some(variant.offset() * 3 + 2),
         },
         model { ("minecraft", format!("{}_log", variant.as_string()) ) },
         variant format!("axis={}", axis.as_string()),
@@ -2932,6 +2944,7 @@ define_blocks! {
             ],
         },
         data Some(variant.data() | (axis.index() << 2)),
+        offset None,
         model { ("minecraft", format!("{}_log", variant.as_string()) ) },
         variant format!("axis={}", axis.as_string()),
     }
@@ -5687,7 +5700,13 @@ pub enum TreeVariant {
     Birch,
     Jungle,
     Acacia,
-    DarkOak
+    DarkOak,
+    StrippedSpruce,
+    StrippedBirch,
+    StrippedJungle,
+    StrippedAcacia,
+    StrippedDarkOak,
+    StrippedOak,
 }
 
 impl TreeVariant {
@@ -5699,6 +5718,12 @@ impl TreeVariant {
             TreeVariant::Jungle => "jungle",
             TreeVariant::Acacia => "acacia",
             TreeVariant::DarkOak => "dark_oak",
+            TreeVariant::StrippedSpruce => "stripped_spruce_log",
+            TreeVariant::StrippedBirch => "stripped_birch_log",
+            TreeVariant::StrippedJungle => "stripped_jungle_log",
+            TreeVariant::StrippedAcacia => "stripped_acacia_log",
+            TreeVariant::StrippedDarkOak => "stripped_dark_oak_log",
+            TreeVariant::StrippedOak => "stripped_oak_log"
         }
     }
 
@@ -5708,6 +5733,24 @@ impl TreeVariant {
             TreeVariant::Spruce | TreeVariant::DarkOak => 1,
             TreeVariant::Birch => 2,
             TreeVariant::Jungle => 3,
+            _ => panic!("TreeVariant {:?} has no data (1.13+ only)"),
+        }
+    }
+
+    pub fn offset(self) -> usize {
+        match self {
+            TreeVariant::Oak => 0,
+            TreeVariant::Spruce => 1,
+            TreeVariant::Birch => 2,
+            TreeVariant::Jungle => 3,
+            TreeVariant::Acacia => 4,
+            TreeVariant::DarkOak => 5,
+            TreeVariant::StrippedSpruce => 6,
+            TreeVariant::StrippedBirch => 7,
+            TreeVariant::StrippedJungle => 8,
+            TreeVariant::StrippedAcacia => 9,
+            TreeVariant::StrippedDarkOak => 10,
+            TreeVariant::StrippedOak => 11,
         }
     }
 
@@ -5719,6 +5762,7 @@ impl TreeVariant {
             TreeVariant::Jungle => 3,
             TreeVariant::Acacia => 4,
             TreeVariant::DarkOak => 5,
+            _ => panic!("TreeVariant {:?} has no plank data (1.13+ only)"),
         }
     }
 }
