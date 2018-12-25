@@ -242,13 +242,13 @@ impl Server {
                             if xx == 0 && z == 0 {
                                 continue;
                             }
-                            server.world.set_block(Position::new(x + xx, h + 3, z + zz), block::Leaves{ variant: block::TreeVariant::Oak, check_decay: false, decayable: false });
-                            server.world.set_block(Position::new(x + xx, h + 4, z + zz), block::Leaves{ variant: block::TreeVariant::Oak, check_decay: false, decayable: false });
+                            server.world.set_block(Position::new(x + xx, h + 3, z + zz), block::Leaves{ variant: block::TreeVariant::Oak, check_decay: false, decayable: false, distance: 1 });
+                            server.world.set_block(Position::new(x + xx, h + 4, z + zz), block::Leaves{ variant: block::TreeVariant::Oak, check_decay: false, decayable: false, distance: 1 });
                             if xx.abs() <= 1 && zz.abs() <= 1 {
-                                server.world.set_block(Position::new(x + xx, h + 5, z + zz), block::Leaves{ variant: block::TreeVariant::Oak, check_decay: false, decayable: false });
+                                server.world.set_block(Position::new(x + xx, h + 5, z + zz), block::Leaves{ variant: block::TreeVariant::Oak, check_decay: false, decayable: false, distance: 1 });
                             }
                             if xx * xx + zz * zz <= 1 {
-                                server.world.set_block(Position::new(x + xx, h + 6, z + zz), block::Leaves{ variant: block::TreeVariant::Oak, check_decay: false, decayable: false });
+                                server.world.set_block(Position::new(x + xx, h + 6, z + zz), block::Leaves{ variant: block::TreeVariant::Oak, check_decay: false, decayable: false, distance: 1 });
                             }
                         }
                     }

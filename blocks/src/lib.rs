@@ -628,10 +628,16 @@ define_blocks! {
             ],
             decayable: bool = [false, true],
             check_decay: bool = [false, true],
+            distance: u8 = [1, 2, 3, 4, 5, 6, 7],
         },
         data Some(variant.data()
                   | (if decayable { 0x4 } else { 0x0 })
                   | (if check_decay { 0x8 } else { 0x0 })),
+        offset if check_decay {
+            None
+        } else {
+            Some(variant.offset() * (7 * 2) + ((distance as usize - 1) << 1) | (if decayable { 0 } else { 1 }))
+        },
         material material::LEAVES,
         model { ("minecraft", format!("{}_leaves", variant.as_string()) ) },
         tint TintType::Foliage,
