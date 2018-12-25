@@ -325,7 +325,7 @@ macro_rules! define_blocks {
                             vals.into_iter()
                         }),*
                     );
-                    let mut last_offset = 0;
+                    let mut last_offset: isize = -1;
                     for block in iter {
                         let vanilla_id = block.get_vanilla_id();
                         let offset = block.get_flat_offset();
@@ -337,8 +337,8 @@ macro_rules! define_blocks {
                             } else {
                                 println!("Block {:?} flat {} hierarchical none, offset={}", block, id, offset);
                             }
-                            if offset > last_offset {
-                                last_offset = offset;
+                            if offset as isize > last_offset {
+                                last_offset = offset as isize;
                             }
                             if blocks.len() <= id {
                                 blocks.resize(id + 1, None);
@@ -359,7 +359,7 @@ macro_rules! define_blocks {
 
                     #[allow(unused_assignments)]
                     {
-                        flat_id += last_offset + 1;
+                        flat_id += (last_offset + 1) as usize;
                     }
                 })+
 
@@ -494,6 +494,7 @@ define_blocks! {
             level: u8 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
         },
         data Some(level as usize),
+        offset None,
         material Material {
             absorbed_light: 2,
             ..material::TRANSPARENT
@@ -518,6 +519,7 @@ define_blocks! {
             level: u8 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
         },
         data Some(level as usize),
+        offset None,
         material Material {
             absorbed_light: 15,
             emitted_light: 15,
