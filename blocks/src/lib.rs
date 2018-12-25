@@ -1789,7 +1789,7 @@ define_blocks! {
                 (AttachedFace::Floor, Direction::South) => "up_z",
                 (AttachedFace::Floor, Direction::East) => "up_x",
                 (AttachedFace::Ceiling, Direction::South) => "down_z",
-                _ => "north", // TODO: support 1.13.2+ new lever directions
+                _ => "north", // TODO: support 1.13.2+ new directions
             }, powered),
         collision vec![],
     }
@@ -1999,28 +1999,43 @@ define_blocks! {
     }
     StoneButton {
         props {
+            face: AttachedFace = [
+                AttachedFace::Floor,
+                AttachedFace::Wall,
+                AttachedFace::Ceiling
+            ],
             facing: Direction = [
-                Direction::Down,
                 Direction::East,
                 Direction::West,
                 Direction::South,
-                Direction::North,
-                Direction::Up
+                Direction::North
             ],
             powered: bool = [false, true],
         },
-        data Some(match facing {
-            Direction::Down => 0,
-            Direction::East => 1,
-            Direction::West => 2,
-            Direction::South => 3,
-            Direction::North => 4,
-            Direction::Up => 5,
-            _ => unreachable!(),
-        } | (if powered { 0x8 } else { 0x0 })),
+        data Some(match (face, facing) {
+            (AttachedFace::Ceiling, Direction::North) => 0,
+            (AttachedFace::Wall, Direction::East) => 1,
+            (AttachedFace::Wall, Direction::West) => 2,
+            (AttachedFace::Wall, Direction::South) => 3,
+            (AttachedFace::Wall, Direction::North) => 4,
+            (AttachedFace::Floor, Direction::North)=> 5,
+            _ => return None,
+            } | (if powered { 0x8 } else { 0x0 })),
+        offset Some(face.offset() * (4 * 2) + facing.horizontal_offset() * 2 + if powered { 0 } else { 1 }),
         material material::NON_SOLID,
         model { ("minecraft", "stone_button") },
-        variant format!("facing={},powered={}", facing.as_string(), powered),
+        variant format!("facing={},powered={}",
+            match (face, facing) {
+                (AttachedFace::Ceiling, Direction::East) => "down_x",
+                (AttachedFace::Wall, Direction::East) => "east",
+                (AttachedFace::Wall, Direction::West) => "west",
+                (AttachedFace::Wall, Direction::South) => "south",
+                (AttachedFace::Wall, Direction::North) => "north",
+                (AttachedFace::Floor, Direction::South) => "up_z",
+                (AttachedFace::Floor, Direction::East) => "up_x",
+                (AttachedFace::Ceiling, Direction::South) => "down_z",
+                _ => "north", // TODO: support 1.13.2+ new directions
+            }, powered),
     }
     SnowLayer {
         props {
@@ -6046,84 +6061,6 @@ impl ComparatorMode {
         match self {
             ComparatorMode::Compare => "compare",
             ComparatorMode::Subtract => "subtract",
-        }
-    }
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum LeverDirection {
-    FloorNorth,
-    FloorSouth,
-    FloorEast,
-    FloorWest,
-    WallNorth,
-    WallSouth,
-    WallEast,
-    WallWest,
-    CeilingNorth,
-    CeilingSouth,
-    CeilingEast,
-    CeilingWest,
-}
-
-impl LeverDirection {
-    pub fn as_string(self) -> &'static str {
-        match self {
-            LeverDirection::WallNorth => "north",
-            LeverDirection::WallSouth => "south",
-            LeverDirection::WallEast => "east",
-            LeverDirection::WallWest => "west",
-            LeverDirection::FloorEast => "up_x",
-            LeverDirection::CeilingEast => "down_x",
-            LeverDirection::FloorSouth => "up_z",
-            LeverDirection::CeilingSouth => "down_z",
-            _ => "north" // TODO: 1.13.2+ other lever directions
-        }
-    }
-
-    pub fn data(self) -> usize {
-        match self {
-            LeverDirection::CeilingEast => 0,
-            LeverDirection::WallEast => 1,
-            LeverDirection::WallWest => 2,
-            LeverDirection::WallSouth => 3,
-            LeverDirection::WallNorth => 4,
-            LeverDirection::FloorSouth => 5,
-            LeverDirection::FloorEast => 6,
-            LeverDirection::CeilingSouth => 7,
-            _ => panic!("LeverDirection no data for {:?}, 1.13.2+ only", self),
-        }
-    }
-
-    pub fn valid_data(self) -> bool {
-        match self {
-            LeverDirection::CeilingEast |
-            LeverDirection::WallEast |
-            LeverDirection::WallWest |
-            LeverDirection::WallSouth |
-            LeverDirection::WallNorth |
-            LeverDirection::FloorSouth |
-            LeverDirection::FloorEast |
-            LeverDirection::CeilingSouth => true,
-            _ => false,
-        }
-    }
-
-
-    pub fn offset(self) -> usize {
-        match self {
-            LeverDirection::FloorNorth => 0,
-            LeverDirection::FloorSouth => 1,
-            LeverDirection::FloorWest => 2,
-            LeverDirection::FloorEast => 3,
-            LeverDirection::WallNorth => 4,
-            LeverDirection::WallSouth => 5,
-            LeverDirection::WallWest => 6,
-            LeverDirection::WallEast => 7,
-            LeverDirection::CeilingNorth => 8,
-            LeverDirection::CeilingSouth => 9,
-            LeverDirection::CeilingWest => 10,
-            LeverDirection::CeilingEast => 11,
         }
     }
 }
