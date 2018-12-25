@@ -1772,6 +1772,7 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data Some(if powered { 1 } else { 0 }),
+        offset Some(if powered { 0 } else { 1 }),
         material material::NON_SOLID,
         model { ("minecraft", "stone_pressure_plate") },
         variant format!("powered={}", powered),
@@ -1806,17 +1807,78 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data Some(if powered { 1 } else { 0 }),
+        offset Some(if powered { 0 } else { 1 }),
         material material::NON_SOLID,
         model { ("minecraft", "wooden_pressure_plate") },
         variant format!("powered={}", powered),
         collision vec![],
     }
+    SprucePressurePlate {
+        props {
+            powered: bool = [false, true],
+        },
+        data None::<usize>,
+        offset Some(if powered { 0 } else { 1 }),
+        material material::NON_SOLID,
+        model { ("minecraft", "spruce_pressure_plate") },
+        variant format!("powered={}", powered),
+        collision vec![],
+    }
+    BirchPressurePlate {
+        props {
+            powered: bool = [false, true],
+        },
+        data None::<usize>,
+        offset Some(if powered { 0 } else { 1 }),
+        material material::NON_SOLID,
+        model { ("minecraft", "birch_pressure_plate") },
+        variant format!("powered={}", powered),
+        collision vec![],
+    }
+    JunglePressurePlate {
+        props {
+            powered: bool = [false, true],
+        },
+        data None::<usize>,
+        offset Some(if powered { 0 } else { 1 }),
+        material material::NON_SOLID,
+        model { ("minecraft", "jungle_pressure_plate") },
+        variant format!("powered={}", powered),
+        collision vec![],
+    }
+    AcaciaPressurePlate {
+        props {
+            powered: bool = [false, true],
+        },
+        data None::<usize>,
+        offset Some(if powered { 0 } else { 1 }),
+        material material::NON_SOLID,
+        model { ("minecraft", "acacia_pressure_plate") },
+        variant format!("powered={}", powered),
+        collision vec![],
+    }
+    DarkOakPressurePlate {
+        props {
+            powered: bool = [false, true],
+        },
+        data None::<usize>,
+        offset Some(if powered { 0 } else { 1 }),
+        material material::NON_SOLID,
+        model { ("minecraft", "dark_oak_pressure_plate") },
+        variant format!("powered={}", powered),
+        collision vec![],
+    }
     RedstoneOre {
-        props {},
-        model { ("minecraft", "redstone_ore") },
+        props {
+            lit: bool = [true, false],
+        },
+        data if !lit { Some(0) } else { None },
+        offset Some(if lit { 1 } else { 0 }),
+        model { ("minecraft", if lit { "lit_redstone_ore" } else { "redstone_ore" }) },
     }
     RedstoneOreLit {
         props {},
+        offset None,
         material Material {
             emitted_light: 9,
             ..material::SOLID
