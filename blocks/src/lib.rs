@@ -2050,6 +2050,7 @@ define_blocks! {
             has_record: bool = [false, true],
         },
         data Some(if has_record { 1 } else { 0 }),
+        offset Some(if has_record { 0 } else { 1 }),
         model { ("minecraft", "jukebox") },
     }
     Fence {
