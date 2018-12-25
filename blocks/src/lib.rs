@@ -1762,13 +1762,7 @@ define_blocks! {
             ],
             powered: bool = [false, true],
         },
-        data {
-            if let Some(facing_data) = face.data_with_facing(facing) {
-                Some(facing_data | (if powered { 0x8 } else { 0x0 }))
-            } else {
-                None
-            }
-        },
+        data face.data_with_facing_and_powered(facing, powered),
         offset Some(face.offset() * (4 * 2) + facing.horizontal_offset() * 2 + if powered { 0 } else { 1 }),
         material material::NON_SOLID,
         model { ("minecraft", "lever") },
@@ -1994,13 +1988,7 @@ define_blocks! {
             ],
             powered: bool = [false, true],
         },
-        data {
-            if let Some(facing_data) = face.data_with_facing(facing) {
-                Some(facing_data | (if powered { 0x8 } else { 0x0 }))
-            } else {
-                None
-            }
-        },
+        data face.data_with_facing_and_powered(facing, powered),
         offset Some(face.offset() * (4 * 2) + facing.horizontal_offset() * 2 + if powered { 0 } else { 1 }),
         material material::NON_SOLID,
         model { ("minecraft", "stone_button") },
@@ -6326,6 +6314,14 @@ impl AttachedFace {
             (AttachedFace::Ceiling, Direction::South) => 7,
             _ => return None,
         })
+    }
+
+    pub fn data_with_facing_and_powered(self, facing: Direction, powered: bool) -> Option<usize> {
+        if let Some(facing_data) = self.data_with_facing(facing) {
+            Some(facing_data | (if powered { 0x8 } else { 0x0 }))
+        } else {
+            None
+        }
     }
 
     pub fn variant_with_facing(self, facing: Direction) -> String {
