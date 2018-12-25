@@ -698,7 +698,24 @@ define_blocks! {
         model { ("minecraft", variant.as_string() ) },
     }
     NoteBlock {
-        props {},
+        props {
+            instrument: NoteBlockInstrument = [
+                NoteBlockInstrument::Harp,
+                NoteBlockInstrument::BaseDrum,
+                NoteBlockInstrument::Snare,
+                NoteBlockInstrument::Hat,
+                NoteBlockInstrument::Bass,
+                NoteBlockInstrument::Flute,
+                NoteBlockInstrument::Bell,
+                NoteBlockInstrument::Guitar,
+                NoteBlockInstrument::Chime,
+                NoteBlockInstrument::Xylophone
+            ],
+            note: u8 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
+            powered: bool = [true, false],
+        },
+        data if instrument == NoteBlockInstrument::Harp && note == 0 && powered { Some(0) } else { None },
+        offset Some(instrument.offset() * (25 * 2) + ((note as usize) << 1) + if powered { 0 } else { 1 }),
         model { ("minecraft", "noteblock") },
     }
     Bed {
@@ -5027,6 +5044,53 @@ impl SandstoneVariant {
         }
     }
 }
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum NoteBlockInstrument {
+    Harp,
+    BaseDrum,
+    Snare,
+    Hat,
+    Bass,
+    Flute,
+    Bell,
+    Guitar,
+    Chime,
+    Xylophone,
+}
+
+impl NoteBlockInstrument {
+    pub fn as_string(self) -> &'static str {
+        match self {
+            NoteBlockInstrument::Harp => "harp",
+            NoteBlockInstrument::BaseDrum => "basedrum",
+            NoteBlockInstrument::Snare => "snare",
+            NoteBlockInstrument::Hat => "hat",
+            NoteBlockInstrument::Bass => "bass",
+            NoteBlockInstrument::Flute => "flute",
+            NoteBlockInstrument::Bell => "bell",
+            NoteBlockInstrument::Guitar => "guitar",
+            NoteBlockInstrument::Chime => "chime",
+            NoteBlockInstrument::Xylophone => "xylophone",
+        }
+    }
+
+    fn offset(self) -> usize {
+        match self {
+            NoteBlockInstrument::Harp => 0,
+            NoteBlockInstrument::BaseDrum => 1,
+            NoteBlockInstrument::Snare => 2,
+            NoteBlockInstrument::Hat => 3,
+            NoteBlockInstrument::Bass => 4,
+            NoteBlockInstrument::Flute => 5,
+            NoteBlockInstrument::Bell => 6,
+            NoteBlockInstrument::Guitar => 7,
+            NoteBlockInstrument::Chime => 8,
+            NoteBlockInstrument::Xylophone => 9,
+        }
+    }
+}
+
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum RedSandstoneVariant {
