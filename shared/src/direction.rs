@@ -128,6 +128,16 @@ impl Direction {
         }
     }
 
+    pub fn horizontal_offset(&self) -> usize {
+        match *self {
+            Direction::North => 0,
+            Direction::South => 1,
+            Direction::West => 2,
+            Direction::East => 3,
+            _ => unreachable!(),
+        }
+    }
+
     pub fn axis(&self) -> Axis {
         match *self {
             Direction::Down | Direction::Up => Axis::Y,

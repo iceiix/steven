@@ -728,10 +728,14 @@ define_blocks! {
             ],
             occupied: bool = [false, true],
             part: BedPart = [BedPart::Head, BedPart::Foot],
+            // TODO: colored beds
         },
         data Some(facing.horizontal_index()
                   | (if occupied { 0x4 } else { 0x0 })
                   | (if part == BedPart::Head { 0x8 } else { 0x0 })),
+        offset Some((facing.horizontal_offset() << 2)
+                  | (if occupied { 0 } else { 2 })
+                  | (if part == BedPart::Head { 0 } else { 1 })),
         material material::NON_SOLID,
         model { ("minecraft", "bed") },
         variant format!("facing={},part={}", facing.as_string(), part.as_string()),
