@@ -347,10 +347,9 @@ macro_rules! define_blocks {
                                 blocks[id] = Some(block);
                             } else {
                                 panic!(
-                                    "Tried to register {:#?} to {}:{} but {:#?} was already registered",
+                                    "Tried to register {:#?} to {} but {:#?} was already registered",
                                     block,
-                                    id >> 4,
-                                    id & 0xF,
+                                    id,
                                     blocks[id]
                                 );
                             }
