@@ -1324,6 +1324,7 @@ define_blocks! {
 
             Some(data)
         },
+        offset None, // TODO: slabs below
         model { ("minecraft", format!("{}_double_slab", variant.as_string()) ) },
         variant if seamless { "all" } else { "normal" },
     }
@@ -1342,6 +1343,7 @@ define_blocks! {
             ],
         },
         data Some(variant.data() | (if half == BlockHalf::Top { 0x8 } else { 0x0 })),
+        offset None, // TODO: slabs below
         material material::NON_SOLID,
         model { ("minecraft", format!("{}_slab", variant.as_string()) ) },
         variant format!("half={}", half.as_string()),
@@ -1356,6 +1358,7 @@ define_blocks! {
             explode: bool = [false, true],
         },
         data Some(if explode { 1 } else { 0 }),
+        offset Some(if explode { 0 } else { 1 }),
         model { ("minecraft", "tnt") },
     }
     BookShelf {
@@ -1390,6 +1393,16 @@ define_blocks! {
                 _ => unreachable!(),
             })
         },
+        offset {
+            Some(match facing {
+                Direction::Up => 0,
+                Direction::North => 1,
+                Direction::South => 2,
+                Direction::West => 3,
+                Direction::East => 4,
+                _ => unreachable!(),
+            })
+        },
         material Material {
             emitted_light: 14,
             ..material::NON_SOLID
@@ -1408,6 +1421,13 @@ define_blocks! {
             east: bool = [false, true],
         },
         data if !up && !north && !south && !west && !east { Some(age as usize) } else { None },
+        offset Some(
+            if west  { 0 } else { 1<<0 } |
+            if up    { 0 } else { 1<<1 } |
+            if south { 0 } else { 1<<2 } |
+            if north { 0 } else { 1<<3 } |
+            if east  { 0 } else { 1<<4 } |
+            ((age as usize) << 5)),
         material Material {
             emitted_light: 15,
             ..material::NON_SOLID
