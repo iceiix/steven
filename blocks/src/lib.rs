@@ -1184,6 +1184,9 @@ define_blocks! {
             variant: PistonType = [PistonType::Normal, PistonType::Sticky],
         },
         data if !short { Some(facing.index() | if variant == PistonType::Sticky { 0x8 } else { 0x0 })} else { None },
+        offset Some(facing.offset() * 4 +
+                    (if short { 0 } else { 2 }) +
+                    (if variant == PistonType::Normal { 0 } else { 1 })),
         material material::NON_SOLID,
         model { ("minecraft", "piston_head") },
         variant format!("facing={},short={},type={}", facing.as_string(), short, variant.as_string()),
