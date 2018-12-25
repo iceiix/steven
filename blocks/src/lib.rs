@@ -1522,6 +1522,12 @@ define_blocks! {
                 None
             }
         },
+        offset Some(
+            west.offset() +
+            south.offset() * 3 +
+            (power as usize) * (3 * 3) +
+            north.offset() * (3 * 3 * 16) +
+            east.offset() * (3 * 3 * 16 * 3)),
         material material::NON_SOLID,
         model { ("minecraft", "redstone_wire") },
         tint TintType::Color{r: ((255.0 / 30.0) * (f64::from(power)) + 14.0) as u8, g: 0, b: 0},
@@ -5951,6 +5957,14 @@ impl RedstoneSide {
             RedstoneSide::None => "none",
             RedstoneSide::Side => "side",
             RedstoneSide::Up => "up",
+        }
+    }
+
+    pub fn offset(self) -> usize {
+        match self {
+            RedstoneSide::Up => 0,
+            RedstoneSide::Side => 1,
+            RedstoneSide::None => 2,
         }
     }
 }
