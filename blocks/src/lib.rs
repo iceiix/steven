@@ -1675,8 +1675,10 @@ define_blocks! {
                 Direction::West,
                 Direction::East
             ],
+            waterlogged: bool = [true, false],
         },
-        data Some(facing.index()),
+        data if !waterlogged { Some(facing.index()) } else { None },
+        offset Some(if waterlogged { 0 } else { 1 } + facing.horizontal_offset() * 2),
         material material::NON_SOLID,
         model { ("minecraft", "ladder") },
         variant format!("facing={}", facing.as_string()),
