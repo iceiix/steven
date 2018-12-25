@@ -1878,7 +1878,7 @@ define_blocks! {
             lit: bool = [true, false],
         },
         data if !lit { Some(0) } else { None },
-        offset Some(if lit { 1 } else { 0 }),
+        offset Some(if lit { 0 } else { 1 }),
         model { ("minecraft", if lit { "lit_redstone_ore" } else { "redstone_ore" }) },
     }
     RedstoneOreLit {
