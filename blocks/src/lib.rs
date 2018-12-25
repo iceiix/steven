@@ -1120,8 +1120,30 @@ define_blocks! {
         tint TintType::Grass,
         collision vec![],
     }
+    Seagrass {
+        props {},
+        data None::<usize>,
+        offset Some(0),
+        material material::NON_SOLID,
+        model { ("minecraft", "seagrass") },
+        collision vec![],
+    }
+    TallSeagrass {
+        props {
+            half: TallSeagrassHalf = [
+                TallSeagrassHalf::Upper,
+                TallSeagrassHalf::Lower
+            ],
+        },
+        data None::<usize>,
+        offset Some(half.offset()),
+        material material::NON_SOLID,
+        model { ("minecraft", "tall_seagrass") },
+        collision vec![],
+    }
     DeadBush {
         props {},
+        offset None,
         material material::NON_SOLID,
         model { ("minecraft", "dead_bush") },
         collision vec![],
@@ -1139,6 +1161,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index() | (if extended { 0x8 } else { 0x0 })),
+        offset Some(facing.offset() + (if extended { 0 } else { 6 })),
         material Material {
             should_cull_against: !extended,
             ..material::NON_SOLID
@@ -6197,6 +6220,28 @@ impl TallGrassVariant {
             TallGrassVariant::DeadBush => 0,
             TallGrassVariant::TallGrass => 1,
             TallGrassVariant::Fern => 2,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum TallSeagrassHalf {
+    Upper,
+    Lower,
+}
+
+impl TallSeagrassHalf {
+    pub fn as_string(self) -> &'static str {
+        match self {
+            TallSeagrassHalf::Upper => "upper",
+            TallSeagrassHalf::Lower => "lower",
+        }
+    }
+
+    fn offset(self) -> usize {
+        match self {
+            TallSeagrassHalf::Upper => 0,
+            TallSeagrassHalf::Lower => 1,
         }
     }
 }
