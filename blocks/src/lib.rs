@@ -1492,8 +1492,17 @@ define_blocks! {
                 Direction::West,
                 Direction::East
             ],
+            type_: ChestType = [
+                ChestType::Single,
+                ChestType::Left,
+                ChestType::Right
+            ],
+            waterlogged: bool = [true, false],
         },
-        data Some(facing.index()),
+        data if type_ == ChestType::Single && !waterlogged { Some(facing.index()) } else { None },
+        offset Some(if waterlogged { 0 } else { 1 } +
+            type_.offset() * 2 +
+            facing.horizontal_offset() * (2 * 3)),
         material material::NON_SOLID,
         model { ("minecraft", "chest") },
     }
@@ -6173,6 +6182,31 @@ impl StairShape {
             StairShape::InnerRight => 2,
             StairShape::OuterLeft => 3,
             StairShape::OuterRight => 4,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum ChestType {
+    Single,
+    Left,
+    Right,
+}
+
+impl ChestType {
+    pub fn as_string(self) -> &'static str {
+        match self {
+            ChestType::Single => "single",
+            ChestType::Left => "left",
+            ChestType::Right => "right",
+        }
+    }
+
+    pub fn offset(self) -> usize {
+        match self {
+            ChestType::Single => 0,
+            ChestType::Left => 1,
+            ChestType::Right => 2,
         }
     }
 }
