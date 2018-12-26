@@ -3185,6 +3185,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index() | (if conditional { 0x8 } else { 0x0 })),
+        offset Some(facing.offset() + (if conditional { 0 } else { 6 })),
         model { ("minecraft", "command_block") },
         variant format!("conditional={},facing={}", conditional, facing.as_string()),
     }
@@ -3207,8 +3208,16 @@ define_blocks! {
                 CobblestoneWallVariant::Normal,
                 CobblestoneWallVariant::Mossy
             ],
+            waterlogged: bool = [true, false],
         },
         data if !north && !south && !east && !west && !up { Some(variant.data()) } else { None },
+        offset Some(if west { 0 } else { 1<<0 } +
+                    if waterlogged { 0 } else { 1<<1 } +
+                    if up { 0 } else { 1<<2 } +
+                    if south { 0 } else { 1<<3 } +
+                    if north { 0 } else { 1<<4 } +
+                    if east { 0 } else { 1<<5 } +
+                    if variant == CobblestoneWallVariant::Normal { 0 } else { 1<<6 }),
         material material::NON_SOLID,
         model { ("minecraft", format!("{}_wall", variant.as_string())) },
         update_state (world, pos) => {
@@ -3228,7 +3237,7 @@ define_blocks! {
                 Block::Air{..} => true,
                 _ => false,
             }) || !((north && south && !west && !east) || (!north && !south && west && east));
-            Block::CobblestoneWall{up: up, north: north, south: south, west: west, east: east, variant: variant}
+            Block::CobblestoneWall{up, north, south, west, east, variant, waterlogged}
         },
         multipart (key, val) => match key {
             "up" => up == (val == "true"),
@@ -3255,7 +3264,7 @@ define_blocks! {
                 FlowerPotVariant::DeadBush,
                 FlowerPotVariant::Fern,
                 FlowerPotVariant::AcaciaSapling,
-                FlowerPotVariant::DarkOak,
+                FlowerPotVariant::DarkOakSapling,
                 FlowerPotVariant::BlueOrchid,
                 FlowerPotVariant::Allium,
                 FlowerPotVariant::AzureBluet,
@@ -3263,12 +3272,12 @@ define_blocks! {
                 FlowerPotVariant::OrangeTulip,
                 FlowerPotVariant::WhiteTulip,
                 FlowerPotVariant::PinkTulip,
-                FlowerPotVariant::Oxeye,
-                FlowerPotVariant::Dandelion
+                FlowerPotVariant::Oxeye
             ],
             legacy_data: u8 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
         },
         data if contents == FlowerPotVariant::Empty { Some(legacy_data as usize) } else { None },
+        offset if legacy_data != 0 { None } else { Some(contents.offset()) },
         material material::NON_SOLID,
         model { ("minecraft", "flower_pot") },
     }
@@ -6823,7 +6832,7 @@ pub enum FlowerPotVariant {
     DeadBush,
     Fern,
     AcaciaSapling,
-    DarkOak,
+    DarkOakSapling,
     BlueOrchid,
     Allium,
     AzureBluet,
@@ -6850,7 +6859,7 @@ impl FlowerPotVariant {
             FlowerPotVariant::DeadBush => "dead_bush",
             FlowerPotVariant::Fern => "fern",
             FlowerPotVariant::AcaciaSapling => "acacia_sapling",
-            FlowerPotVariant::DarkOak => "dark_oak_sapling",
+            FlowerPotVariant::DarkOakSapling => "dark_oak_sapling",
             FlowerPotVariant::BlueOrchid => "blue_orchid",
             FlowerPotVariant::Allium => "allium",
             FlowerPotVariant::AzureBluet => "houstonia",
@@ -6859,6 +6868,33 @@ impl FlowerPotVariant {
             FlowerPotVariant::WhiteTulip => "white_tulip",
             FlowerPotVariant::PinkTulip => "pink_tulip",
             FlowerPotVariant::Oxeye => "oxeye_daisy",
+        }
+    }
+
+    pub fn offset(self) -> usize {
+        match self {
+            FlowerPotVariant::Empty => 0,
+            FlowerPotVariant::OakSapling => 1,
+            FlowerPotVariant::SpruceSapling => 2,
+            FlowerPotVariant::BirchSapling => 3,
+            FlowerPotVariant::JungleSapling => 4,
+            FlowerPotVariant::AcaciaSapling => 5,
+            FlowerPotVariant::DarkOakSapling => 6,
+            FlowerPotVariant::Fern => 7,
+            FlowerPotVariant::Dandelion => 8,
+            FlowerPotVariant::Poppy => 9,
+            FlowerPotVariant::BlueOrchid => 10,
+            FlowerPotVariant::Allium => 11,
+            FlowerPotVariant::AzureBluet => 12,
+            FlowerPotVariant::RedTulip => 13,
+            FlowerPotVariant::OrangeTulip => 14,
+            FlowerPotVariant::WhiteTulip => 15,
+            FlowerPotVariant::PinkTulip => 16,
+            FlowerPotVariant::Oxeye => 17,
+            FlowerPotVariant::RedMushroom => 18,
+            FlowerPotVariant::BrownMushroom => 19,
+            FlowerPotVariant::DeadBush => 20,
+            FlowerPotVariant::Cactus => 21,
         }
     }
 }
