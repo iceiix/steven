@@ -3330,7 +3330,7 @@ define_blocks! {
         model { ("minecraft", "wooden_button") },
         variant format!("facing={},powered={}", face.variant_with_facing(facing), powered),
     }
-    Skull {
+    SkullSkeletonWall {
         props {
             facing: Direction = [
                 Direction::Up,
@@ -3342,6 +3342,7 @@ define_blocks! {
             nodrop: bool = [false, true],
         },
         data if !nodrop { Some(facing.index()) } else { None },
+        offset if !nodrop && facing != Direction::Up { Some(facing.horizontal_offset()) } else { None },
         material material::NON_SOLID,
         model { ("minecraft", "skull") },
         variant format!("facing={},nodrop={}", facing.as_string(), nodrop),
@@ -3354,6 +3355,69 @@ define_blocks! {
                 Direction::East => (0.0, 0.25, 0.25, 0.5, 0.75, 0.75),
                 _ => unreachable!(),
             };
+
+            vec![Aabb3::new(
+                Point3::new(min_x, min_y, min_z),
+                Point3::new(max_x, max_y, max_z)
+            )]
+        },
+    }
+    SkullSkeleton
+    {
+        props {
+            rotation: u8 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+        },
+        data None::<usize>,
+        offset Some(rotation as usize),
+        material material::NON_SOLID,
+        model { ("minecraft", "skull") },
+        collision {
+            let (min_x, min_y, min_z, max_x, max_y, max_z) = (0.25, 0.0, 0.25, 0.75, 0.5, 0.75);
+
+            vec![Aabb3::new(
+                Point3::new(min_x, min_y, min_z),
+                Point3::new(max_x, max_y, max_z)
+            )]
+        },
+    }
+    SkullWitherSkeletonWall {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data None::<usize>,
+        offset Some(facing.horizontal_offset()),
+        material material::NON_SOLID,
+        model { ("minecraft", "skull") },
+        collision {
+            let (min_x, min_y, min_z, max_x, max_y, max_z) = match facing {
+                Direction::North => (0.25, 0.25, 0.5, 0.75, 0.75, 1.0),
+                Direction::South => (0.25, 0.25, 0.0, 0.75, 0.75, 0.5),
+                Direction::West => (0.5, 0.25, 0.25, 1.0, 0.75, 0.75),
+                Direction::East => (0.0, 0.25, 0.25, 0.5, 0.75, 0.75),
+                _ => unreachable!(),
+            };
+
+            vec![Aabb3::new(
+                Point3::new(min_x, min_y, min_z),
+                Point3::new(max_x, max_y, max_z)
+            )]
+        },
+    }
+    SkullWitherSkeleton {
+        props {
+            rotation: u8 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+        },
+        data None::<usize>,
+        offset Some(rotation as usize),
+        material material::NON_SOLID,
+        model { ("minecraft", "skull") },
+        collision {
+            let (min_x, min_y, min_z, max_x, max_y, max_z) = (0.25, 0.0, 0.25, 0.75, 0.5, 0.75);
 
             vec![Aabb3::new(
                 Point3::new(min_x, min_y, min_z),
