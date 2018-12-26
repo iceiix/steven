@@ -1,5 +1,5 @@
 
-#![recursion_limit="300"]
+#![recursion_limit="600"]
 
 extern crate steven_shared as shared;
 
