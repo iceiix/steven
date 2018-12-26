@@ -3942,14 +3942,21 @@ define_blocks! {
             ],
             half: BlockHalf = [BlockHalf::Top, BlockHalf::Bottom],
             open: bool = [false, true],
+            waterlogged: bool = [true, false],
+            powered: bool = [true, false],
         },
-        data Some(match facing {
+        data if waterlogged || powered { None } else { Some(match facing {
             Direction::North => 0,
             Direction::South => 1,
             Direction::West => 2,
             Direction::East => 3,
             _ => unreachable!(),
-        } | (if open { 0x4 } else { 0x0 }) | (if half == BlockHalf::Top { 0x8 } else { 0x0 })),
+        } | (if open { 0x4 } else { 0x0 }) | (if half == BlockHalf::Top { 0x8 } else { 0x0 }))},
+        offset Some(if waterlogged { 0 } else { 1<<0 } +
+            if powered { 0 } else { 1<<1 } +
+            if open { 0 } else { 1<<2 } +
+            if half == BlockHalf::Top { 0 } else { 1<<3 } +
+            facing.horizontal_offset() * (1<<4)),
         material material::NON_SOLID,
         model { ("minecraft", "iron_trapdoor") },
         variant format!("facing={},half={},open={}", facing.as_string(), half.as_string(), open),
@@ -3965,6 +3972,84 @@ define_blocks! {
         },
         data Some(variant.data()),
         model { ("minecraft", variant.as_string() ) },
+    }
+    PrismarineStairs {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            half: BlockHalf = [BlockHalf::Top, BlockHalf::Bottom],
+            shape: StairShape = [
+                StairShape::Straight,
+                StairShape::InnerLeft,
+                StairShape::InnerRight,
+                StairShape::OuterLeft,
+                StairShape::OuterRight
+            ],
+            waterlogged: bool = [true, false],
+        },
+        data stair_data(facing, half, shape, waterlogged),
+        offset stair_offset(facing, half, shape, waterlogged),
+        material material::NON_SOLID,
+        model { ("minecraft", "prismarine_stairs") },
+        variant format!("facing={},half={},shape={}", facing.as_string(), half.as_string(), shape.as_string()),
+        collision stair_collision(facing, shape, half),
+        update_state (world, pos) => Block::OakStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
+    }
+    PrismarineBrickStairs {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            half: BlockHalf = [BlockHalf::Top, BlockHalf::Bottom],
+            shape: StairShape = [
+                StairShape::Straight,
+                StairShape::InnerLeft,
+                StairShape::InnerRight,
+                StairShape::OuterLeft,
+                StairShape::OuterRight
+            ],
+            waterlogged: bool = [true, false],
+        },
+        data stair_data(facing, half, shape, waterlogged),
+        offset stair_offset(facing, half, shape, waterlogged),
+        material material::NON_SOLID,
+        model { ("minecraft", "prismarine_brick_stairs") },
+        variant format!("facing={},half={},shape={}", facing.as_string(), half.as_string(), shape.as_string()),
+        collision stair_collision(facing, shape, half),
+        update_state (world, pos) => Block::OakStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
+    }
+    DarkPrismarineStairs {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            half: BlockHalf = [BlockHalf::Top, BlockHalf::Bottom],
+            shape: StairShape = [
+                StairShape::Straight,
+                StairShape::InnerLeft,
+                StairShape::InnerRight,
+                StairShape::OuterLeft,
+                StairShape::OuterRight
+            ],
+            waterlogged: bool = [true, false],
+        },
+        data stair_data(facing, half, shape, waterlogged),
+        offset stair_offset(facing, half, shape, waterlogged),
+        material material::NON_SOLID,
+        model { ("minecraft", "dark_prismarine_stairs") },
+        variant format!("facing={},half={},shape={}", facing.as_string(), half.as_string(), shape.as_string()),
+        collision stair_collision(facing, shape, half),
+        update_state (world, pos) => Block::OakStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
     }
     SeaLantern {
         props {},
