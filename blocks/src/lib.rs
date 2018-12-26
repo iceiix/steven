@@ -2437,6 +2437,62 @@ define_blocks! {
         props {},
         model { ("minecraft", "melon_block") },
     }
+    AttachedPumpkinStem {
+        props {
+             facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data None::<usize>,
+        offset Some(facing.horizontal_offset()),
+        material material::NON_SOLID,
+        model { ("minecraft", "pumpkin_stem") },
+        variant format!("facing={}", facing.as_string()),
+        collision vec![],
+        update_state (world, pos) => {
+            let facing = match (world.get_block(pos.shift(Direction::East)), world.get_block(pos.shift(Direction::West)),
+                                world.get_block(pos.shift(Direction::North)), world.get_block(pos.shift(Direction::South))) {
+                (Block::Pumpkin{ .. }, _, _, _) => Direction::East,
+                (_, Block::Pumpkin{ .. }, _, _) => Direction::West,
+                (_, _, Block::Pumpkin{ .. }, _) => Direction::North,
+                (_, _, _, Block::Pumpkin{ .. }) => Direction::South,
+                _ => Direction::Up,
+            };
+
+            Block::AttachedPumpkinStem{facing}
+        },
+    }
+    AttachedMelonStem {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data None::<usize>,
+        offset Some(facing.horizontal_offset()),
+        material material::NON_SOLID,
+        model { ("minecraft", "melon_stem") },
+        variant format!("facing={}", facing.as_string()),
+        collision vec![],
+        update_state (world, pos) => {
+            let facing = match (world.get_block(pos.shift(Direction::East)), world.get_block(pos.shift(Direction::West)),
+                                world.get_block(pos.shift(Direction::North)), world.get_block(pos.shift(Direction::South))) {
+                (Block::MelonBlock{ .. }, _, _, _) => Direction::East,
+                (_, Block::MelonBlock{ .. }, _, _) => Direction::West,
+                (_, _, Block::MelonBlock{ .. }, _) => Direction::North,
+                (_, _, _, Block::MelonBlock{ .. }) => Direction::South,
+                _ => Direction::Up,
+            };
+
+            Block::AttachedMelonStem{facing}
+        },
+    }
     PumpkinStem {
         props {
             age: u8 = [0, 1, 2, 3, 4, 5, 6, 7],
@@ -2525,6 +2581,11 @@ define_blocks! {
         } else {
             None
         },
+        offset Some(if west { 0 } else { 1<<0 } +
+                    if up { 0 } else { 1<<1 } +
+                    if south { 0 } else { 1<<2 } +
+                    if north { 0 } else { 1<<3 } +
+                    if east { 0 } else { 1<<4 }),
         material material::NON_SOLID,
         model { ("minecraft", "vine") },
         variant format!("east={},north={},south={},up={},west={}", east, north, south, up, west),
@@ -2549,6 +2610,10 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data fence_gate_data(facing, in_wall, open, powered),
+        offset Some(if powered { 0 } else { 1<<0 } +
+                    if open { 0 } else { 1<<1 } +
+                    if in_wall { 0 } else { 1<<2 } +
+                    facing.horizontal_offset() * (2 * 2 * 2)),
         material material::NON_SOLID,
         model { ("minecraft", "fence_gate") },
         variant format!("facing={},in_wall={},open={}", facing.as_string(), in_wall, open),
@@ -2617,6 +2682,7 @@ define_blocks! {
             snowy: bool = [false, true],
         },
         data if snowy { None } else { Some(0) },
+        offset Some(if snowy { 0 } else { 1 }),
         material material::SOLID,
         model { ("minecraft", "mycelium") },
         variant format!("snowy={}", snowy),
@@ -2642,8 +2708,14 @@ define_blocks! {
             south: bool = [false, true],
             west: bool = [false, true],
             east: bool = [false, true],
+            waterlogged: bool = [true, false],
         },
         data if !north && !south && !west && !east { Some(0) } else { None },
+        offset Some(if west { 0 } else { 1<<0 } +
+            if waterlogged { 0 } else { 1<<1 } +
+            if south { 0 } else { 1<<2 } +
+            if north { 0 } else { 1<<3 } +
+            if east { 0 } else { 1<<4 }),
         material material::NON_SOLID,
         model { ("minecraft", "nether_brick_fence") },
         collision fence_collision(north, south, west, east),
@@ -2660,7 +2732,7 @@ define_blocks! {
             };
 
             let (north, south, west, east) = can_connect_sides(world, pos, &f);
-            Block::NetherBrickFence{north: north, south: south, west: west, east: east}
+            Block::NetherBrickFence{north, south, west, east, waterlogged}
         },
         multipart (key, val) => match key {
             "north" => north == (val == "true"),
@@ -2724,6 +2796,9 @@ define_blocks! {
         data Some((if has_bottle_0 { 0x1 } else { 0x0 })
                   | (if has_bottle_1 { 0x2 } else { 0x0 })
                   | (if has_bottle_2 { 0x4 } else { 0x0 })),
+        offset Some(if has_bottle_0 { 0 } else { 1<<0 } +
+                    if has_bottle_1 { 0 } else { 1<<1 } +
+                    if has_bottle_2 { 0 } else { 1<<2 }),
         material Material {
             emitted_light: 1,
             ..material::NON_SOLID
@@ -2765,6 +2840,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index() | (if eye { 0x4 } else { 0x0 })),
+        offset Some(facing.horizontal_offset() + (if eye { 0 } else { 4 })),
         material Material {
             emitted_light: 1,
             ..material::NON_SOLID
