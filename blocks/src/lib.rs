@@ -2328,25 +2328,17 @@ define_blocks! {
     }
     BrownMushroomBlock {
         props {
-            variant: MushroomVariant = [
-                MushroomVariant::East,
-                MushroomVariant::North,
-                MushroomVariant::NorthEast,
-                MushroomVariant::NorthWest,
-                MushroomVariant::South,
-                MushroomVariant::SouthEast,
-                MushroomVariant::SouthWest,
-                MushroomVariant::West,
-                MushroomVariant::Center,
-                MushroomVariant::Stem,
-                MushroomVariant::AllInside,
-                MushroomVariant::AllOutside,
-                MushroomVariant::AllStem
-            ],
+            is_stem: bool = [true, false],
+            west: bool = [true, false],
+            up: bool = [true, false],
+            south: bool = [true, false],
+            north: bool = [true, false],
+            east: bool = [true, false],
+            down: bool = [true, false],
         },
-        data Some(variant.data()),
+        data mushroom_block_data(is_stem, west, up, south, north, east, down),
         model { ("minecraft", "brown_mushroom_block") },
-        variant format!("variant={}", variant.as_string()),
+        variant format!("variant={}", mushroom_block_variant(is_stem, west, up, south, north, east, down)),
     }
     RedMushroomBlock {
         props {
@@ -5856,6 +5848,49 @@ impl PrismarineVariant {
             PrismarineVariant::Dark => 2,
         }
     }
+}
+
+fn mushroom_block_data(is_stem: bool, west: bool, up: bool, south: bool, north: bool, east: bool, down: bool) -> Option<usize> {
+    Some(match
+        (is_stem, west,  up,    south, north, east,  down) {
+        (false, false, false, false, false, false, false) => 0,
+        (false, true,  false, false, true,  false, false) => 1,
+        (false, false, false, false, true,  false, false) => 2,
+        (false, false, false, false, true,  true,  false) => 3,
+        (false, true,  false, false, false, false, false) => 4,
+        (false, false, true,  false, false, false, false) => 5,
+        (false, false, false, false, false, true,  false) => 6,
+        (false, true,  false, true,  false, false, false) => 7,
+        (false, false, false, true,  false, false, false) => 8,
+        (false, false, false, true,  false, true,  false) => 9,
+        (false, true,  false, true,  true,  true, false)  => 10,
+        (false, true,  true,  true,  true,  true,  true)  => 14,
+        (true,  false, false, false, false, false, false) => 15,
+        _ => return None,
+    })
+}
+
+fn mushroom_block_variant(is_stem: bool, west: bool, up: bool, south: bool, north: bool, east: bool, down: bool) -> String {
+    (if is_stem {
+        "all_stem"
+    } else {
+        match
+            (west,  up,    south, north, east,  down) {
+            (false, false, false, false, false, false) => "all_inside",
+            (true,  false, false, true,  false, false) => "north_west",
+            (false, false, false, true,  false, false) => "north",
+            (false, false, false, true,  true,  false) => "north_east",
+            (true,  false, false, false, false, false) => "west",
+            (false, true,  false, false, false, false) => "center",
+            (false, false, false, false, true,  false) => "east",
+            (true,  false, true,  false, false, false) => "south_west",
+            (false, false, true,  false, false, false) => "south",
+            (false, false, true,  false, true,  false) => "south_east",
+            (true,  false, true,  true,  true, false)  => "stem",
+            (true,  true,  true,  true,  true,  true)  => "all_outside",
+            _ => "all_stem",
+        }
+    }).to_string()
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
