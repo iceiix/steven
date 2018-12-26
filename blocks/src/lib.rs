@@ -2129,6 +2129,7 @@ define_blocks! {
             axis: Axis = [Axis::X, Axis::Z],
         },
         data Some(axis.index()),
+        offset Some(axis.index() - 1),
         material Material {
             emitted_light: 11,
             ..material::TRANSPARENT
@@ -2148,11 +2149,30 @@ define_blocks! {
             without_face: bool = [false, true],
         },
         data Some(facing.horizontal_index() | (if without_face { 0x4 } else { 0x0 })),
+        offset None,
         material Material {
             emitted_light: 15,
             ..material::SOLID
         },
         model { ("minecraft", "lit_pumpkin") },
+        variant format!("facing={}", facing.as_string()),
+    }
+    PumpkinCarved {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data None::<usize>,
+        offset Some(facing.horizontal_offset()),
+        material Material {
+            emitted_light: 15,
+            ..material::SOLID
+        },
+        model { ("minecraft", "carved_pumpkin") },
         variant format!("facing={}", facing.as_string()),
     }
     Cake {
