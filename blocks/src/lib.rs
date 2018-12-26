@@ -2998,8 +2998,10 @@ define_blocks! {
                 Direction::West,
                 Direction::East
             ],
+            waterlogged: bool = [true, false],
         },
-        data Some(facing.index()),
+        data if waterlogged { None } else { Some(facing.index()) },
+        offset Some(if waterlogged { 0 } else { 1 } + facing.horizontal_offset() * 2),
         material Material {
             emitted_light: 7,
             ..material::NON_SOLID
@@ -3025,6 +3027,9 @@ define_blocks! {
         data Some(facing.horizontal_index()
                   | (if attached { 0x4 } else { 0x0 })
                   | (if powered { 0x8 } else { 0x0 })),
+        offset Some(if powered { 0 } else { 1 } +
+                    facing.horizontal_offset() * 2 +
+                    if attached { 0 } else { 2 * 4 }),
         material material::NON_SOLID,
         model { ("minecraft", "tripwire_hook") },
         variant format!("attached={},facing={},powered={}", attached, facing.as_string(), powered),
@@ -3048,6 +3053,17 @@ define_blocks! {
                  | (if mojang_cant_even { 0x2 } else { 0x0 }))
         } else {
             None
+        },
+        offset if mojang_cant_even {
+            None
+        } else {
+            Some(if west { 0 } else { 1<<0 } +
+                 if south { 0 } else { 1<<1 } +
+                 if powered { 0 } else { 1<<2 } +
+                 if north { 0 } else { 1<<3 } +
+                 if east { 0 } else { 1<<4 } +
+                 if disarmed { 0 } else { 1<<5 } +
+                 if attached { 0 } else { 1<<6 })
         },
         material material::TRANSPARENT,
         model { ("minecraft", "tripwire") },
