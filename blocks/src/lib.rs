@@ -2410,14 +2410,20 @@ define_blocks! {
             south: bool = [false, true],
             west: bool = [false, true],
             east: bool = [false, true],
+            waterlogged: bool = [true, false],
         },
-        data if !north && !south && !west && !east { Some(0) } else { None },
+        data if !waterlogged && !north && !south && !west && !east { Some(0) } else { None },
+        offset Some(if west { 0 } else { 1<<0 } +
+                    if waterlogged { 0 } else { 1<<1 } +
+                    if south { 0 } else { 1<<2 } +
+                    if north { 0 } else { 1<<3 } +
+                    if east { 0 } else { 1<<4 }),
         material material::NON_SOLID,
         model { ("minecraft", "glass_pane") },
         collision pane_collision(north, south, east, west),
         update_state (world, pos) => {
             let (north, south, west, east) = can_connect_sides(world, pos, &can_connect_glasspane);
-            Block::GlassPane{north: north, south: south, west: west, east: east}
+            Block::GlassPane{north, south, west, east, waterlogged}
         },
         multipart (key, val) => match key {
             "north" => north == (val == "true"),
