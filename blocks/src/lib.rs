@@ -3425,6 +3425,98 @@ define_blocks! {
             )]
         },
     }
+    ZombieWallHead {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data None::<usize>,
+        offset Some(facing.horizontal_offset()),
+        material material::NON_SOLID,
+        model { ("minecraft", "zombie_wall_head") },
+    }
+    ZombieHead {
+        props {
+            rotation: u8 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+        },
+        data None::<usize>,
+        offset Some(rotation as usize),
+        material material::NON_SOLID,
+        model { ("minecraft", "zombie_head") },
+    }
+    PlayerWallHead {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data None::<usize>,
+        offset Some(facing.horizontal_offset()),
+        material material::NON_SOLID,
+        model { ("minecraft", "player_wall_head") },
+    }
+    PlayerHead {
+        props {
+            rotation: u8 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+        },
+        data None::<usize>,
+        offset Some(rotation as usize),
+        material material::NON_SOLID,
+        model { ("minecraft", "player_head") },
+    }
+    CreeperWallHead {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data None::<usize>,
+        offset Some(facing.horizontal_offset()),
+        material material::NON_SOLID,
+        model { ("minecraft", "creeper_wall_head") },
+    }
+    CreeperHead {
+        props {
+            rotation: u8 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+        },
+        data None::<usize>,
+        offset Some(rotation as usize),
+        material material::NON_SOLID,
+        model { ("minecraft", "creeper_head") },
+    }
+    DragonWallHead {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data None::<usize>,
+        offset Some(facing.horizontal_offset()),
+        material material::NON_SOLID,
+        model { ("minecraft", "dragon_wall_head") },
+    }
+    DragonHead {
+        props {
+            rotation: u8 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+        },
+        data None::<usize>,
+        offset Some(rotation as usize),
+        material material::NON_SOLID,
+        model { ("minecraft", "dragon_head") },
+    }
     Anvil {
         props {
             damage: u8 = [0, 1, 2],
@@ -3436,6 +3528,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index() | (match damage { 0 => 0x0, 1 => 0x4, 2 => 0x8, _ => unreachable!() })),
+        offset Some(facing.horizontal_offset() + (damage as usize) * 4),
         material material::NON_SOLID,
         model { ("minecraft", "anvil") },
         variant format!("damage={},facing={}", damage, facing.as_string()),
@@ -3459,8 +3552,17 @@ define_blocks! {
                 Direction::West,
                 Direction::East
             ],
+            type_: ChestType = [
+                ChestType::Single,
+                ChestType::Left,
+                ChestType::Right
+            ],
+            waterlogged: bool = [true, false],
         },
-        data Some(facing.index()),
+        data if type_ == ChestType::Single && !waterlogged { Some(facing.index()) } else { None },
+        offset Some(if waterlogged { 0 } else { 1 } +
+            type_.offset() * 2 +
+            facing.horizontal_offset() * (2 * 3)),
         material material::NON_SOLID,
         model { ("minecraft", "trapped_chest") },
         variant format!("facing={}", facing.as_string()),
@@ -3503,6 +3605,9 @@ define_blocks! {
         data Some(facing.horizontal_index()
                   | (if mode == ComparatorMode::Subtract { 0x4 } else { 0x0 })
                   | (if powered { 0x8 } else { 0x0 })),
+        offset Some(if powered { 0 } else { 1<<0 } +
+                    if mode == ComparatorMode::Compare { 0 } else { 1<<1 } +
+                    facing.horizontal_offset() * (1<<2)),
         material material::NON_SOLID,
         model { ("minecraft", "unpowered_comparator") },
         variant format!("facing={},mode={},powered={}", facing.as_string(), mode.as_string(), powered),
@@ -3525,6 +3630,7 @@ define_blocks! {
         data Some(facing.horizontal_index()
                   | (if mode == ComparatorMode::Subtract { 0x4 } else { 0x0 })
                   | (if powered { 0x8 } else { 0x0 })),
+        offset None,
         material material::NON_SOLID,
         model { ("minecraft", "powered_comparator") },
         variant format!("facing={},mode={},powered={}", facing.as_string(), mode.as_string(), powered),
@@ -3536,8 +3642,10 @@ define_blocks! {
     DaylightDetector {
         props {
             power: u8 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            inverted: bool = [true, false],
         },
-        data Some(power as usize),
+        data if inverted { None } else { Some(power as usize) },
+        offset Some((power as usize) + if inverted { 0 } else { 16 }),
         material material::NON_SOLID,
         model { ("minecraft", "daylight_detector") },
         variant format!("power={}", power),
@@ -3566,6 +3674,14 @@ define_blocks! {
             ],
         },
         data Some(facing.index() | (if enabled { 0x8 } else { 0x0 })),
+        offset Some(match facing {
+            Direction::Down => 0,
+            Direction::North => 1,
+            Direction::South => 2,
+            Direction::West => 3,
+            Direction::East => 4,
+            _ => unreachable!(),
+        } + if enabled { 0 } else { 5 }),
         material material::NON_SOLID,
         model { ("minecraft", "hopper") },
         variant format!("facing={}", facing.as_string()),
@@ -3629,6 +3745,7 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data Some(shape.data() | (if powered { 0x8 } else { 0x0 })),
+        offset Some(shape.data() + (if powered { 0 } else { 6 })),
         material material::NON_SOLID,
         model { ("minecraft", "activator_rail") },
         variant format!("powered={},shape={}", powered, shape.as_string()),
@@ -3647,6 +3764,7 @@ define_blocks! {
             triggered: bool = [false, true],
         },
         data Some(facing.index() | (if triggered { 0x8 } else { 0x0 })),
+        offset Some(if triggered { 0 } else { 1 } + facing.offset() * 2),
         model { ("minecraft", "dropper") },
         variant format!("facing={}", facing.as_string()),
     }
@@ -3698,14 +3816,21 @@ define_blocks! {
             south: bool = [false, true],
             east: bool = [false, true],
             west: bool = [false, true],
+            waterlogged: bool = [true, false],
         },
-        data if !north && !south && !east && !west { Some(color.data()) } else { None },
+        data if !north && !south && !east && !west && !waterlogged { Some(color.data()) } else { None },
+        offset Some(if west { 0 } else { 1<<0 } +
+                    if waterlogged { 0 } else { 1<<1 } +
+                    if south { 0 } else { 1<<2 } +
+                    if north { 0 } else { 1<<3 } +
+                    if east { 0 } else { 1<<4 } +
+                    color.data() * (1<<5)),
         material material::TRANSPARENT,
         model { ("minecraft", format!("{}_stained_glass_pane", color.as_string()) ) },
         collision pane_collision(north, south, east, west),
         update_state (world, pos) => {
             let (north, south, west, east) = can_connect_sides(world, pos, &can_connect_glasspane);
-            Block::StainedGlassPane{color: color, north: north, south: south, west: west, east: east}
+            Block::StainedGlassPane{color, north, south, west, east, waterlogged}
         },
         multipart (key, val) => match key {
             "north" => north == (val == "true"),
