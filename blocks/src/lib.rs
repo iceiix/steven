@@ -2082,7 +2082,7 @@ define_blocks! {
             _ => false,
         },
     }
-    Pumpkin {
+    PumpkinFace {
         props {
             facing: Direction = [
                 Direction::North,
@@ -2093,8 +2093,15 @@ define_blocks! {
             without_face: bool = [false, true],
         },
         data Some(facing.horizontal_index() | (if without_face { 0x4 } else { 0x0 })),
+        offset None,
         model { ("minecraft", "pumpkin") },
         variant format!("facing={}", facing.as_string()),
+    }
+    Pumpkin {
+        props {},
+        data None::<usize>,
+        offset Some(0),
+        model { ("minecraft", "pumpkin") },
     }
     Netherrack {
         props {},
