@@ -3315,116 +3315,19 @@ define_blocks! {
                 Direction::North
             ],
             powered: bool = [false, true],
+            variant: TreeVariant = [
+                TreeVariant::Oak,
+                TreeVariant::Spruce,
+                TreeVariant::Birch,
+                TreeVariant::Jungle,
+                TreeVariant::Acacia,
+                TreeVariant::DarkOak
+            ],
         },
-        data face.data_with_facing_and_powered(facing, powered),
-        offset Some(face.offset() * (4 * 2) + facing.horizontal_offset() * 2 + if powered { 0 } else { 1 }),
+        data if variant == TreeVariant::Oak { face.data_with_facing_and_powered(facing, powered) } else { None },
+        offset Some(variant.offset() * (3 * 4 * 2) + face.offset() * (4 * 2) + facing.horizontal_offset() * 2 + if powered { 0 } else { 1 }),
         material material::NON_SOLID,
         model { ("minecraft", "wooden_button") },
-        variant format!("facing={},powered={}", face.variant_with_facing(facing), powered),
-    }
-    SpruceButton {
-        props {
-            face: AttachedFace = [
-                AttachedFace::Floor,
-                AttachedFace::Wall,
-                AttachedFace::Ceiling
-            ],
-            facing: Direction = [
-                Direction::East,
-                Direction::West,
-                Direction::South,
-                Direction::North
-            ],
-            powered: bool = [false, true],
-        },
-        data None::<usize>,
-        offset Some(face.offset() * (4 * 2) + facing.horizontal_offset() * 2 + if powered { 0 } else { 1 }),
-        material material::NON_SOLID,
-        model { ("minecraft", "spruce_button") },
-        variant format!("facing={},powered={}", face.variant_with_facing(facing), powered),
-    }
-    BirchButton {
-        props {
-            face: AttachedFace = [
-                AttachedFace::Floor,
-                AttachedFace::Wall,
-                AttachedFace::Ceiling
-            ],
-            facing: Direction = [
-                Direction::East,
-                Direction::West,
-                Direction::South,
-                Direction::North
-            ],
-            powered: bool = [false, true],
-        },
-        data None::<usize>,
-        offset Some(face.offset() * (4 * 2) + facing.horizontal_offset() * 2 + if powered { 0 } else { 1 }),
-        material material::NON_SOLID,
-        model { ("minecraft", "birch_button") },
-        variant format!("facing={},powered={}", face.variant_with_facing(facing), powered),
-    }
-    JungleButton {
-        props {
-            face: AttachedFace = [
-                AttachedFace::Floor,
-                AttachedFace::Wall,
-                AttachedFace::Ceiling
-            ],
-            facing: Direction = [
-                Direction::East,
-                Direction::West,
-                Direction::South,
-                Direction::North
-            ],
-            powered: bool = [false, true],
-        },
-        data None::<usize>,
-        offset Some(face.offset() * (4 * 2) + facing.horizontal_offset() * 2 + if powered { 0 } else { 1 }),
-        material material::NON_SOLID,
-        model { ("minecraft", "jungle_button") },
-        variant format!("facing={},powered={}", face.variant_with_facing(facing), powered),
-    }
-    AcaciaButton {
-        props {
-            face: AttachedFace = [
-                AttachedFace::Floor,
-                AttachedFace::Wall,
-                AttachedFace::Ceiling
-            ],
-            facing: Direction = [
-                Direction::East,
-                Direction::West,
-                Direction::South,
-                Direction::North
-            ],
-            powered: bool = [false, true],
-        },
-        data None::<usize>,
-        offset Some(face.offset() * (4 * 2) + facing.horizontal_offset() * 2 + if powered { 0 } else { 1 }),
-        material material::NON_SOLID,
-        model { ("minecraft", "acacia_button") },
-        variant format!("facing={},powered={}", face.variant_with_facing(facing), powered),
-    }
-    DarkOakButton {
-        props {
-            face: AttachedFace = [
-                AttachedFace::Floor,
-                AttachedFace::Wall,
-                AttachedFace::Ceiling
-            ],
-            facing: Direction = [
-                Direction::East,
-                Direction::West,
-                Direction::South,
-                Direction::North
-            ],
-            powered: bool = [false, true],
-        },
-        data None::<usize>,
-        offset Some(face.offset() * (4 * 2) + facing.horizontal_offset() * 2 + if powered { 0 } else { 1 }),
-        material material::NON_SOLID,
-        model { ("minecraft", "dark_oak_button") },
         variant format!("facing={},powered={}", face.variant_with_facing(facing), powered),
     }
     Skull {
