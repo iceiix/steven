@@ -2273,8 +2273,16 @@ define_blocks! {
             open: bool = [false, true],
             waterlogged: bool = [true, false],
             powered: bool = [true, false],
+            wood: TreeVariant = [
+                TreeVariant::Oak,
+                TreeVariant::Spruce,
+                TreeVariant::Birch,
+                TreeVariant::Jungle,
+                TreeVariant::Acacia,
+                TreeVariant::DarkOak
+            ],
         },
-        data if waterlogged || powered { None } else { Some(match facing {
+        data if waterlogged || powered || wood != TreeVariant::Oak { None } else { Some(match facing {
             Direction::North => 0,
             Direction::South => 1,
             Direction::West => 2,
@@ -2285,7 +2293,8 @@ define_blocks! {
             if powered { 0 } else { 1<<1 } +
             if open { 0 } else { 1<<2 } +
             if half == BlockHalf::Top { 0 } else { 1<<3 } +
-            facing.horizontal_offset() * (2 * 2 * 2 * 2)),
+            facing.horizontal_offset() * (2 * 2 * 2 * 2) +
+            wood.offset() * (2 * 2 * 2 * 2 * 4)),
         material material::NON_SOLID,
         model { ("minecraft", "trapdoor") },
         variant format!("facing={},half={},open={}", facing.as_string(), half.as_string(), open),
