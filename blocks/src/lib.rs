@@ -2903,6 +2903,7 @@ define_blocks! {
             ],
         },
         data Some(variant.data()),
+        offset None,
         model { ("minecraft", format!("{}_double_slab", variant.as_string()) ) },
     }
     WoodenSlab {
@@ -2918,6 +2919,7 @@ define_blocks! {
             ],
         },
         data Some(variant.data() | (if half == BlockHalf::Top { 0x8 } else { 0x0 })),
+        offset None,
         material material::NON_SOLID,
         model { ("minecraft", format!("{}_slab", variant.as_string()) ) },
         variant format!("half={}", half.as_string()),
