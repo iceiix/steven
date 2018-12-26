@@ -2271,14 +2271,21 @@ define_blocks! {
             ],
             half: BlockHalf = [BlockHalf::Top, BlockHalf::Bottom],
             open: bool = [false, true],
+            waterlogged: bool = [true, false],
+            powered: bool = [true, false],
         },
-        data Some(match facing {
+        data if waterlogged || powered { None } else { Some(match facing {
             Direction::North => 0,
             Direction::South => 1,
             Direction::West => 2,
             Direction::East => 3,
             _ => unreachable!(),
-        } | (if open { 0x4 } else { 0x0 }) | (if half == BlockHalf::Top { 0x8 } else { 0x0 })),
+        } | (if open { 0x4 } else { 0x0 }) | (if half == BlockHalf::Top { 0x8 } else { 0x0 }))},
+        offset Some(if waterlogged { 0 } else { 1<<0 } +
+            if powered { 0 } else { 1<<1 } +
+            if open { 0 } else { 1<<2 } +
+            if half == BlockHalf::Top { 0 } else { 1<<3 } +
+            facing.horizontal_offset() * (2 * 2 * 2 * 2)),
         material material::NON_SOLID,
         model { ("minecraft", "trapdoor") },
         variant format!("facing={},half={},open={}", facing.as_string(), half.as_string(), open),
