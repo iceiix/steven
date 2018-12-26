@@ -5859,68 +5859,6 @@ impl PrismarineVariant {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum MushroomCapStem {
-    Down(bool),
-    East(bool),
-    North(bool),
-    South(bool),
-    Up(bool),
-    West(bool),
-}
-
-impl MushroomCapStem {
-    pub fn as_string(self) -> &'static str {
-        match self {
-            MushroomCapStem{ East(true), West(true), South(true), North(true), Down(false), Up(false) } => "stem",
-            MushroomCapStem{ East(false), West(false), South(false), North(false), Down(false), Up(false) } => "all_inside",
-            MushroomCapStem{ East(true), West(true), South(true), North(true), Down(true), Up(true) } => "all_outside",
-            MushroomCapStem{ North(true), East(true), .. } => "north_east",
-            MushroomCapStem{ North(true), West(true), .. } => "north_west",
-            MushroomCapStem{ South(true), East(true), .. } => "south_east",
-            MushroomCapStem{ South(true), West(true), .. } => "south_west",
-            MushroomCapStem{ East(true), .. } => "east",
-            MushroomCapStem{ North(true), .. } => "north",
-            MushroomCapStem{ South(true), .. } => "south",
-            MushroomCapStem{ West(true), .. } => "west",
-            MushroomCapStem{ Up(true), .. } => "center",
-            //{ AllStem => "all_stem",
-            _ => "all_stem",
-        }
-    }
-
-    fn data(self) -> usize {
-        match self {
-            MushroomCapStem{ East(true), West(true), South(true), North(true), Down(false), Up(false) } => 10,
-            MushroomCapStem{ East(false), West(false), South(false), North(false), Down(false), Up(false) } => 0,
-            MushroomCapStem{ East(true), West(true), South(true), North(true), Down(true), Up(true) } => 14,
-            MushroomCapStem{ North(true), East(true), .. } => 3,
-            MushroomCapStem{ North(true), West(true), .. } => 2,
-            MushroomCapStem{ South(true), East(true), .. } => 9,
-            MushroomCapStem{ South(true), West(true), .. } => 7,
-            MushroomCapStem{ East(true), .. } => 6,
-            MushroomCapStem{ North(true), .. } => 2,
-            MushroomCapStem{ South(true), .. } => 8,
-            MushroomCapStem{ West(true), .. } => 4,
-            MushroomCapStem{ Up(true), .. } => 5,
-            //{ AllStem => "all_stem",
-            _ => 15
-        }
-    }
-
-    fn offset(self) -> usize {
-        let MushroomCapStem{ West(west), Up(up), South(south), North(north), East(east), Down(down) } = self;
-
-        west * (1<<0) +
-        up * (1<<1) +
-        south * (1<<2) +
-        north * (1<<3) +
-        east * (1<<4) +
-        down * (1<<5)
-    }
-}
-
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum MushroomVariant {
     East,
     North,
