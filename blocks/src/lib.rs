@@ -2337,30 +2337,38 @@ define_blocks! {
             down: bool = [true, false],
         },
         data mushroom_block_data(is_stem, west, up, south, north, east, down),
+        offset mushroom_block_offset(is_stem, west, up, south, north, east, down),
         model { ("minecraft", "brown_mushroom_block") },
         variant format!("variant={}", mushroom_block_variant(is_stem, west, up, south, north, east, down)),
     }
     RedMushroomBlock {
         props {
-            variant: MushroomVariant = [
-                MushroomVariant::East,
-                MushroomVariant::North,
-                MushroomVariant::NorthEast,
-                MushroomVariant::NorthWest,
-                MushroomVariant::South,
-                MushroomVariant::SouthEast,
-                MushroomVariant::SouthWest,
-                MushroomVariant::West,
-                MushroomVariant::Center,
-                MushroomVariant::Stem,
-                MushroomVariant::AllInside,
-                MushroomVariant::AllOutside,
-                MushroomVariant::AllStem
-            ],
+            is_stem: bool = [true, false],
+            west: bool = [true, false],
+            up: bool = [true, false],
+            south: bool = [true, false],
+            north: bool = [true, false],
+            east: bool = [true, false],
+            down: bool = [true, false],
         },
-        data Some(variant.data()),
+        data mushroom_block_data(is_stem, west, up, south, north, east, down),
+        offset mushroom_block_offset(is_stem, west, up, south, north, east, down),
         model { ("minecraft", "red_mushroom_block") },
-        variant format!("variant={}", variant.as_string()),
+        variant format!("variant={}", mushroom_block_variant(is_stem, west, up, south, north, east, down)),
+    }
+    MushroomStem {
+        props {
+            west: bool = [true, false],
+            up: bool = [true, false],
+            south: bool = [true, false],
+            north: bool = [true, false],
+            east: bool = [true, false],
+            down: bool = [true, false],
+        },
+        data None::<usize>,
+        offset mushroom_block_offset(false, west, up, south, north, east, down),
+        model { ("minecraft", "mushroom_stem") },
+        variant format!("variant=all_stem"),
     }
     IronBars {
         props {
@@ -5870,6 +5878,20 @@ fn mushroom_block_data(is_stem: bool, west: bool, up: bool, south: bool, north: 
     })
 }
 
+fn mushroom_block_offset(is_stem: bool, west: bool, up: bool, south: bool, north: bool, east: bool, down: bool) -> Option<usize> {
+    if is_stem {
+        None
+    } else {
+        Some(if west { 0 } else { 1<<0 } +
+             if up { 0 } else { 1<<1 } +
+             if south { 0 } else { 1<<2 } +
+             if north { 0 } else { 1<<3 } +
+             if east { 0 } else { 1<<4 } +
+             if down { 0 } else { 1<<5 })
+    }
+}
+
+
 fn mushroom_block_variant(is_stem: bool, west: bool, up: bool, south: bool, north: bool, east: bool, down: bool) -> String {
     (if is_stem {
         "all_stem"
@@ -5886,66 +5908,11 @@ fn mushroom_block_variant(is_stem: bool, west: bool, up: bool, south: bool, nort
             (true,  false, true,  false, false, false) => "south_west",
             (false, false, true,  false, false, false) => "south",
             (false, false, true,  false, true,  false) => "south_east",
-            (true,  false, true,  true,  true, false)  => "stem",
+            (true,  false, true,  true,  true,  false)  => "stem",
             (true,  true,  true,  true,  true,  true)  => "all_outside",
             _ => "all_stem",
         }
     }).to_string()
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum MushroomVariant {
-    East,
-    North,
-    NorthEast,
-    NorthWest,
-    South,
-    SouthEast,
-    SouthWest,
-    West,
-    Center,
-    Stem,
-    AllInside,
-    AllOutside,
-    AllStem,
-}
-
-impl MushroomVariant {
-    pub fn as_string(self) -> &'static str {
-        match self {
-            MushroomVariant::East => "east",
-            MushroomVariant::North => "north",
-            MushroomVariant::NorthEast => "north_east",
-            MushroomVariant::NorthWest => "north_west",
-            MushroomVariant::South => "south",
-            MushroomVariant::SouthEast => "south_east",
-            MushroomVariant::SouthWest => "south_west",
-            MushroomVariant::West => "west",
-            MushroomVariant::Center => "center",
-            MushroomVariant::Stem => "stem",
-            MushroomVariant::AllInside => "all_inside",
-            MushroomVariant::AllOutside => "all_outside",
-            MushroomVariant::AllStem => "all_stem",
-        }
-    }
-
-    fn data(self) -> usize {
-        match self {
-            MushroomVariant::AllInside => 0,
-            MushroomVariant::NorthWest => 1,
-            MushroomVariant::North => 2,
-            MushroomVariant::NorthEast => 3,
-            MushroomVariant::West => 4,
-            MushroomVariant::Center => 5,
-            MushroomVariant::East => 6,
-            MushroomVariant::SouthWest => 7,
-            MushroomVariant::South => 8,
-            MushroomVariant::SouthEast => 9,
-            MushroomVariant::Stem => 10,
-            MushroomVariant::AllOutside => 14,
-            MushroomVariant::AllStem => 15,
-        }
-    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
