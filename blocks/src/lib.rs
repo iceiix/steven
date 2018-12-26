@@ -2188,7 +2188,7 @@ define_blocks! {
             Point3::new(1.0 - (1.0/16.0), 0.5, 1.0 - (1.0/16.0))
         )],
     }
-    RepeaterUnpowered {
+    Repeater {
         props {
             delay: u8 = [1, 2, 3, 4],
             facing: Direction = [
@@ -2198,16 +2198,21 @@ define_blocks! {
                 Direction::East
             ],
             locked: bool = [false, true],
+            powered: bool = [true, false],
         },
-        data if !locked { Some(facing.horizontal_index() | (delay as usize - 1) << 2) } else { None },
+        data if powered { None } else { if !locked { Some(facing.horizontal_index() | (delay as usize - 1) << 2) } else { None } },
+        offset Some(if powered { 0 } else { 1<<0 } +
+            if locked { 0 } else { 1<<1 } +
+            facing.horizontal_offset() * (2 * 2) +
+            ((delay - 1) as usize) * (2 * 2 * 4)),
         material material::NON_SOLID,
-        model { ("minecraft", "unpowered_repeater") },
+        model { ("minecraft", if powered { "powered_repeater" } else { "unpowered_repeater" }) },
         variant format!("delay={},facing={},locked={}", delay, facing.as_string(), locked),
         collision vec![Aabb3::new(
             Point3::new(0.0, 0.0, 0.0),
             Point3::new(1.0, 1.0/8.0, 1.0)
         )],
-        update_state (world, pos) => RepeaterUnpowered{delay: delay, facing: facing, locked: update_repeater_state(world, pos, facing)},
+        update_state (world, pos) => Repeater{delay, facing, locked: update_repeater_state(world, pos, facing), powered},
     }
     RepeaterPowered {
         props {
@@ -2221,6 +2226,7 @@ define_blocks! {
             locked: bool = [false, true],
         },
         data if !locked { Some(facing.horizontal_index() | (delay as usize - 1) << 2) } else { None },
+        offset None,
         material material::NON_SOLID,
         model { ("minecraft", "powered_repeater") },
         variant format!("delay={},facing={},locked={}", delay, facing.as_string(), locked),
