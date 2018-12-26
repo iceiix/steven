@@ -2936,6 +2936,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index() | ((age as usize) << 2)),
+        offset Some(facing.horizontal_offset() + ((age as usize) * 4)),
         material material::NON_SOLID,
         model { ("minecraft", "cocoa") },
         variant format!("age={},facing={}", age, facing.as_string()),
