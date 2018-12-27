@@ -4023,7 +4023,7 @@ define_blocks! {
                 ],
         },
         data None::<usize>,
-        offset Some(if waterlogged { 0 } else { 1 } + type_.slab_offset() * (1<<1) * variant.data() * (1<<2)),
+        offset Some(if waterlogged { 0 } else { 1 } + type_.offset() * (1<<1) * variant.data() * (1<<2)),
         material material::NON_SOLID,
         model { ("minecraft", match variant {
             PrismarineVariant::Normal => "prismarine_slab",
@@ -4097,6 +4097,7 @@ define_blocks! {
             variant: DoublePlantVariant = [
                 DoublePlantVariant::Sunflower,
                 DoublePlantVariant::Lilac,
+                DoublePlantVariant::RoseBush,
                 DoublePlantVariant::DoubleTallgrass,
                 DoublePlantVariant::LargeFern,
                 DoublePlantVariant::RoseBush,
@@ -4104,6 +4105,7 @@ define_blocks! {
             ],
         },
         data Some(variant.data() | (if half == BlockHalf::Upper { 0x8 } else { 0x0 })),
+        offset Some(half.offset() + variant.offset() * 2),
         material material::NON_SOLID,
         model { ("minecraft", variant.as_string()) },
         variant format!("half={}", half.as_string()),
@@ -4111,7 +4113,7 @@ define_blocks! {
         collision vec![],
         update_state (world, pos) => {
             let (half, variant) = update_double_plant_state(world, pos, half, variant);
-            Block::DoublePlant{half: half, variant: variant}
+            Block::DoublePlant{half, variant}
         },
     }
     StandingBanner {
@@ -6598,7 +6600,7 @@ impl BlockHalf {
         }
     }
 
-    pub fn slab_offset(self) -> usize {
+    pub fn offset(self) -> usize {
         match self {
             BlockHalf::Top => 0,
             BlockHalf::Bottom => 1,
@@ -6991,6 +6993,17 @@ impl DoublePlantVariant {
             DoublePlantVariant::LargeFern => 3,
             DoublePlantVariant::RoseBush => 4,
             DoublePlantVariant::Peony => 5,
+        }
+    }
+
+    pub fn offset(self) -> usize {
+        match self {
+            DoublePlantVariant::Sunflower => 0,
+            DoublePlantVariant::Lilac => 1,
+            DoublePlantVariant::RoseBush => 2,
+            DoublePlantVariant::Peony => 3,
+            DoublePlantVariant::DoubleTallgrass => 4,
+            DoublePlantVariant::LargeFern => 5,
         }
     }
 }
