@@ -5630,6 +5630,56 @@ define_blocks! {
         offset Some(if waterlogged { 0 } else { 1 } + variant.offset() * 2),
         model { ("minecraft", variant.as_string()) },
     }
+    CoralWallFan {
+        props {
+            facing: Direction = [
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+            waterlogged: bool = [true, false],
+            variant: CoralVariant = [
+                CoralVariant::DeadTube,
+                CoralVariant::DeadBrain,
+                CoralVariant::DeadBubble,
+                CoralVariant::DeadFire,
+                CoralVariant::DeadHorn,
+                CoralVariant::Tube,
+                CoralVariant::Brain,
+                CoralVariant::Bubble,
+                CoralVariant::Fire,
+                CoralVariant::Horn
+            ],
+        },
+        data None::<usize>,
+        offset Some(if waterlogged { 0 } else { 1 } +
+                    facing.horizontal_offset() * 2 +
+                    variant.offset() * (2 * 4)),
+        model { ("minecraft", variant.as_string()) },
+    }
+    CoralFan {
+        props {
+            waterlogged: bool = [true, false],
+            variant: CoralVariant = [
+                CoralVariant::DeadTube,
+                CoralVariant::DeadBrain,
+                CoralVariant::DeadBubble,
+                CoralVariant::DeadFire,
+                CoralVariant::DeadHorn,
+                CoralVariant::Tube,
+                CoralVariant::Brain,
+                CoralVariant::Bubble,
+                CoralVariant::Fire,
+                CoralVariant::Horn
+            ],
+        },
+        data None::<usize>,
+        offset Some(if waterlogged { 0 } else { 1 } +
+                    variant.offset() * 2),
+        model { ("minecraft", variant.as_string()) },
+    }
+
     Missing253 {
         props {},
         data None::<usize>,
