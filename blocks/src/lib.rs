@@ -52,7 +52,6 @@ macro_rules! define_blocks {
                 },
                 $(data $datafunc:expr,)*
                 $(offset $offsetfunc:expr,)*
-                $(id $idfunc:expr,)*
                 $(material $mat:expr,)*
                 model $model:expr,
                 $(variant $variant:expr,)*
@@ -111,23 +110,6 @@ macro_rules! define_blocks {
                                 return data;
                             )*
                             Some(0)
-                        }
-                    )+
-                }
-            }
-
-            #[allow(unused_variables, unreachable_code)]
-            pub fn get_hierarchical_block_id(&self) -> Option<usize> {
-                match *self {
-                    $(
-                        Block::$name {
-                            $($fname,)*
-                        } => {
-                            $(
-                                let offset: usize = ($idfunc);
-                                return offset;
-                            )*
-                            return None;
                         }
                     )+
                 }
