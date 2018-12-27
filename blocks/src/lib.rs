@@ -5711,6 +5711,8 @@ define_blocks! {
             collidable: false,
             .. material::INVISIBLE
         },
+        data None::<usize>,
+        offset Some(0),
         model { ("minecraft", "air") },
         collision vec![],
     }
@@ -5720,6 +5722,8 @@ define_blocks! {
             collidable: false,
             .. material::INVISIBLE
         },
+        data None::<usize>,
+        offset Some(0),
         model { ("minecraft", "air") },
         collision vec![],
     }
@@ -5733,13 +5737,13 @@ define_blocks! {
     }
     Missing253 {
         props {},
-        data None::<usize>,
+        data Some(0),
         offset None,
         model { ("steven", "missing_block") },
     }
     Missing254 {
         props {},
-        data None::<usize>,
+        data Some(0),
         offset None,
         model { ("steven", "missing_block") },
     }
