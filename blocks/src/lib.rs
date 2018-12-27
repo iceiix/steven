@@ -1324,7 +1324,7 @@ define_blocks! {
 
             Some(data)
         },
-        offset None, // TODO: slabs below
+        offset None,
         model { ("minecraft", format!("{}_double_slab", variant.as_string()) ) },
         variant if seamless { "all" } else { "normal" },
     }
@@ -1343,7 +1343,7 @@ define_blocks! {
             ],
         },
         data Some(variant.data() | (if half == BlockHalf::Top { 0x8 } else { 0x0 })),
-        offset None, // TODO: slabs below
+        offset None,
         material material::NON_SOLID,
         model { ("minecraft", format!("{}_slab", variant.as_string()) ) },
         variant format!("half={}", half.as_string()),
@@ -4268,6 +4268,30 @@ define_blocks! {
         variant format!("type={}", type_.as_string()),
         collision slab_collision(type_),
     }
+    StoneSlabMaybeDouble {
+        props {
+            type_: BlockHalf = [BlockHalf::Top, BlockHalf::Bottom, BlockHalf::Double],
+            variant: StoneSlabVariant = [
+                StoneSlabVariant::Stone,
+                StoneSlabVariant::Sandstone,
+                StoneSlabVariant::Wood,
+                StoneSlabVariant::Cobblestone,
+                StoneSlabVariant::Brick,
+                StoneSlabVariant::StoneBrick,
+                StoneSlabVariant::NetherBrick,
+                StoneSlabVariant::Quartz,
+                StoneSlabVariant::RedSandstone,
+                StoneSlabVariant::Purpur
+            ],
+            waterlogged: bool = [true, false],
+        },
+        data None::<usize>,
+        offset Some(if waterlogged { 0 } else { 1 } + type_.offset() * 2 + variant.offset()),
+        material material::NON_SOLID,
+        model { ("minecraft", format!("{}_slab", variant.as_string()) ) },
+        variant format!("type={}", type_.as_string()),
+        collision slab_collision(type_),
+    }
     DoubleStoneSlab2 {
         props {
             seamless: bool = [false, true],
@@ -4287,6 +4311,7 @@ define_blocks! {
             variant: StoneSlabVariant = [StoneSlabVariant::RedSandstone],
         },
         data Some(variant.data() | (if half == BlockHalf::Top { 0x8 } else { 0x0 })),
+        offset None,
         material material::NON_SOLID,
         model { ("minecraft", format!("{}_slab", variant.as_string()) ) },
         variant format!("half={}", half.as_string()),
@@ -4814,6 +4839,7 @@ define_blocks! {
         props {
             variant: StoneSlabVariant = [StoneSlabVariant::Purpur],
         },
+        offset None,
         model { ("minecraft", format!("{}_double_slab", variant.as_string()) ) },
     }
     PurpurSlab {
@@ -4822,6 +4848,7 @@ define_blocks! {
             variant: StoneSlabVariant = [StoneSlabVariant::Purpur],
         },
         data if half == BlockHalf::Top { Some(0x8) } else { Some(0) },
+        offset None,
         material material::NON_SOLID,
         model { ("minecraft", format!("{}_slab", variant.as_string()) ) },
         variant format!("half={},variant=default", half.as_string()),
@@ -6605,6 +6632,21 @@ impl StoneSlabVariant {
             StoneSlabVariant::StoneBrick => 5,
             StoneSlabVariant::NetherBrick => 6,
             StoneSlabVariant::Quartz => 7,
+        }
+    }
+
+    fn offset(self) -> usize {
+        match self {
+            StoneSlabVariant::Stone => 0,
+            StoneSlabVariant::Sandstone => 1,
+            StoneSlabVariant::Wood => 2,
+            StoneSlabVariant::Cobblestone => 3,
+            StoneSlabVariant::Brick => 4,
+            StoneSlabVariant::StoneBrick => 5,
+            StoneSlabVariant::NetherBrick => 6,
+            StoneSlabVariant::Quartz => 7,
+            StoneSlabVariant::RedSandstone => 8,
+            StoneSlabVariant::Purpur => 9,
         }
     }
 }
