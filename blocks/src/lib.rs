@@ -5001,6 +5001,7 @@ define_blocks! {
             axis: Axis = [Axis::Y, Axis::Z, Axis::X],
         },
         data Some(axis.index() << 2),
+        offset Some(match axis { Axis::X => 0, Axis::Y => 1, Axis::Z => 2, _ => unreachable!() }),
         model { ("minecraft", "bone_block") },
         variant format!("axis={}", axis.as_string()),
     }
@@ -5027,6 +5028,7 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data Some(facing.index() | (if powered { 0x8 } else { 0x0 })),
+        offset Some(if powered { 0 } else { 1 } + facing.offset() * 2),
         model { ("minecraft", "observer") },
         variant format!("facing={},powered={}", facing.as_string(), powered),
     }
