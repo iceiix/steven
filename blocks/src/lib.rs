@@ -5563,6 +5563,14 @@ define_blocks! {
         data Some(color.data()),
         model { ("minecraft", format!("{}_concrete_powder", color.as_string()) ) },
     }
+    Kelp {
+        props {
+            age: u8 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25],
+        },
+        data None::<usize>,
+        offset Some(age as usize),
+        model { ("minecraft", "kelp") },
+    }
     Missing253 {
         props {},
         data None::<usize>,
