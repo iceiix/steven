@@ -4317,6 +4317,25 @@ define_blocks! {
         variant format!("half={}", half.as_string()),
         collision slab_collision(half),
     }
+    SmoothStone {
+        props {
+            variant: StoneSlabVariant = [
+                StoneSlabVariant::Stone,
+                StoneSlabVariant::Sandstone,
+                StoneSlabVariant::Quartz,
+                StoneSlabVariant::RedSandstone
+            ],
+        },
+        data None::<usize>,
+        offset Some(match variant {
+            StoneSlabVariant::Stone => 0,
+            StoneSlabVariant::Sandstone => 1,
+            StoneSlabVariant::Quartz => 2,
+            StoneSlabVariant::RedSandstone => 3,
+            _ => unreachable!(),
+        }),
+        model { ("minecraft", format!("smooth_{}", variant.as_string()) ) },
+    }
     SpruceFenceGate {
         props {
             facing: Direction = [
