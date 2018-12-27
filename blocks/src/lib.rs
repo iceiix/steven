@@ -4864,6 +4864,7 @@ define_blocks! {
             axis: Axis = [Axis::X, Axis::Y, Axis::Z],
         },
         data Some(match axis { Axis::X => 0x4, Axis::Y => 0x0, Axis::Z => 0x8, _ => unreachable!() }),
+        offset Some(match axis { Axis::X => 0, Axis::Y => 1, Axis::Z => 2, _ => unreachable!() }),
         model { ("minecraft", "purpur_pillar") },
         variant format!("axis={}", axis.as_string()),
     }
