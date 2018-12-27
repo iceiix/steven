@@ -4464,14 +4464,20 @@ define_blocks! {
             south: bool = [false, true],
             west: bool = [false, true],
             east: bool = [false, true],
+            waterlogged: bool = [true, false],
         },
-        data if !north && !south && !west && !east { Some(0) } else { None },
+        data if !north && !south && !west && !east && !waterlogged { Some(0) } else { None },
+        offset Some(if west { 0 } else { 1<<0 } +
+                    if waterlogged { 0 } else { 1<<1 } +
+                    if south { 0 } else { 1<<2 } +
+                    if north { 0 } else { 1<<3 } +
+                    if east { 0 } else { 1<<4 }),
         material material::NON_SOLID,
         model { ("minecraft", "spruce_fence") },
         collision fence_collision(north, south, west, east),
         update_state (world, pos) => {
             let (north, south, west, east) = can_connect_sides(world, pos, &can_connect_fence);
-            Block::SpruceFence{north: north, south: south, west: west, east: east}
+            Block::SpruceFence{north, south, west, east, waterlogged}
         },
         multipart (key, val) => match key {
             "north" => north == (val == "true"),
@@ -4487,14 +4493,20 @@ define_blocks! {
             south: bool = [false, true],
             west: bool = [false, true],
             east: bool = [false, true],
+            waterlogged: bool = [true, false],
         },
-        data if !north && !south && !west && !east { Some(0) } else { None },
+        data if !north && !south && !west && !east && !waterlogged { Some(0) } else { None },
+        offset Some(if west { 0 } else { 1<<0 } +
+                    if waterlogged { 0 } else { 1<<1 } +
+                    if south { 0 } else { 1<<2 } +
+                    if north { 0 } else { 1<<3 } +
+                    if east { 0 } else { 1<<4 }),
         material material::NON_SOLID,
         model { ("minecraft", "birch_fence") },
         collision fence_collision(north, south, west, east),
         update_state (world, pos) => {
             let (north, south, west, east) = can_connect_sides(world, pos, &can_connect_fence);
-            Block::BirchFence{north: north, south: south, west: west, east: east}
+            Block::BirchFence{north, south, west, east, waterlogged}
         },
         multipart (key, val) => match key {
             "north" => north == (val == "true"),
@@ -4510,14 +4522,20 @@ define_blocks! {
             south: bool = [false, true],
             west: bool = [false, true],
             east: bool = [false, true],
+            waterlogged: bool = [true, false],
         },
-        data if !north && !south && !west && !east { Some(0) } else { None },
+        data if !north && !south && !west && !east && !waterlogged { Some(0) } else { None },
+        offset Some(if west { 0 } else { 1<<0 } +
+                    if waterlogged { 0 } else { 1<<1 } +
+                    if south { 0 } else { 1<<2 } +
+                    if north { 0 } else { 1<<3 } +
+                    if east { 0 } else { 1<<4 }),
         material material::NON_SOLID,
         model { ("minecraft", "jungle_fence") },
         collision fence_collision(north, south, west, east),
         update_state (world, pos) => {
             let (north, south, west, east) = can_connect_sides(world, pos, &can_connect_fence);
-            Block::JungleFence{north: north, south: south, west: west, east: east}
+            Block::JungleFence{north, south, west, east, waterlogged}
         },
         multipart (key, val) => match key {
             "north" => north == (val == "true"),
@@ -4533,14 +4551,20 @@ define_blocks! {
             south: bool = [false, true],
             west: bool = [false, true],
             east: bool = [false, true],
+            waterlogged: bool = [true, false],
         },
-        data if !north && !south && !west && !east { Some(0) } else { None },
+        data if !north && !south && !west && !east && !waterlogged { Some(0) } else { None },
+        offset Some(if west { 0 } else { 1<<0 } +
+                    if waterlogged { 0 } else { 1<<1 } +
+                    if south { 0 } else { 1<<2 } +
+                    if north { 0 } else { 1<<3 } +
+                    if east { 0 } else { 1<<4 }),
         material material::NON_SOLID,
         model { ("minecraft", "dark_oak_fence") },
         collision fence_collision(north, south, west, east),
         update_state (world, pos) => {
             let (north, south, west, east) = can_connect_sides(world, pos, &can_connect_fence);
-            Block::DarkOakFence{north: north, south: south, east: east, west: west}
+            Block::DarkOakFence{north, south, west, east, waterlogged}
         },
         multipart (key, val) => match key {
             "north" => north == (val == "true"),
@@ -4556,14 +4580,20 @@ define_blocks! {
             south: bool = [false, true],
             west: bool = [false, true],
             east: bool = [false, true],
+            waterlogged: bool = [true, false],
         },
-        data if !north && !south && !east && !west { Some(0) } else { None },
+        data if !north && !south && !west && !east && !waterlogged { Some(0) } else { None },
+        offset Some(if west { 0 } else { 1<<0 } +
+                    if waterlogged { 0 } else { 1<<1 } +
+                    if south { 0 } else { 1<<2 } +
+                    if north { 0 } else { 1<<3 } +
+                    if east { 0 } else { 1<<4 }),
         material material::NON_SOLID,
         model { ("minecraft", "acacia_fence") },
         collision fence_collision(north, south, west, east),
         update_state (world, pos) => {
             let (north, south, west, east) = can_connect_sides(world, pos, &can_connect_fence);
-            Block::AcaciaFence{north: north, south: south, east: east, west: west}
+            Block::AcaciaFence{north, south, west, east, waterlogged}
         },
         multipart (key, val) => match key {
             "north" => north == (val == "true"),
