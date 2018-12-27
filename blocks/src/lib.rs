@@ -4008,6 +4008,31 @@ define_blocks! {
         collision stair_collision(facing, shape, half),
         update_state (world, pos) => Block::PrismarineStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged, variant},
     }
+    PrismarineSlab {
+        props {
+            type_: BlockHalf = [
+                BlockHalf::Top,
+                BlockHalf::Bottom,
+                BlockHalf::Double
+            ],
+            waterlogged: bool = [true, false],
+            variant: PrismarineVariant = [
+                    PrismarineVariant::Normal,
+                    PrismarineVariant::Brick,
+                    PrismarineVariant::Dark
+                ],
+        },
+        data None::<usize>,
+        offset Some(if waterlogged { 0 } else { 1 } + type_.slab_offset() * (1<<1) * variant.data() * (1<<2)),
+        material material::NON_SOLID,
+        model { ("minecraft", match variant {
+            PrismarineVariant::Normal => "prismarine_slab",
+            PrismarineVariant::Brick => "prismarine_brick_slab",
+            PrismarineVariant::Dark => "dark_prismarine_slab",
+        }) },
+        variant format!("type={}", type_.as_string()),
+        collision slab_collision(type_),
+    }
     SeaLantern {
         props {},
         material Material {
@@ -5877,6 +5902,7 @@ fn slab_collision(half: BlockHalf) -> Vec<Aabb3<f64>> {
     let (min_x, min_y, min_z, max_x, max_y, max_z) = match half {
         BlockHalf::Top => (0.0, 0.5, 0.0, 1.0, 1.0, 1.0),
         BlockHalf::Bottom => (0.0, 0.0, 0.0, 1.0, 0.5, 1.0),
+        BlockHalf::Double => (0.0, 0.0, 0.0, 1.0, 1.0, 1.0),
         _ => unreachable!(),
     };
 
@@ -6557,6 +6583,7 @@ pub enum BlockHalf {
     Bottom,
     Upper,
     Lower,
+    Double,
 }
 
 impl BlockHalf {
@@ -6566,35 +6593,19 @@ impl BlockHalf {
             BlockHalf::Bottom => "bottom",
             BlockHalf::Upper => "upper",
             BlockHalf::Lower => "lower",
+            BlockHalf::Double => "double",
         }
     }
-}
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum SlabType {
-    Top,
-    Bottom,
-    Double,
-}
-
-impl SlabType {
-    pub fn as_string(self) -> &'static str {
+    pub fn slab_offset(self) -> usize {
         match self {
-            SlabType::Top => "top",
-            SlabType::Bottom => "bottom",
-            SlabType::Double => "double",
-        }
-    }
-
-    pub fn offset(self) -> usize {
-         match self {
-            SlabType::Top => 0,
-            SlabType::Bottom => 1,
-            SlabType::Double => 2,
+            BlockHalf::Top => 0,
+            BlockHalf::Bottom => 1,
+            BlockHalf::Double => 2,
+            _ => unreachable!(),
         }
     }
 }
-       
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum CobblestoneWallVariant {
