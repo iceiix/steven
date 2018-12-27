@@ -4023,7 +4023,7 @@ define_blocks! {
                 ],
         },
         data None::<usize>,
-        offset Some(if waterlogged { 0 } else { 1 } + type_.offset() * (1<<1) * variant.data() * (1<<2)),
+        offset Some(if waterlogged { 0 } else { 1 } + type_.offset() * 2 + variant.data() * (2 * 3)),
         material material::NON_SOLID,
         model { ("minecraft", match variant {
             PrismarineVariant::Normal => "prismarine_slab",
