@@ -5656,7 +5656,7 @@ define_blocks! {
         offset Some(if waterlogged { 0 } else { 1 } +
                     facing.horizontal_offset() * 2 +
                     variant.offset() * (2 * 4)),
-        model { ("minecraft", variant.as_string()) },
+        model { ("minecraft", format!("{}_wall_fan", variant.as_string())) },
     }
     CoralFan {
         props {
@@ -5677,9 +5677,25 @@ define_blocks! {
         data None::<usize>,
         offset Some(if waterlogged { 0 } else { 1 } +
                     variant.offset() * 2),
-        model { ("minecraft", variant.as_string()) },
+        model { ("minecraft", format!("{}_fan", variant.as_string())) },
     }
-
+    SeaPickle {
+        props {
+            age: u8 = [1, 2, 3, 4],
+            waterlogged: bool = [true, false],
+        },
+        data None::<usize>,
+        offset Some(if waterlogged { 0 } else { 1 } +
+                    ((age - 1) as usize) * 2),
+        model { ("minecraft", "sea_pickle") },
+        variant format!("age={}", age),
+    }
+    BlueIce {
+        props {},
+        data None::<usize>,
+        offset Some(0),
+        model { ("minecraft", "blue_ice") },
+    }
     Missing253 {
         props {},
         data None::<usize>,
