@@ -4097,7 +4097,6 @@ define_blocks! {
             variant: DoublePlantVariant = [
                 DoublePlantVariant::Sunflower,
                 DoublePlantVariant::Lilac,
-                DoublePlantVariant::RoseBush,
                 DoublePlantVariant::DoubleTallgrass,
                 DoublePlantVariant::LargeFern,
                 DoublePlantVariant::RoseBush,
@@ -6602,10 +6601,9 @@ impl BlockHalf {
 
     pub fn offset(self) -> usize {
         match self {
-            BlockHalf::Top => 0,
-            BlockHalf::Bottom => 1,
+            BlockHalf::Top | BlockHalf::Upper => 0,
+            BlockHalf::Bottom | BlockHalf::Lower => 1,
             BlockHalf::Double => 2,
-            _ => unreachable!(),
         }
     }
 }
