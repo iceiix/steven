@@ -5610,6 +5610,26 @@ define_blocks! {
         offset Some(variant.offset()),
         model { ("minecraft", format!("{}_block", variant.as_string())) },
     }
+    Coral {
+        props {
+            waterlogged: bool = [true, false],
+            variant: CoralVariant = [
+                CoralVariant::DeadTube,
+                CoralVariant::DeadBrain,
+                CoralVariant::DeadBubble,
+                CoralVariant::DeadFire,
+                CoralVariant::DeadHorn,
+                CoralVariant::Tube,
+                CoralVariant::Brain,
+                CoralVariant::Bubble,
+                CoralVariant::Fire,
+                CoralVariant::Horn
+            ],
+        },
+        data None::<usize>,
+        offset Some(if waterlogged { 0 } else { 1 } + variant.offset() * 2),
+        model { ("minecraft", variant.as_string()) },
+    }
     Missing253 {
         props {},
         data None::<usize>,
