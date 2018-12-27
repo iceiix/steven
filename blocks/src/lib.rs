@@ -5570,6 +5570,46 @@ define_blocks! {
         offset Some(age as usize),
         model { ("minecraft", "kelp") },
     }
+    KelpPlant {
+        props {},
+        data None::<usize>,
+        offset Some(0),
+        model { ("minecraft", "kelp_plant") },
+    }
+    DriedKelpBlock {
+        props {},
+        data None::<usize>,
+        offset Some(0),
+        model { ("minecraft", "dried_kelp_block") },
+    }
+    TurtleEgg {
+        props {
+            age: u8 = [1, 2, 3, 4],
+            hatch: u8 = [0, 1, 2],
+        },
+        data None::<usize>,
+        offset Some((hatch as usize) + ((age - 1) as usize) * 3),
+        model { ("minecraft", "turtle_egg") },
+    }
+    CoralBlock {
+        props {
+            variant: CoralVariant = [
+                CoralVariant::DeadTube,
+                CoralVariant::DeadBrain,
+                CoralVariant::DeadBubble,
+                CoralVariant::DeadFire,
+                CoralVariant::DeadHorn,
+                CoralVariant::Tube,
+                CoralVariant::Brain,
+                CoralVariant::Bubble,
+                CoralVariant::Fire,
+                CoralVariant::Horn
+            ],
+        },
+        data None::<usize>,
+        offset Some(variant.offset()),
+        model { ("minecraft", format!("{}_block", variant.as_string())) },
+    }
     Missing253 {
         props {},
         data None::<usize>,
@@ -7322,3 +7362,50 @@ impl FlowerPotVariant {
         }
     }
 }
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum CoralVariant {
+    DeadTube,
+    DeadBrain,
+    DeadBubble,
+    DeadFire,
+    DeadHorn,
+    Tube,
+    Brain,
+    Bubble,
+    Fire,
+    Horn,
+}
+
+impl CoralVariant {
+    pub fn as_string(self) -> &'static str {
+        match self {
+            CoralVariant::DeadTube => "dead_tube",
+            CoralVariant::DeadBrain => "dead_brain",
+            CoralVariant::DeadBubble => "dead_bubble",
+            CoralVariant::DeadFire => "dead_fire",
+            CoralVariant::DeadHorn => "dead_horn",
+            CoralVariant::Tube => "dead_tube",
+            CoralVariant::Brain => "brain",
+            CoralVariant::Bubble => "bubble",
+            CoralVariant::Fire => "fire",
+            CoralVariant::Horn => "horn",
+        }
+    }
+
+    pub fn offset(self) -> usize {
+        match self {
+            CoralVariant::DeadTube => 0,
+            CoralVariant::DeadBrain => 1,
+            CoralVariant::DeadBubble => 2,
+            CoralVariant::DeadFire => 3,
+            CoralVariant::DeadHorn => 4,
+            CoralVariant::Tube => 5,
+            CoralVariant::Brain => 6,
+            CoralVariant::Bubble => 7,
+            CoralVariant::Fire => 8,
+            CoralVariant::Horn => 9,
+        }
+    }
+}
+
