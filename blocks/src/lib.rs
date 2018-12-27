@@ -4286,7 +4286,7 @@ define_blocks! {
             waterlogged: bool = [true, false],
         },
         data None::<usize>,
-        offset Some(if waterlogged { 0 } else { 1 } + type_.offset() * 2 + variant.offset()),
+        offset Some(if waterlogged { 0 } else { 1 } + type_.offset() * 2 + variant.offset() * (2 * 3)),
         material material::NON_SOLID,
         model { ("minecraft", format!("{}_slab", variant.as_string()) ) },
         variant format!("type={}", type_.as_string()),
