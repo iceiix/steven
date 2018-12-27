@@ -4977,7 +4977,11 @@ define_blocks! {
         variant format!("conditional={},facing={}", conditional, facing.as_string()),
     }
     FrostedIce {
-        props {},
+        props {
+            age: u8 = [ 0, 1, 2, 3 ],
+        },
+        data if age == 0 { Some(0) } else { None },
+        offset Some(age as usize),
         model { ("minecraft", "frosted_ice") },
     }
     MagmaBlock {
