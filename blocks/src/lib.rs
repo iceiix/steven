@@ -4770,6 +4770,12 @@ define_blocks! {
             east: bool = [false, true],
         },
         data if !up && !down && !north && !south && !west && !east { Some(0) } else { None },
+        offset Some(if west { 0 } else { 1<<0 } +
+                    if up { 0 } else { 1<<1 } +
+                    if south { 0 } else { 1<<2 } +
+                    if north { 0 } else { 1<<3 } +
+                    if east { 0 } else { 1<<4 } +
+                    if down { 0 } else { 1<<5 }),
         material material::NON_SOLID,
         model { ("minecraft", "chorus_plant") },
         collision {
