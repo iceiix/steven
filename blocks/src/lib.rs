@@ -5696,6 +5696,41 @@ define_blocks! {
         offset Some(0),
         model { ("minecraft", "blue_ice") },
     }
+    Conduit {
+        props {
+            waterlogged: bool = [true, false],
+        },
+        data None::<usize>,
+        offset Some(if waterlogged { 0 } else { 1 }),
+        material material::NON_SOLID,
+        model { ("minecraft", "conduit") },
+    }
+    VoidAir {
+        props {},
+        material material::Material {
+            collidable: false,
+            .. material::INVISIBLE
+        },
+        model { ("minecraft", "air") },
+        collision vec![],
+    }
+    CaveAir {
+        props {},
+        material material::Material {
+            collidable: false,
+            .. material::INVISIBLE
+        },
+        model { ("minecraft", "air") },
+        collision vec![],
+    }
+    BubbleColumn {
+        props {
+            drag: bool = [true, false],
+        },
+        data None::<usize>,
+        offset Some(if drag { 0 } else { 1 }),
+        model { ("minecraft", "bubble_column") },
+    }
     Missing253 {
         props {},
         data None::<usize>,
@@ -5721,7 +5756,6 @@ define_blocks! {
         model { ("minecraft", "structure_block") },
         variant format!("mode={}", mode.as_string()),
     }
-
     Missing {
         props {},
         data None::<usize>,
