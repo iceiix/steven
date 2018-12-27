@@ -4244,6 +4244,30 @@ define_blocks! {
         collision stair_collision(facing, shape, half),
         update_state (world, pos) => Block::RedSandstoneStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
     }
+    WoodenSlabMaybeDouble {
+        props {
+            type_: BlockHalf = [
+                BlockHalf::Top,
+                BlockHalf::Bottom,
+                BlockHalf::Double
+            ],
+            waterlogged: bool = [true, false],
+            variant: WoodSlabVariant = [
+                WoodSlabVariant::Oak,
+                WoodSlabVariant::Spruce,
+                WoodSlabVariant::Birch,
+                WoodSlabVariant::Jungle,
+                WoodSlabVariant::Acacia,
+                WoodSlabVariant::DarkOak
+            ],
+        },
+        data None::<usize>,
+        offset Some(if waterlogged { 0 } else { 1 } + type_.offset() * 2 + variant.data() * (2 * 3)),
+        material material::NON_SOLID,
+        model { ("minecraft", format!("{}_slab", variant.as_string()) ) },
+        variant format!("type={}", type_.as_string()),
+        collision slab_collision(type_),
+    }
     DoubleStoneSlab2 {
         props {
             seamless: bool = [false, true],
@@ -4252,6 +4276,7 @@ define_blocks! {
             ],
         },
         data Some(variant.data() | (if seamless { 0x8 } else { 0x0 })),
+        offset None,
         material material::SOLID,
         model { ("minecraft", format!("{}_double_slab", variant.as_string()) ) },
         variant if seamless { "all" } else { "normal" },
