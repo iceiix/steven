@@ -2610,10 +2610,7 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data fence_gate_data(facing, in_wall, open, powered),
-        offset Some(if powered { 0 } else { 1<<0 } +
-                    if open { 0 } else { 1<<1 } +
-                    if in_wall { 0 } else { 1<<2 } +
-                    facing.horizontal_offset() * (2 * 2 * 2)),
+        offset fence_gate_offset(facing, in_wall, open, powered),
         material material::NON_SOLID,
         model { ("minecraft", "fence_gate") },
         variant format!("facing={},in_wall={},open={}", facing.as_string(), in_wall, open),
@@ -4349,6 +4346,7 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data fence_gate_data(facing, in_wall, open, powered),
+        offset fence_gate_offset(facing, in_wall, open, powered),
         material material::NON_SOLID,
         model { ("minecraft", "spruce_fence_gate") },
         variant format!("facing={},in_wall={},open={}", facing.as_string(), in_wall, open),
@@ -4373,6 +4371,7 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data fence_gate_data(facing, in_wall, open, powered),
+        offset fence_gate_offset(facing, in_wall, open, powered),
         material material::NON_SOLID,
         model { ("minecraft", "birch_fence_gate") },
         variant format!("facing={},in_wall={},open={}", facing.as_string(), in_wall, open),
@@ -4397,6 +4396,7 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data fence_gate_data(facing, in_wall, open, powered),
+        offset fence_gate_offset(facing, in_wall, open, powered),
         material material::NON_SOLID,
         model { ("minecraft", "jungle_fence_gate") },
         variant format!("facing={},in_wall={},open={}", facing.as_string(), in_wall, open),
@@ -4421,6 +4421,7 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data fence_gate_data(facing, in_wall, open, powered),
+        offset fence_gate_offset(facing, in_wall, open, powered),
         material material::NON_SOLID,
         model { ("minecraft", "dark_oak_fence_gate") },
         variant format!("facing={},in_wall={},open={}", facing.as_string(), in_wall, open),
@@ -4445,6 +4446,7 @@ define_blocks! {
             powered: bool = [false, true],
         },
         data fence_gate_data(facing, in_wall, open, powered),
+        offset fence_gate_offset(facing, in_wall, open, powered),
         material material::NON_SOLID,
         model { ("minecraft", "acacia_fence_gate") },
         variant format!("facing={},in_wall={},open={}", facing.as_string(), in_wall, open),
@@ -5616,6 +5618,13 @@ fn fence_gate_data(facing: Direction, in_wall: bool, open: bool, powered: bool) 
     if in_wall || powered { return None; }
 
     Some(facing.horizontal_index() | (if open { 0x4 } else { 0x0 }))
+}
+
+fn fence_gate_offset(facing: Direction, in_wall: bool, open: bool, powered: bool) -> Option<usize> {
+    Some(if powered { 0 } else { 1<<0 } +
+         if open { 0 } else { 1<<1 } +
+         if in_wall { 0 } else { 1<<2 } +
+         facing.horizontal_offset() * (1<<3))
 }
 
 fn fence_gate_collision(facing: Direction, in_wall: bool, open: bool) -> Vec<Aabb3<f64>> {
