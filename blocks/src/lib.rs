@@ -5035,7 +5035,7 @@ define_blocks! {
     // TODO: Shulker box textures (1.11+), since there is no model, we use wool for now
     // The textures should be built from textures/blocks/shulker_top_<color>.png
     // and textures/entity/shulker/shulker_<color>.png
-   eShulkerBox {
+    ShulkerBox {
         props {
             facing: Direction = [
                 Direction::Up,
@@ -5050,7 +5050,6 @@ define_blocks! {
         offset Some(facing.offset()),
         model { ("minecraft", "sponge") },
     }
-
     WhiteShulkerBox {
         props {
             facing: Direction = [
