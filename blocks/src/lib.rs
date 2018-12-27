@@ -6571,6 +6571,32 @@ impl BlockHalf {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum SlabType {
+    Top,
+    Bottom,
+    Double,
+}
+
+impl SlabType {
+    pub fn as_string(self) -> &'static str {
+        match self {
+            SlabType::Top => "top",
+            SlabType::Bottom => "bottom",
+            SlabType::Double => "double",
+        }
+    }
+
+    pub fn offset(self) -> usize {
+         match self {
+            SlabType::Top => 0,
+            SlabType::Bottom => 1,
+            SlabType::Double => 2,
+        }
+    }
+}
+       
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum CobblestoneWallVariant {
     Normal,
     Mossy,
