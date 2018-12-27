@@ -115,7 +115,6 @@ macro_rules! define_blocks {
                 }
             }
 
-
             pub fn by_vanilla_id(id: usize) -> Block {
                 VANILLA_ID_MAP.get(id).and_then(|v| *v).unwrap_or(Block::Missing{})
             }
@@ -5707,23 +5706,23 @@ define_blocks! {
     }
     VoidAir {
         props {},
+        data None::<usize>,
+        offset Some(0),
         material material::Material {
             collidable: false,
             .. material::INVISIBLE
         },
-        data None::<usize>,
-        offset Some(0),
         model { ("minecraft", "air") },
         collision vec![],
     }
     CaveAir {
         props {},
+        data None::<usize>,
+        offset Some(0),
         material material::Material {
             collidable: false,
             .. material::INVISIBLE
         },
-        data None::<usize>,
-        offset Some(0),
         model { ("minecraft", "air") },
         collision vec![],
     }
