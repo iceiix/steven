@@ -4955,6 +4955,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index() | (if conditional { 0x8 } else { 0x0 })),
+        offset Some(facing.offset() + (if conditional { 0 } else { 6 })),
         model { ("minecraft", "repeating_command_block") },
         variant format!("conditional={},facing={}", conditional, facing.as_string()),
     }
@@ -4971,6 +4972,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index() | (if conditional { 0x8 } else { 0x0 })),
+        offset Some(facing.offset() + (if conditional { 0 } else { 6 })),
         model { ("minecraft", "chain_command_block") },
         variant format!("conditional={},facing={}", conditional, facing.as_string()),
     }
