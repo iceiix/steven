@@ -1302,7 +1302,7 @@ define_blocks! {
             variant: StoneSlabVariant = [
                 StoneSlabVariant::Stone,
                 StoneSlabVariant::Sandstone,
-                StoneSlabVariant::Wood,
+                StoneSlabVariant::PetrifiedWood,
                 StoneSlabVariant::Cobblestone,
                 StoneSlabVariant::Brick,
                 StoneSlabVariant::StoneBrick,
@@ -1334,7 +1334,7 @@ define_blocks! {
             variant: StoneSlabVariant = [
                 StoneSlabVariant::Stone,
                 StoneSlabVariant::Sandstone,
-                StoneSlabVariant::Wood,
+                StoneSlabVariant::PetrifiedWood,
                 StoneSlabVariant::Cobblestone,
                 StoneSlabVariant::Brick,
                 StoneSlabVariant::StoneBrick,
@@ -4274,7 +4274,7 @@ define_blocks! {
             variant: StoneSlabVariant = [
                 StoneSlabVariant::Stone,
                 StoneSlabVariant::Sandstone,
-                StoneSlabVariant::Wood,
+                StoneSlabVariant::PetrifiedWood,
                 StoneSlabVariant::Cobblestone,
                 StoneSlabVariant::Brick,
                 StoneSlabVariant::StoneBrick,
@@ -6594,7 +6594,7 @@ impl PistonType {
 pub enum StoneSlabVariant {
     Stone,
     Sandstone,
-    Wood,
+    PetrifiedWood,
     Cobblestone,
     Brick,
     StoneBrick,
@@ -6609,7 +6609,7 @@ impl StoneSlabVariant {
         match self {
             StoneSlabVariant::Stone => "stone",
             StoneSlabVariant::Sandstone => "sandstone",
-            StoneSlabVariant::Wood => "wood_old",
+            StoneSlabVariant::PetrifiedWood => "wood_old",
             StoneSlabVariant::Cobblestone => "cobblestone",
             StoneSlabVariant::Brick => "brick",
             StoneSlabVariant::StoneBrick => "stone_brick",
@@ -6626,7 +6626,7 @@ impl StoneSlabVariant {
             StoneSlabVariant::RedSandstone |
             StoneSlabVariant::Purpur => 0,
             StoneSlabVariant::Sandstone => 1,
-            StoneSlabVariant::Wood => 2,
+            StoneSlabVariant::PetrifiedWood => 2,
             StoneSlabVariant::Cobblestone => 3,
             StoneSlabVariant::Brick => 4,
             StoneSlabVariant::StoneBrick => 5,
@@ -6639,7 +6639,7 @@ impl StoneSlabVariant {
         match self {
             StoneSlabVariant::Stone => 0,
             StoneSlabVariant::Sandstone => 1,
-            StoneSlabVariant::Wood => 2,
+            StoneSlabVariant::PetrifiedWood => 2,
             StoneSlabVariant::Cobblestone => 3,
             StoneSlabVariant::Brick => 4,
             StoneSlabVariant::StoneBrick => 5,
