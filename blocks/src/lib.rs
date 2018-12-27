@@ -4735,6 +4735,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index()),
+        offset Some(facing.offset()),
         material Material {
             emitted_light: 14,
             ..material::NON_SOLID
