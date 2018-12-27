@@ -5035,6 +5035,22 @@ define_blocks! {
     // TODO: Shulker box textures (1.11+), since there is no model, we use wool for now
     // The textures should be built from textures/blocks/shulker_top_<color>.png
     // and textures/entity/shulker/shulker_<color>.png
+   eShulkerBox {
+        props {
+            facing: Direction = [
+                Direction::Up,
+                Direction::Down,
+                Direction::North,
+                Direction::South,
+                Direction::West,
+                Direction::East
+            ],
+        },
+        data None::<usize>,
+        offset Some(facing.offset()),
+        model { ("minecraft", "sponge") },
+    }
+
     WhiteShulkerBox {
         props {
             facing: Direction = [
@@ -5047,6 +5063,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index()),
+        offset Some(facing.offset()),
         model { ("minecraft", "white_wool") },
     }
     OrangeShulkerBox {
@@ -5061,6 +5078,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index()),
+        offset Some(facing.offset()),
         model { ("minecraft", "orange_wool") },
     }
     MagentaShulkerBox {
@@ -5075,6 +5093,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index()),
+        offset Some(facing.offset()),
         model { ("minecraft", "magenta_wool") },
     }
     LightBlueShulkerBox {
@@ -5089,6 +5108,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index()),
+        offset Some(facing.offset()),
         model { ("minecraft", "light_blue_wool") },
     }
     YellowShulkerBox {
@@ -5103,6 +5123,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index()),
+        offset Some(facing.offset()),
         model { ("minecraft", "yellow_wool") },
     }
     LimeShulkerBox {
@@ -5117,6 +5138,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index()),
+        offset Some(facing.offset()),
         model { ("minecraft", "lime_wool") },
     }
     PinkShulkerBox {
@@ -5131,6 +5153,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index()),
+        offset Some(facing.offset()),
         model { ("minecraft", "pink_wool") },
     }
     GrayShulkerBox {
@@ -5145,6 +5168,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index()),
+        offset Some(facing.offset()),
         model { ("minecraft", "gray_wool") },
     }
     LightGrayShulkerBox {
@@ -5159,6 +5183,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index()),
+        offset Some(facing.offset()),
         model { ("minecraft", "light_gray_wool") },
     }
     CyanShulkerBox {
@@ -5173,6 +5198,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index()),
+        offset Some(facing.offset()),
         model { ("minecraft", "cyan_wool") },
     }
     PurpleShulkerBox {
@@ -5187,6 +5213,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index()),
+        offset Some(facing.offset()),
         model { ("minecraft", "purple_wool") },
     }
     BlueShulkerBox {
@@ -5201,6 +5228,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index()),
+        offset Some(facing.offset()),
         model { ("minecraft", "blue_wool") },
     }
     BrownShulkerBox {
@@ -5215,6 +5243,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index()),
+        offset Some(facing.offset()),
         model { ("minecraft", "brown_wool") },
     }
     GreenShulkerBox {
@@ -5229,6 +5258,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index()),
+        offset Some(facing.offset()),
         model { ("minecraft", "green_wool") },
     }
     RedShulkerBox {
@@ -5243,6 +5273,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index()),
+        offset Some(facing.offset()),
         model { ("minecraft", "red_wool") },
     }
     BlackShulkerBox {
@@ -5257,6 +5288,7 @@ define_blocks! {
             ],
         },
         data Some(facing.index()),
+        offset Some(facing.offset()),
         model { ("minecraft", "black_wool") },
     }
     WhiteGlazedTerracotta {
@@ -5269,6 +5301,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index()),
+        offset Some(facing.horizontal_offset()),
         model { ("minecraft", "white_glazed_terracotta") },
         variant format!("facing={}", facing.as_string()),
     }
@@ -5282,6 +5315,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index()),
+        offset Some(facing.horizontal_offset()),
         model { ("minecraft", "orange_glazed_terracotta") },
         variant format!("facing={}", facing.as_string()),
     }
@@ -5295,6 +5329,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index()),
+        offset Some(facing.horizontal_offset()),
         model { ("minecraft", "magenta_glazed_terracotta") },
         variant format!("facing={}", facing.as_string()),
     }
@@ -5308,6 +5343,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index()),
+        offset Some(facing.horizontal_offset()),
         model { ("minecraft", "light_blue_glazed_terracotta") },
         variant format!("facing={}", facing.as_string()),
     }
@@ -5321,6 +5357,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index()),
+        offset Some(facing.horizontal_offset()),
         model { ("minecraft", "yellow_glazed_terracotta") },
         variant format!("facing={}", facing.as_string()),
     }
@@ -5334,6 +5371,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index()),
+        offset Some(facing.horizontal_offset()),
         model { ("minecraft", "lime_glazed_terracotta") },
         variant format!("facing={}", facing.as_string()),
     }
@@ -5347,6 +5385,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index()),
+        offset Some(facing.horizontal_offset()),
         model { ("minecraft", "pink_glazed_terracotta") },
         variant format!("facing={}", facing.as_string()),
     }
@@ -5360,6 +5399,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index()),
+        offset Some(facing.horizontal_offset()),
         model { ("minecraft", "gray_glazed_terracotta") },
         variant format!("facing={}", facing.as_string()),
     }
@@ -5373,6 +5413,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index()),
+        offset Some(facing.horizontal_offset()),
         model { ("minecraft", "silver_glazed_terracotta") },
         variant format!("facing={}", facing.as_string()),
     }
@@ -5386,6 +5427,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index()),
+        offset Some(facing.horizontal_offset()),
         model { ("minecraft", "cyan_glazed_terracotta") },
         variant format!("facing={}", facing.as_string()),
     }
@@ -5399,6 +5441,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index()),
+        offset Some(facing.horizontal_offset()),
         model { ("minecraft", "purple_glazed_terracotta") },
         variant format!("facing={}", facing.as_string()),
     }
@@ -5412,6 +5455,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index()),
+        offset Some(facing.horizontal_offset()),
         model { ("minecraft", "blue_glazed_terracotta") },
         variant format!("facing={}", facing.as_string()),
     }
@@ -5425,6 +5469,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index()),
+        offset Some(facing.horizontal_offset()),
         model { ("minecraft", "brown_glazed_terracotta") },
         variant format!("facing={}", facing.as_string()),
     }
@@ -5438,6 +5483,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index()),
+        offset Some(facing.horizontal_offset()),
         model { ("minecraft", "green_glazed_terracotta") },
         variant format!("facing={}", facing.as_string()),
     }
@@ -5451,6 +5497,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index()),
+        offset Some(facing.horizontal_offset()),
         model { ("minecraft", "red_glazed_terracotta") },
         variant format!("facing={}", facing.as_string()),
     }
@@ -5464,6 +5511,7 @@ define_blocks! {
             ],
         },
         data Some(facing.horizontal_index()),
+        offset Some(facing.horizontal_offset()),
         model { ("minecraft", "black_glazed_terracotta") },
         variant format!("facing={}", facing.as_string()),
     }
