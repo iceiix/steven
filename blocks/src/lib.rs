@@ -41,6 +41,11 @@ macro_rules! create_ids {
     );
 }
 
+struct VanillaIDMap {
+    flat: Vec<Option<Block>>,
+    hier: Vec<Option<Block>>,
+}
+
 macro_rules! define_blocks {
     (
         $(
@@ -129,7 +134,7 @@ macro_rules! define_blocks {
             }
 
             pub fn by_vanilla_id(id: usize) -> Block {
-                VANILLA_ID_MAP.get(id).and_then(|v| *v).unwrap_or(Block::Missing{})
+                VANILLA_ID_MAP.flat.get(id).and_then(|v| *v).unwrap_or(Block::Missing{})
             }
 
             #[allow(unused_variables, unreachable_code)]
@@ -245,8 +250,9 @@ macro_rules! define_blocks {
         }
 
         lazy_static! {
-            static ref VANILLA_ID_MAP: Vec<Option<Block>> = {
-                let mut blocks = vec![];
+            static ref VANILLA_ID_MAP: VanillaIDMap = {
+                let mut blocks_flat = vec![];
+                let mut blocks_hier = vec![];
                 let mut flat_id = 0;
                 let mut last_internal_id = 0;
                 let mut hier_block_id = 0;
@@ -367,18 +373,35 @@ macro_rules! define_blocks {
                             if offset as isize > last_offset {
                                 last_offset = offset as isize;
                             }
-                            if blocks.len() <= id {
-                                blocks.resize(id + 1, None);
+
+                            if blocks_flat.len() <= id {
+                                blocks_flat.resize(id + 1, None);
                             }
-                            if blocks[id].is_none() {
-                                blocks[id] = Some(block);
+                            if blocks_flat[id].is_none() {
+                                blocks_flat[id] = Some(block);
                             } else {
                                 panic!(
                                     "Tried to register {:#?} to {} but {:#?} was already registered",
                                     block,
                                     id,
-                                    blocks[id]
+                                    blocks_flat[id]
                                 );
+                            }
+
+                            if let Some(vanilla_id) = vanilla_id {
+                                if blocks_hier.len() <= vanilla_id {
+                                    blocks_hier.resize(vanilla_id + 1, None);
+                                }
+                                if blocks_hier[vanilla_id].is_none() {
+                                    blocks_hier[vanilla_id] = Some(block);
+                                } else {
+                                    panic!(
+                                        "Tried to register {:#?} to {} but {:#?} was already registered",
+                                        block,
+                                        id,
+                                        blocks_hier[vanilla_id]
+                                    );
+                                }
                             }
                         }
                     }
@@ -389,7 +412,7 @@ macro_rules! define_blocks {
                     }
                 })+
 
-                blocks
+                VanillaIDMap { flat: blocks_flat, hier: blocks_hier }
             };
         }
     );
@@ -661,9 +684,13 @@ define_blocks! {
         },
         data match variant {
             TreeVariant::Oak | TreeVariant::Spruce | TreeVariant::Birch | TreeVariant::Jungle =>
-                Some(variant.data()
-                      | (if decayable { 0x4 } else { 0x0 })
-                      | (if check_decay { 0x8 } else { 0x0 })),
+                if distance == 1 {
+                    Some(variant.data()
+                          | (if decayable { 0x4 } else { 0x0 })
+                          | (if check_decay { 0x8 } else { 0x0 }))
+                } else {
+                    None
+                },
             _ => None,
         },
         offset if check_decay {
@@ -2088,7 +2115,7 @@ define_blocks! {
             east: bool = [false, true],
             waterlogged: bool = [false, true],
         },
-        data if !north && !south && !east && !west { Some(0) } else { None },
+        data if !north && !south && !east && !west && !waterlogged { Some(0) } else { None },
         offset Some(if west { 0 } else { 1<<0 } +
             if waterlogged { 0 } else { 1<<1 } +
             if south { 0 } else { 1<<2 } +
@@ -2734,7 +2761,7 @@ define_blocks! {
             east: bool = [false, true],
             waterlogged: bool = [true, false],
         },
-        data if !north && !south && !west && !east { Some(0) } else { None },
+        data if !north && !south && !west && !east && !waterlogged { Some(0) } else { None },
         offset Some(if west { 0 } else { 1<<0 } +
             if waterlogged { 0 } else { 1<<1 } +
             if south { 0 } else { 1<<2 } +
@@ -3234,7 +3261,7 @@ define_blocks! {
             ],
             waterlogged: bool = [true, false],
         },
-        data if !north && !south && !east && !west && !up { Some(variant.data()) } else { None },
+        data if !north && !south && !east && !west && !up && !waterlogged { Some(variant.data()) } else { None },
         offset Some(if west { 0 } else { 1<<0 } +
                     if waterlogged { 0 } else { 1<<1 } +
                     if up { 0 } else { 1<<2 } +
