@@ -78,17 +78,30 @@ macro_rules! define_blocks {
 
         impl Block {
             #[allow(unused_variables, unreachable_code)]
-            pub fn get_vanilla_id(&self) -> Option<usize> {
+            pub fn get_internal_id(&self) -> usize {
+                match *self {
+                    $(
+                        Block::$name {
+                            $($fname,)*
+                        } => {
+                            internal_ids::$name
+                        }
+                    )+
+                }
+            }
+
+            #[allow(unused_variables, unreachable_code)]
+            pub fn get_hierarchical_data(&self) -> Option<usize> {
                 match *self {
                     $(
                         Block::$name {
                             $($fname,)*
                         } => {
                             $(
-                                let data: Option<usize> = ($datafunc).map(|v| v + (internal_ids::$name << 4));
+                                let data: Option<usize> = ($datafunc).map(|v| v);
                                 return data;
                             )*
-                            Some(internal_ids::$name << 4)
+                            Some(0)
                         }
                     )+
                 }
@@ -235,6 +248,8 @@ macro_rules! define_blocks {
             static ref VANILLA_ID_MAP: Vec<Option<Block>> = {
                 let mut blocks = vec![];
                 let mut flat_id = 0;
+                let mut last_internal_id = 0;
+                let mut hier_block_id = 0;
                 $({
                     #[allow(non_camel_case_types, dead_code)]
                     struct CombinationIter<$($fname),*> {
@@ -326,7 +341,20 @@ macro_rules! define_blocks {
                     );
                     let mut last_offset: isize = -1;
                     for block in iter {
-                        let vanilla_id = block.get_vanilla_id();
+                        let internal_id = block.get_internal_id();
+                        let hier_data: Option<usize> = block.get_hierarchical_data();
+                        let vanilla_id =
+                            if let Some(hier_data) = hier_data {
+                                if internal_id != last_internal_id {
+                                    hier_block_id += 1;
+                                }
+                                last_internal_id = internal_id;
+                                Some((hier_block_id << 4) + hier_data)
+                            } else {
+                                None
+                            };
+                        //println!("{:?} block state = internal {} last_internal {}, hier_block_id={}, hier_data={:?}", block, internal_id, last_internal_id, hier_block_id, hier_data);
+
                         let offset = block.get_flat_offset();
                         if let Some(offset) = offset {
                             let id = flat_id + offset;
