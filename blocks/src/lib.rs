@@ -363,17 +363,17 @@ macro_rules! define_blocks {
                             } else {
                                 None
                             };
-                        //println!("{:?} block state = internal {} last_internal {}, hier_block_id={}, hier_data={:?}", block, internal_id, last_internal_id, hier_block_id, hier_data);
 
                         let offset = block.get_flat_offset();
                         if let Some(offset) = offset {
                             let id = flat_id + offset;
-                            //let id = vanilla_id;
+                            /*
                             if let Some(vanilla_id) = vanilla_id {
                                 println!("{} block state = {:?} hierarchical {}:{} offset={}", id, block, vanilla_id >> 4, vanilla_id & 0xF, offset);
                             } else {
                                 println!("{} block state = {:?} hierarchical none, offset={}", id, block, offset);
                             }
+                            */
                             if offset as isize > last_offset {
                                 last_offset = offset as isize;
                             }
@@ -667,7 +667,7 @@ define_blocks! {
             ],
             axis: Axis = [Axis::X, Axis::Y, Axis::Z],
         },
-        data None::<usize>, // TODO: skip pre-1.13.2!
+        data None::<usize>,
         offset Some(variant.offset() * 3 + axis.index()),
         model { ("minecraft", format!("{}_wood", variant.as_string()) ) },
         variant format!("axis={}", axis.as_string()),
@@ -4299,7 +4299,7 @@ define_blocks! {
         collision stair_collision(facing, shape, half),
         update_state (world, pos) => Block::RedSandstoneStairs{facing, half, shape: update_stair_shape(world, pos, facing), waterlogged},
     }
-    WoodenSlabMaybeDouble {
+    WoodenSlabFlat {
         props {
             type_: BlockHalf = [
                 BlockHalf::Top,
@@ -4323,7 +4323,7 @@ define_blocks! {
         variant format!("type={}", type_.as_string()),
         collision slab_collision(type_),
     }
-    StoneSlabMaybeDouble {
+    StoneSlabFlat {
         props {
             type_: BlockHalf = [BlockHalf::Top, BlockHalf::Bottom, BlockHalf::Double],
             variant: StoneSlabVariant = [
@@ -5818,6 +5818,7 @@ define_blocks! {
         model { ("minecraft", "structure_block") },
         variant format!("mode={}", mode.as_string()),
     }
+
     Missing {
         props {},
         data None::<usize>,
