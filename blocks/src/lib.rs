@@ -133,8 +133,12 @@ macro_rules! define_blocks {
                 }
             }
 
-            pub fn by_vanilla_id(id: usize) -> Block {
-                VANILLA_ID_MAP.flat.get(id).and_then(|v| *v).unwrap_or(Block::Missing{})
+            pub fn by_vanilla_id(id: usize, protocol_version: i32) -> Block {
+                if protocol_version >= 404 {
+                    VANILLA_ID_MAP.flat.get(id).and_then(|v| *v).unwrap_or(Block::Missing{})
+                } else {
+                    VANILLA_ID_MAP.hier.get(id).and_then(|v| *v).unwrap_or(Block::Missing{})
+                }
             }
 
             #[allow(unused_variables, unreachable_code)]
