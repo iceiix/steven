@@ -808,7 +808,7 @@ define_blocks! {
         data if color != ColoredVariant::White { None } else { Some(facing.horizontal_index()
                   | (if occupied { 0x4 } else { 0x0 })
                   | (if part == BedPart::Head { 0x8 } else { 0x0 }))},
-        offset Some((color.data() - 1) * (2 * 2 * 4)
+        offset Some(color.data() * (2 * 2 * 4)
                   + (facing.horizontal_offset() * (2 * 2))
                   + (if occupied { 0 } else { 2 })
                   + (if part == BedPart::Head { 0 } else { 1 })),
