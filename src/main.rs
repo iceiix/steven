@@ -251,14 +251,14 @@ fn main() {
 
         let version = {
             let try_res = game.resource_manager.try_write();
-            if try_res.is_ok() {
+            if !try_res.is_ok() {
+                warn!("Failed to obtain mutable reference to resource manager!");
+                continue
+            }
+
             let mut res = try_res.unwrap();
             res.tick(&mut resui, &mut ui_container, delta);
             res.version()
-            } else {
-                println!("ERROR obtaining mutable reference to resource manager!");
-                3
-            }
         };
 
         let vsync_changed = *game.vars.get(settings::R_VSYNC);
