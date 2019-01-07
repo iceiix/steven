@@ -250,10 +250,14 @@ fn main() {
         let (physical_width, physical_height) = window.get_inner_size().unwrap().to_physical(game.dpi_factor).into();
 
         let version = {
-            let mut res = game.resource_manager.write().unwrap();
+            println!("obtaining mutable reference to resource manager");
+            let mut res = game.resource_manager.try_write().unwrap();
+            println!("about to tick resource");
             res.tick(&mut resui, &mut ui_container, delta);
+            println!("ticked resources, returning version");
             res.version()
         };
+        println!("version = {}", version);
 
         let vsync_changed = *game.vars.get(settings::R_VSYNC);
         if vsync != vsync_changed {
