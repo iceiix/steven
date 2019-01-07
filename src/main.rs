@@ -257,7 +257,8 @@ fn main() {
                 res.tick(&mut resui, &mut ui_container, delta);
                 res.version()
             } else {
-                warn!("Failed to obtain mutable reference to resource manager!");
+                // TODO: why does game.resource_manager.write() sometimes deadlock?
+                //warn!("Failed to obtain mutable reference to resource manager!");
                 last_resource_version
             }
         };
