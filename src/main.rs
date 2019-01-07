@@ -251,11 +251,17 @@ fn main() {
 
         let version = {
             println!("obtaining mutable reference to resource manager");
-            let mut res = game.resource_manager.try_write().unwrap();
+            let try_res = game.resource_manager.try_write();
+            if try_res.is_ok() {
+            let mut res = try_res.unwrap();
             println!("about to tick resource");
             res.tick(&mut resui, &mut ui_container, delta);
             println!("ticked resources, returning version");
             res.version()
+            } else {
+                println!("ERROR obtaining mutable reference to resource manager!");
+                3
+            }
         };
         println!("version = {}", version);
 
