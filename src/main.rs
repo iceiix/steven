@@ -240,6 +240,7 @@ fn main() {
     };
     game.renderer.camera.pos = cgmath::Point3::new(0.5, 13.2, 0.5);
 
+    let mut last_resource_version = 0;
     while !game.should_close {
 
         let now = Instant::now();
@@ -251,15 +252,16 @@ fn main() {
 
         let version = {
             let try_res = game.resource_manager.try_write();
-            if !try_res.is_ok() {
+            if try_res.is_ok() {
+                let mut res = try_res.unwrap();
+                res.tick(&mut resui, &mut ui_container, delta);
+                res.version()
+            } else {
                 warn!("Failed to obtain mutable reference to resource manager!");
-                continue
+                last_resource_version
             }
-
-            let mut res = try_res.unwrap();
-            res.tick(&mut resui, &mut ui_container, delta);
-            res.version()
         };
+        last_resource_version = version;
 
         let vsync_changed = *game.vars.get(settings::R_VSYNC);
         if vsync != vsync_changed {
