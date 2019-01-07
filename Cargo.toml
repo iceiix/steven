@@ -4,9 +4,6 @@ version = "0.0.1"
 authors = [ "Thinkofdeath <thinkofdeath@spigotmc.org>" ]
 edition = "2018"
 
-[profile.release]
-debug = true
-
 [profile.dev]
 # Steven runs horrendously slow with no optimizations, and often freezes.
 # However, building with full -O3 optimizations takes too long for a debug build.
