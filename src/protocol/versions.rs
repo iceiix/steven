@@ -14,6 +14,10 @@ pub fn translate_internal_packet_id_for_version(version: i32, state: State, dir:
     match version {
         // https://wiki.vg/Protocol_History
         // https://wiki.vg/Protocol_version_numbers#Versions_after_the_Netty_rewrite
+
+        // 18w50a
+        451 => v1_13_2::translate_internal_packet_id(state, dir, id, to_internal),
+
         // 1.13.2
         404 => v1_13_2::translate_internal_packet_id(state, dir, id, to_internal),
 
