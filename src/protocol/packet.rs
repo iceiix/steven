@@ -1638,6 +1638,12 @@ state_packets!(
                 field item_tags: LenPrefixed<VarInt, packet::Tags> =,
                 field fluid_tags: LenPrefixed<VarInt, packet::Tags> =,
             }
+            packet TagsWithEntities {
+                field block_tags: LenPrefixed<VarInt, packet::Tags> =,
+                field item_tags: LenPrefixed<VarInt, packet::Tags> =,
+                field fluid_tags: LenPrefixed<VarInt, packet::Tags> =,
+                field entity_tags: LenPrefixed<VarInt, packet::Tags> =,
+            }
        }
     }
     login Login {

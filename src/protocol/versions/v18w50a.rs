@@ -139,7 +139,7 @@ protocol_packet_ids!(
             0x54 => EntityProperties
             0x55 => EntityEffect
             0x56 => DeclareRecipes
-            0x57 => Tags
+            0x57 => TagsWithEntities
             //0x58 => UpdateLight
         }
     }
