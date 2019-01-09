@@ -1653,6 +1653,14 @@ state_packets!(
                 field fluid_tags: LenPrefixed<VarInt, packet::Tags> =,
                 field entity_tags: LenPrefixed<VarInt, packet::Tags> =,
             }
+            packet UpdateLight {
+                field chunk_x: VarInt =,
+                field chunk_z: VarInt =,
+                field sky_light_mask: VarInt =,
+                field block_light_mask: VarInt =,
+                field empty_sky_light_mask: VarInt =,
+                field light_arrays: Vec<u8> =,
+            }
        }
     }
     login Login {
