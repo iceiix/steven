@@ -868,6 +868,11 @@ impl World {
                 }
                 let section = chunk.sections[i as usize].as_mut().unwrap();
                 section.dirty = true;
+ 
+                if self.protocol_version >= 451 {
+                    let _block_count = data.read_u16::<byteorder::LittleEndian>()?;
+                    // TODO: use block_count
+                }
 
                 let mut bit_size = data.read_u8()?;
                 let mut mappings: HashMap<usize, block::Block, BuildHasherDefault<FNVHash>> = HashMap::with_hasher(BuildHasherDefault::default());
@@ -903,91 +908,11 @@ impl World {
                     }
                 }
 
-                data.read_exact(&mut section.block_light.data)?;
-                data.read_exact(&mut section.sky_light.data)?;
-            }
-
-            if new {
-                data.read_exact(&mut chunk.biomes)?;
-            }
-
-            chunk.calculate_heightmap();
-        }
-
-        self.dirty_chunks_by_bitmask(x, z, mask);
-        Ok(())
-    }
-
-    pub fn load_chunk114(&mut self, x: i32, z: i32, new: bool, mask: u16, data: Vec<u8>) -> Result<(), protocol::Error> {
-        use std::io::{Cursor, Read};
-        use byteorder::ReadBytesExt;
-        use crate::protocol::{VarInt, Serializable, LenPrefixed};
-
-        let mut data = Cursor::new(data);
-
-        let cpos = CPos(x, z);
-        {
-            let chunk = if new {
-                self.chunks.insert(cpos, Chunk::new(cpos));
-                self.chunks.get_mut(&cpos).unwrap()
-            } else {
-                if !self.chunks.contains_key(&cpos) {
-                    return Ok(());
-                }
-                self.chunks.get_mut(&cpos).unwrap()
-            };
-
-            for i in 0 .. 16 {
-                if chunk.sections[i].is_none() {
-                    let mut fill_sky = chunk.sections.iter()
-                        .skip(i)
-                        .all(|v| v.is_none());
-                    fill_sky &= (mask & !((1 << i) | ((1 << i) - 1))) == 0;
-                    if !fill_sky || mask & (1 << i) != 0 {
-                        chunk.sections[i] = Some(Section::new(i as u8, fill_sky));
-                    }
-                }
-                if mask & (1 << i) == 0 {
-                    continue;
-                }
-                let section = chunk.sections[i as usize].as_mut().unwrap();
-                section.dirty = true;
-
-                let mut bit_size = data.read_u8()?;
-                let mut mappings: HashMap<usize, block::Block, BuildHasherDefault<FNVHash>> = HashMap::with_hasher(BuildHasherDefault::default());
-                if bit_size == 0 {
-                    bit_size = 13;
+                if self.protocol_version >= 451 {
+                    // Skylight in update skylight packet for 1.14+
                 } else {
-                    let count = VarInt::read_from(&mut data)?.0;
-                    for i in 0 .. count {
-                        let id = VarInt::read_from(&mut data)?.0;
-                        let bl = block::Block::by_vanilla_id(id as usize, self.protocol_version);
-                        mappings.insert(i as usize, bl);
-                    }
-                }
-
-                let _block_count = data.read_u16::<byteorder::LittleEndian>()?;
-                // TODO: use block_count
-
-                let bits = LenPrefixed::<VarInt, u64>::read_from(&mut data)?.data;
-                let m = bit::Map::from_raw(bits, bit_size as usize);
-
-                for bi in 0 .. 4096 {
-                    let id = m.get(bi);
-                    section.blocks.set(bi, mappings.get(&id).cloned().unwrap_or(block::Block::by_vanilla_id(id, self.protocol_version)));
-                    // Spawn block entities
-                    let b = section.blocks.get(bi);
-                    if block_entity::BlockEntityType::get_block_entity(b).is_some() {
-                        let pos = Position::new(
-                            (bi & 0xF) as i32,
-                            (bi >> 8) as i32,
-                            ((bi >> 4) & 0xF) as i32
-                        ) + (chunk.position.0 << 4, (i << 4) as i32, chunk.position.1 << 4);
-                        if chunk.block_entities.contains_key(&pos) {
-                            self.block_entity_actions.push_back(BlockEntityAction::Remove(pos))
-                        }
-                        self.block_entity_actions.push_back(BlockEntityAction::Create(pos))
-                    }
+                    data.read_exact(&mut section.block_light.data)?;
+                    data.read_exact(&mut section.sky_light.data)?;
                 }
             }
 
