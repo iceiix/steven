@@ -1123,7 +1123,7 @@ impl Server {
     }
 
     fn on_chunk_data_heightmap(&mut self, chunk_data: packet::play::clientbound::ChunkData_HeightMap) {
-        self.world.load_chunk19(
+        self.world.load_chunk114(
             chunk_data.chunk_x,
             chunk_data.chunk_z,
             chunk_data.new,
