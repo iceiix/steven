@@ -2357,6 +2357,13 @@ pub enum RecipeData {
         experience: f32,
         cooking_time: VarInt,
     },
+    Campfire {
+        group: String,
+        ingredient: RecipeIngredient,
+        result: Option<item::Stack>,
+        experience: f32,
+        cooking_time: VarInt,
+    },
 }
 
 impl Default for RecipeData {
@@ -2428,6 +2435,13 @@ impl Serializable for Recipe {
                 cooking_time: Serializable::read_from(buf)?,
             },
             "smoking" => RecipeData::Smoking {
+                group: Serializable::read_from(buf)?,
+                ingredient: Serializable::read_from(buf)?,
+                result: Serializable::read_from(buf)?,
+                experience: Serializable::read_from(buf)?,
+                cooking_time: Serializable::read_from(buf)?,
+            },
+            "campfire" => RecipeData::Campfire {
                 group: Serializable::read_from(buf)?,
                 ingredient: Serializable::read_from(buf)?,
                 result: Serializable::read_from(buf)?,
