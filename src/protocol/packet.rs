@@ -1175,6 +1175,10 @@ state_packets!(
                 field yaw: f32 =,
                 field pitch: f32 =,
             }
+            /// Opens the book GUI.
+            packet OpenBook {
+                field hand: VarInt =,
+            }
             /// SignEditorOpen causes the client to open the editor for a sign so that
             /// it can write to it. Only sent in vanilla when the player places a sign.
             packet SignEditorOpen {
@@ -1561,6 +1565,14 @@ state_packets!(
                 field z: i32 =,
                 field volume: f32 =,
                 field pitch: u8 =,
+            }
+            /// Plays a sound effect from an entity.
+            packet EntitySoundEffect {
+                field sound_id: VarInt =,
+                field sound_category: VarInt =,
+                field entity_id: VarInt =,
+                field volume: f32 =,
+                field pitch: f32 =,
             }
             /// PlayerListHeaderFooter updates the header/footer of the player list.
             packet PlayerListHeaderFooter {

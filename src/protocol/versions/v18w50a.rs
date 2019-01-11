@@ -97,7 +97,7 @@ protocol_packet_ids!(
             0x29 => EntityLookAndMove_i16
             0x2a => EntityLook_VarInt
             0x2b => VehicleTeleport
-            //0x2c => OpenBook
+            0x2c => OpenBook
             0x2d => SignEditorOpen
             0x2e => CraftRecipeResponse
             0x2f => PlayerAbilities
@@ -131,7 +131,7 @@ protocol_packet_ids!(
             0x4b => TimeUpdate
             0x4d => StopSound
             0x4e => SoundEffect
-            //0x4f => EntitySoundEffect
+            0x4f => EntitySoundEffect
             0x50 => PlayerListHeaderFooter
             0x51 => CollectItem
             0x52 => EntityTeleport_f64
