@@ -73,7 +73,7 @@ protocol_packet_ids!(
             0x11 => DeclareCommands
             0x12 => ConfirmTransaction
             0x13 => WindowClose
-            0x14 => WindowOpen
+            0x14 => WindowOpenHorse
             0x15 => WindowItems
             0x16 => WindowProperty
             0x17 => WindowSetSlot
@@ -141,6 +141,8 @@ protocol_packet_ids!(
             0x56 => DeclareRecipes
             0x57 => TagsWithEntities
             0x58 => UpdateLight
+            0x59 => WindowOpen_VarInt
+            0x5a => TradeList
         }
     }
     login Login {
